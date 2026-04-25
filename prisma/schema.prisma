@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GitLabCache {
+  id        Int      @id @default(autoincrement())
+  date      String   @unique
+  data      String   // Store JSON string of events
+  updatedAt DateTime @updatedAt
+}
+
+model DailyReport {
+  id        Int      @id @default(autoincrement())
+  date      String   @unique // YYYY-MM-DD
+  masuk     String?
+  pulang    String?
+  ti        String?
+  aktivitas String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MonthlyReport {
+  id        Int      @id @default(autoincrement())
+  month     String   @unique // YYYY-MM
+  rows      String?  // JSON string of MonthlyReportRow[]
+  summary   String?  // The AI summary text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

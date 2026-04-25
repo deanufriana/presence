@@ -1,0 +1,36 @@
+{
+  "name": "report-absen",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "@vueuse/core": "^14.2.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "lucide-vue-next": "^1.0.0",
+    "nuxt": "^4.0.0",
+    "reka-ui": "^2.9.6",
+    "tailwind-merge": "^3.5.0",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0",
+    "vue-sonner": "^2.0.9"
+  },
+  "devDependencies": {
+    "@nuxtjs/color-mode": "^4.0.0",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@prisma/config": "^7.8.0",
+    "@types/node": "^25.6.0",
+    "prisma": "^6.2.1",
+    "shadcn-nuxt": "^2.6.2",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.4.2"
+  }
+}
