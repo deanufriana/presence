@@ -5,23 +5,10 @@ export default defineEventHandler(async (event): Promise<any> => {
 
     if (!month) return { success: false, error: 'Month required' }
 
-    const data = {
+    const updated = await upsertMonthlyReport({
       month,
-      rows: Array.isArray(rows) ? JSON.stringify(rows) : undefined,
-      summary: typeof summary === 'string' ? summary : undefined
-    }
-
-    const updated = await prisma.monthlyReport.upsert({
-      where: { month },
-      update: {
-        ...(data.rows !== undefined && { rows: data.rows }),
-        ...(data.summary !== undefined && { summary: data.summary })
-      },
-      create: {
-        month,
-        rows: data.rows || '[]',
-        summary: data.summary || ''
-      }
+      summary,
+      rows
     })
 
     return { success: true, report: updated }

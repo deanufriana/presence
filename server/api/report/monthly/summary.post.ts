@@ -16,33 +16,23 @@ export default defineEventHandler(async (event): Promise<any> => {
       return { success: false, error: 'No activities found for this month' }
     }
 
-    // Get month name for prompt context
-    const [year, monthNum] = month.split('-')
-    const monthName = new Intl.DateTimeFormat('id-ID', { month: 'long' }).format(new Date(parseInt(year), parseInt(monthNum) - 1))
-
-    const prompt = getMonthlyPrompt(activities, monthName)
+    const prompt = getMonthlyPrompt(activities)
     const rawContent = await generateSummary(prompt, { max_tokens: 1000 })
-    
-    // Improved JSON extraction using regex
-    let jsonStr = ""
-    const jsonMatch = rawContent.match(/\{[\s\S]*\}/)
-    if (jsonMatch) {
-      jsonStr = jsonMatch[0]
-    } else {
-      jsonStr = rawContent.trim()
-    }
 
-    try {
-      const parsed = JSON.parse(jsonStr)
-      return { 
-        success: true, 
-        summary: parsed.summary || "", 
-        rows: parsed.rows || [] 
-      }
-    } catch (parseError) {
-      console.error('Failed to parse AI monthly JSON. Raw content:', rawContent)
-      // Fallback: if parsing fails, return as summary
-      return { success: true, summary: rawContent, rows: [] }
+    // Parse the markdown output into structured rows
+    const rows = parseMonthlyMarkdown(rawContent)
+
+    // Persist the summary (raw markdown) and parsed rows
+    const report = await upsertMonthlyReport({
+      month,
+      summary: rawContent.trim(),
+      rows
+    })
+
+    return {
+      success: true,
+      summary: report.summary,
+      rows: report.rows
     }
   } catch (error: any) {
     console.error('AI Monthly Summary Error:', error)

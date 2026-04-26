@@ -130,16 +130,52 @@
 
             <!-- AI Section -->
             <div class="space-y-3 pt-2 border-t border-border/40">
-              <div class="flex items-center gap-2">
-                <div
-                  class="h-5 w-5 rounded bg-violet-500/10 flex items-center justify-center"
-                >
-                  <Sparkles class="h-3 w-3 text-violet-500" />
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="h-5 w-5 rounded bg-violet-500/10 flex items-center justify-center"
+                  >
+                    <Sparkles class="h-3 w-3 text-violet-500" />
+                  </div>
+                  <span class="text-sm font-medium">AI Configuration</span>
                 </div>
-                <span class="text-sm font-medium">AI Summary (Gemini)</span>
+                
+                <div class="flex bg-muted rounded-lg p-0.5 border">
+                  <button 
+                    class="px-2 py-1 text-[10px] rounded-md transition-all font-medium"
+                    :class="settings.ai_provider === 'gemini' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:bg-background/50'"
+                    @click="settings.ai_provider = 'gemini'; settings.ai_model = 'gemini-2.0-flash-lite'"
+                  >Gemini</button>
+                  <button 
+                    class="px-2 py-1 text-[10px] rounded-md transition-all font-medium"
+                    :class="settings.ai_provider === 'openai' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:bg-background/50'"
+                    @click="settings.ai_provider = 'openai'; settings.ai_model = 'gpt-4o-mini'"
+                  >OpenAI</button>
+                </div>
               </div>
+
               <div class="space-y-3 pl-7">
+                <!-- Model Selection -->
                 <div class="space-y-1.5">
+                  <Label class="text-xs">Model Selection</Label>
+                  <select 
+                    v-model="settings.ai_model"
+                    class="w-full h-9 bg-card border border-border/50 rounded-md px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+                  >
+                    <template v-if="settings.ai_provider === 'gemini'">
+                      <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite (Fastest)</option>
+                      <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                      <option value="gemini-1.5-pro">Gemini 1.5 Pro (Powerful)</option>
+                    </template>
+                    <template v-else>
+                      <option value="gpt-4o-mini">GPT-4o Mini (Recommended)</option>
+                      <option value="gpt-4o">GPT-4o</option>
+                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    </template>
+                  </select>
+                </div>
+
+                <div v-if="settings.ai_provider === 'gemini'" class="space-y-1.5">
                   <Label class="text-xs">Gemini API Key</Label>
                   <Input
                     v-model="settings.ai_api_key"
@@ -148,12 +184,12 @@
                     class="h-9 text-sm"
                   />
                   <p class="text-[10px] text-muted-foreground">
-                    Used to summarize technical commits into simple activity
-                    descriptions.
+                    Google's high-speed AI for text processing.
                   </p>
                 </div>
-                <div class="space-y-1.5">
-                  <Label class="text-xs">OpenAI API Key (ChatGPT)</Label>
+                
+                <div v-else class="space-y-1.5">
+                  <Label class="text-xs">OpenAI API Key</Label>
                   <Input
                     v-model="settings.openai_api_key"
                     type="password"
@@ -161,8 +197,7 @@
                     class="h-9 text-sm"
                   />
                   <p class="text-[10px] text-muted-foreground">
-                    Alternative provider. Uses gpt-4o-mini for fast and reliable
-                    summaries.
+                    Standard industry provider for GPT models.
                   </p>
                 </div>
               </div>

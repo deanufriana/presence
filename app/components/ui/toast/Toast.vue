@@ -19,7 +19,9 @@ interface Props extends ToastRootProps {
   description?: string
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  duration: 5000
+})
 const emits = defineEmits<ToastRootEmits>()
 
 const forwarded = useForwardPropsEmits(props, emits)

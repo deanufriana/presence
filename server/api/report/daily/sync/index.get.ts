@@ -3,7 +3,6 @@ import { format } from 'date-fns'
 export default defineEventHandler(async (event): Promise<any> => {
   const query = getQuery(event)
   const dateStr = query.date as string || new Date().toISOString().slice(0, 7)
-  const force = query.force === 'true'
 
   try {
     const [gitlabRes, calendarCache, reports]: any = await Promise.all([
@@ -58,14 +57,13 @@ export default defineEventHandler(async (event): Promise<any> => {
       })
     }
 
-    // 3. Build the Rows
+    // 3. Build the Rows and Save to DB
     const activeDates = Object.keys(groupedActivities).sort()
-    const rows = activeDates.map(date => ({
-      date,
-      masuk: getRandomTime('07:30', '08:00'),
-      pulang: getRandomTime('17:00', '17:30'),
-      ti: 'TI',
-      aktivitas: groupedActivities[date]!.map(a => a.trim().startsWith('-') ? a.trim() : `- ${a.trim()}`).join('\n')
+    const rows = await Promise.all(activeDates.map(async (date) => {
+      return await upsertDailyReport({
+        date,
+        activities: groupedActivities[date]!
+      })
     }))
 
     return {

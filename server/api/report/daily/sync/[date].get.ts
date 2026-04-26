@@ -47,15 +47,14 @@ export default defineEventHandler(async (event): Promise<any> => {
       })
     }
 
+    const report = await upsertDailyReport({
+      date: dateStr,
+      activities
+    })
+
     return {
       success: true,
-      data: {
-        date: dateStr,
-        masuk: getRandomTime('07:30', '08:00'),
-        pulang: getRandomTime('17:00', '17:30'),
-        ti: 'TI',
-        aktivitas: activities.map(a => a.trim().startsWith('-') ? a.trim() : `- ${a.trim()}`).join('\n')
-      }
+      data: report
     }
   } catch (error: any) {
     return {

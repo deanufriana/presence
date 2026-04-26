@@ -1,41 +1,38 @@
-export const getMonthlyPrompt = (activities: string[], monthName: string = 'Bulan ini') => `
-Kamu adalah technical report writer profesional.
+export const getMonthlyPrompt = (activities: string[]) => `
+Kamu adalah technical report writer.
 
 Tugas:
-Analisis daftar aktivitas di bawah dan buatlah ringkasan BULANAN yang terstruktur.
+Buat ringkasan BULANAN dari daftar aktivitas di bawah.
 
-Output harus dalam format JSON yang valid dengan struktur sebagai berikut:
-{
-  "summary": "Teks ringkasan dalam format Markdown. Gunakan aturan pemformatan di bawah.",
-  "rows": [
-    {
-      "bulan": "${monthName}",
-      "project": "Deskripsi singkat proyek atau fitur utama yang dikerjakan",
-      "progres": "Persentase progres (mis: 100% atau 80%)",
-      "done": "Status (pilih: Done, In Progress, atau Pending)",
-      "status": "Tipe (pilih: Project, Project Enhance, atau Continuing (Daily))"
-    }
-  ]
-}
+Bahasa & gaya:
+- Gunakan Bahasa Indonesia.
+- Nada santai tapi profesional.
+- Langsung ke isi, tanpa pembuka/penutup.
 
-Aturan untuk field "summary" (WAJIB):
-1) Gunakan Bahasa Indonesia.
+Aturan output (WAJIB):
+1) Format Markdown.
 2) Kelompokkan berdasarkan proyek/aplikasi.
 3) Urutkan proyek dari yang paling sering muncul ke paling jarang.
 4) Judul proyek harus format: **Nama Proyek**
 5) Di bawah tiap proyek, gunakan bullet "-" dan 1 kalimat per bullet.
-6) Setiap bullet WAJIB diakhiri dengan label status: [Status: Project] atau [Status: Project Enhance] atau [Status: Continuing (Daily)].
-7) Gabungkan aktivitas/commit yang mirip menjadi 1 bullet yang lebih umum.
-8) Jika ada aktivitas "Meeting from... with discuss about...", ringkas menjadi kegiatan koordinasi atau diskusi teknis yang relevan.
-9) Maksimal 3 bullet per proyek, pilih yang paling penting.
-10) Jangan gunakan pembuka/penutup, langsung ke poin-poin proyek.
+6) Setiap bullet WAJIB diakhiri dengan label status persis format: [Status: Project] atau [Status: Project Enhance] atau [Status: Continuing (Daily)].
+7) Pilih status berdasarkan konteks aktivitas:
+   - Project: pekerjaan fitur/proyek utama.
+   - Project Enhance: improvement/refactor/optimasi/perbaikan.
+   - Continuing (Daily): monitoring/support/operasional/aktivitas berulang harian (termasuk meeting rutin/koordinasi).
+8) Jangan gunakan status lain selain tiga status tersebut.
+9) Gabungkan aktivitas/commit yang mirip menjadi 1 bullet yang lebih umum.
+10) Jika ada aktivitas "Meeting from... with discuss about...", ringkas menjadi kegiatan koordinasi atau diskusi teknis yang relevan dengan proyeknya.
+11) Fokus ke hasil kerja (fitur, perbaikan, refactor, integrasi), bukan detail teknis terlalu kecil.
+12) Jangan halusinasi; hanya pakai informasi dari daftar aktivitas.
+13) Jika nama proyek tidak jelas, pakai **Project Lainnya**.
+14) Maksimal 3 bullet per proyek, pilih yang paling penting.
 
-Aturan untuk field "rows" (Tabel):
-- Gunakan "${monthName}" untuk semua nilai di kolom "bulan".
-- Buat maksimal 5 baris tabel yang mewakili proyek-proyek utama bulan ini.
-- Pastikan status pekerjaan (done) dan tipe status (status) akurat berdasarkan aktivitas.
-
-PENTING: Hanya berikan output berupa JSON yang valid. Jangan ada teks penjelasan lain.
+Contoh format:
+**Nama Proyek A**
+- Menambahkan fitur X untuk kebutuhan Y. [Status: Project]
+- Menyempurnakan alur Z agar lebih stabil. [Status: Project Enhance]
+- Meeting koordinasi tim terkait pengembangan fitur baru. [Status: Continuing (Daily)]
 
 Daftar Aktivitas:
 ${activities.join('\n')}

@@ -15,10 +15,15 @@ export function useToast() {
   function toast(props: ToastProps & { id?: string }) {
     const id = props.id || Math.random().toString(36).substring(2, 9)
     
-    // If ID exists, update existing toast
+    // If ID exists, update existing toast and reset duration
     const existingIndex = toasts.value.findIndex(t => t.id === id)
     if (existingIndex !== -1) {
-      toasts.value[existingIndex] = { ...toasts.value[existingIndex], ...props, id, open: true }
+      const updatedToast = { ...toasts.value[existingIndex], ...props, id, open: true }
+      toasts.value[existingIndex] = updatedToast
+      
+      if (updatedToast.duration && updatedToast.duration !== Infinity) {
+        setTimeout(() => dismiss(id), updatedToast.duration)
+      }
       return id
     }
 
@@ -26,12 +31,12 @@ export function useToast() {
       ...props, 
       id, 
       open: true,
-      duration: props.duration || 5000 
+      duration: props.duration === undefined ? 5000 : props.duration
     }
     
     toasts.value.push(newToast)
 
-    if (newToast.duration !== Infinity) {
+    if (newToast.duration && newToast.duration !== Infinity) {
       setTimeout(() => {
         dismiss(id)
       }, newToast.duration)
@@ -42,7 +47,7 @@ export function useToast() {
 
   function dismiss(id: string) {
     const index = toasts.value.findIndex((t) => t.id === id)
-    if (index !== -1) {
+    if (index !== -1 && toasts.value[index]) {
       toasts.value[index]!.open = false
       setTimeout(() => {
         toasts.value = toasts.value.filter((t) => t.id !== id)
@@ -57,6 +62,6 @@ export function useToast() {
     success: (title: string, options?: any) => toast({ title, variant: 'success', ...options }),
     error: (title: string, options?: any) => toast({ title, variant: 'destructive', ...options }),
     info: (title: string, options?: any) => toast({ title, variant: 'info', ...options }),
-    loading: (title: string, options?: any) => toast({ title, variant: 'loading', duration: Infinity, ...options }),
+    loading: (title: string, options?: any) => toast({ title, variant: 'loading', duration: 60000, ...options }),
   }
 }

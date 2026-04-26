@@ -77,7 +77,7 @@ export const useGitlabStore = defineStore('gitlab', () => {
     fetchingProjects.value = true
     try {
       const data: any = await $fetch("/api/gitlab/projects" as any)
-      allProjects.value = data
+      allProjects.value = data.projects || []
     } catch (err) {
       console.error("Failed to fetch projects:", err)
       error("Failed to fetch GitLab projects")

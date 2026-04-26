@@ -23,6 +23,8 @@ export const useCoreStore = defineStore('core', () => {
     gitlab_selected_projects: "",
     ai_api_key: "",
     openai_api_key: "",
+    ai_provider: "gemini",
+    ai_model: "gemini-2.0-flash-lite",
   })
 
   const isAiEnabled = computed(() => !!(settings.value.ai_api_key || settings.value.openai_api_key))

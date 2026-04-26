@@ -7,23 +7,28 @@ export interface AiOptions {
 
 export const generateSummary = async (prompt: string, options: AiOptions): Promise<string> => {
   try {
-    return await callGemini(prompt, options)
-  } catch (geminiError: any) {
-    console.error('Gemini failed:', geminiError.message)
+    const [providerSetting, modelSetting] = await Promise.all([
+      prisma.setting.findUnique({ where: { key: 'ai_provider' } }),
+      prisma.setting.findUnique({ where: { key: 'ai_model' } })
+    ])
 
-    // Only fallback to OpenAI if a key is provided
-    const openAiKey = await prisma.setting.findUnique({ where: { key: 'openai_api_key' } })
-    if (openAiKey?.value) {
-      return await callOpenAi(prompt, options)
+    const provider = providerSetting?.value || 'gemini'
+    const model = modelSetting?.value || options.model
+
+    if (provider === 'openai') {
+      return await callOpenAi(prompt, { ...options, model })
     }
 
-    throw geminiError
+    return await callGemini(prompt, { ...options, model })
+  } catch (error: any) {
+    console.error('AI Summary failed:', error.message)
+    throw error
   }
 }
 
 async function callOpenAi (prompt: string, options: AiOptions): Promise<string> {
   const aiKeySetting = await prisma.setting.findUnique({ where: { key: 'openai_api_key' } })
-  if (!aiKeySetting?.value) throw new Error('AI API Key not configured in settings')
+  if (!aiKeySetting?.value) throw new Error('OpenAI API Key not configured in settings')
 
   const isJson = prompt.toLowerCase().includes('json')
   const response: any = await (globalThis as any).$fetch('https://api.openai.com/v1/chat/completions', {
@@ -33,7 +38,7 @@ async function callOpenAi (prompt: string, options: AiOptions): Promise<string> 
       'Content-Type': 'application/json'
     },
     body: {
-      model: 'gpt-4o-mini',
+      model: options.model || 'gpt-4o-mini',
       messages: [
         { role: 'system', content: 'Anda adalah asisten profesional yang membantu merangkum aktivitas kerja.' },
         { role: 'user', content: prompt }

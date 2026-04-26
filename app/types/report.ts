@@ -26,6 +26,8 @@ export interface SettingsData {
   gitlab_selected_projects: string;
   ai_api_key: string;
   openai_api_key: string;
+  ai_provider: 'gemini' | 'openai';
+  ai_model: string;
 }
 
 export interface MonthlyReportRow {

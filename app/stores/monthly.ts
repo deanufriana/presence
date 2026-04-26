@@ -6,7 +6,7 @@ import type { MonthlyReportRow } from '~/types/report'
 
 export const useMonthlyStore = defineStore('monthly', () => {
   const core = useCoreStore()
-  const { success, error, loading, dismiss } = useToast()
+  const { success, error, loading } = useToast()
 
   const monthlyRows = ref<MonthlyReportRow[]>([])
   const monthlyHighlights = ref("")
