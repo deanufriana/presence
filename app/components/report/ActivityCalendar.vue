@@ -32,7 +32,7 @@
           <Button
             variant="outline"
             size="sm"
-            @click="$emit('refreshGitlab')"
+            @click="fetchGitlabFresh()"
             :disabled="fetchingGitlab"
             class="gap-1.5 text-xs h-7 border-orange-500/20 hover:bg-orange-500/5 text-orange-600 dark:text-orange-400"
           >
@@ -76,7 +76,7 @@
           <div
             v-for="day in calendarDays"
             :key="day.date"
-            @click="$emit('openManualEntry', day)"
+            @click="openManualEntry(day)"
             class="relative aspect-square rounded-md border border-border/40 flex flex-col items-center justify-center group transition-all cursor-pointer hover:border-primary"
             :class="[
               day.count > 0
@@ -98,7 +98,7 @@
             <!-- Day Action Button (top-right) -->
             <button
               v-if="day.hasManual"
-              @click.stop="$emit('deleteManualActivity', day.date)"
+              @click.stop="deleteManualActivity(day.date)"
               class="absolute -top-1.5 -right-1.5 h-7 w-7 flex items-center justify-center rounded-full border border-red-500/50 bg-red-500/25 text-red-200 hover:bg-red-500/40 hover:text-white shadow-lg shadow-red-500/20 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
               title="Delete activity"
             >
@@ -106,7 +106,7 @@
             </button>
             <button
               v-else-if="day.count > 0"
-              @click.stop="$emit('syncDayActivity', day.date)"
+              @click.stop="syncDayActivity(day.date)"
               class="absolute -top-1.5 -right-1.5 h-7 w-7 flex items-center justify-center rounded-full border border-orange-500/50 bg-orange-500/20 text-orange-200 hover:bg-orange-500/35 hover:text-white shadow-lg shadow-orange-500/20 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
               title="Sync activity from commits"
             >
@@ -197,8 +197,15 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
+import { useCoreStore } from "~/stores/core";
+import { useDailyStore } from "~/stores/daily";
+import { useGitlabStore } from "~/stores/gitlab";
+import { useCalendarStore } from "~/stores/calendar";
 import { CalendarRange, RefreshCw, Trash2 } from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
+import { format, parse } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 import {
   Card,
   CardHeader,
@@ -206,17 +213,23 @@ import {
   CardContent,
 } from "~/components/ui/card";
 
-defineProps<{
-  formattedDate: string;
-  fetchingGitlab: boolean;
-  calendarBlanks: number;
-  calendarDays: any[];
-}>();
+const coreStore = useCoreStore();
+const dailyStore = useDailyStore();
+const gitlabStore = useGitlabStore();
+const calendarStore = useCalendarStore();
 
-defineEmits<{
-  openManualEntry: [day: any];
-  refreshGitlab: [];
-  deleteManualActivity: [date: string];
-  syncDayActivity: [date: string];
-}>();
+const { fetchingGitlab } = storeToRefs(gitlabStore);
+const { calendarBlanks, calendarDays } = storeToRefs(calendarStore);
+
+const { openManualEntry, deleteManualActivity, syncDayActivity } = dailyStore;
+const { fetchGitlabFresh } = gitlabStore;
+
+const formattedDate = computed(() => {
+  try {
+    const d = parse(coreStore.selectedDate, "yyyy-MM", new Date());
+    return format(d, "MMMM yyyy", { locale: idLocale });
+  } catch {
+    return "";
+  }
+});
 </script>

@@ -141,3 +141,15 @@ export async function syncGitLabEvents (dateStr: string, force: boolean = false)
 
   return { success: true, events: allCommits, date: dateStr }
 }
+
+export async function getGitLabCache (dateStr: string) {
+  const cacheEntry = await prisma.gitLabCache.findUnique({
+    where: { date: dateStr }
+  })
+
+  if (cacheEntry) {
+    return { success: true, events: JSON.parse(cacheEntry.data), date: dateStr, cached: true }
+  }
+
+  return { success: true, events: [], date: dateStr, cached: true }
+}

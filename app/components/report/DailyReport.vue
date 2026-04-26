@@ -138,9 +138,7 @@
 
                 <button
                   v-if="
-                    isAiEnabled &&
-                    row.aktivitas &&
-                    row.aktivitas.length > 5
+                    isAiEnabled && row.aktivitas && row.aktivitas.length > 5
                   "
                   @click.stop="summarizeRow(row)"
                   class="h-6 w-6 flex items-center justify-center rounded-md text-violet-500 hover:bg-violet-500/10 transition-all"
@@ -155,6 +153,21 @@
                     class="h-3.5 w-3.5 animate-spin text-violet-600"
                   />
                   <Sparkles v-else class="h-3.5 w-3.5" />
+                </button>
+
+                <button
+                  @click.stop="syncDayActivity(row.date)"
+                  class="h-6 w-6 flex items-center justify-center rounded-md text-emerald-500 hover:bg-emerald-500/10 transition-all"
+                  :class="{
+                    'opacity-100 bg-emerald-500/5': syncingRows[row.date],
+                  }"
+                  :disabled="syncingRows[row.date]"
+                  title="Sync Day Activity"
+                >
+                  <RefreshCw
+                    class="h-3.5 w-3.5"
+                    :class="{ 'animate-spin': syncingRows[row.date] }"
+                  />
                 </button>
 
                 <button
@@ -173,7 +186,7 @@
                 class="flex flex-col items-center justify-center text-center text-muted-foreground"
               >
                 <FileText class="h-8 w-8 mb-2 opacity-20" />
-                <span>Click "Sync GitLab" to create your report...</span>
+                <span>Click "Sync Activity" to auto create your report...</span>
               </div>
             </td>
           </tr>
@@ -184,7 +197,18 @@
 </template>
 
 <script setup lang="ts">
-import { FileText, Copy, Check, Sparkles, RefreshCw, Trash2 } from "lucide-vue-next";
+import { storeToRefs } from "pinia";
+import { useToast } from "~/composables/use-toast";
+import { useDailyStore } from "~/stores/daily";
+import { useCoreStore } from "~/stores/core";
+import {
+  FileText,
+  Copy,
+  Check,
+  Sparkles,
+  RefreshCw,
+  Trash2,
+} from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -193,22 +217,21 @@ import {
   CardDescription,
   CardContent,
 } from "~/components/ui/card";
-import type { ReportRow, SettingsData } from "~/composables/useReport";
 
-defineProps<{
-  localRows: ReportRow[];
-  settings: SettingsData;
-  copied: boolean;
-  pending: boolean;
-  summarizingRows: Record<string, boolean>;
-}>();
+const coreStore = useCoreStore();
+const dailyStore = useDailyStore();
+const { success } = useToast();
 
-const { copyReport, summarizeRow, openManualEntry, isAiEnabled, removeDailyRow } = useReport();
+const { isAiEnabled, pending, copied } = storeToRefs(coreStore);
+const { localRows, summarizingRows, syncingRows } = storeToRefs(dailyStore);
+
+const { copyReport, summarizeRow, openManualEntry, removeDailyRow, syncDayActivity } = dailyStore;
 
 const copiedRows = ref<Record<string, boolean>>({});
 
 const copyRow = (text: string, date: string) => {
   navigator.clipboard.writeText(text);
+  success(`Copied activity for ${date}`);
   copiedRows.value[date] = true;
   setTimeout(() => {
     copiedRows.value[date] = false;

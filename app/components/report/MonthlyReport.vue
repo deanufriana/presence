@@ -239,34 +239,22 @@ import {
   CardDescription,
   CardContent,
 } from "~/components/ui/card";
-import type {
-  ReportRow,
-  SettingsData,
-  MonthlyReportRow,
-} from "~/composables/useReport";
+import { storeToRefs } from "pinia";
+import { useCoreStore } from "~/stores/core";
+import { useMonthlyStore } from "~/stores/monthly";
+import { useDailyStore } from "~/stores/daily";
 import { format, parse } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
-const props = defineProps<{
-  localRows: ReportRow[];
-  settings: SettingsData;
-  summarizing: boolean;
-  copiedMonthly: boolean;
-  monthlyHighlights: string;
-  monthlyRows: MonthlyReportRow[];
-  selectedDate: string;
-}>();
+const coreStore = useCoreStore();
+const monthlyStore = useMonthlyStore();
+const dailyStore = useDailyStore();
 
-defineEmits<{}>();
+const { isAiEnabled, selectedDate } = storeToRefs(coreStore);
+const { monthlyRows, monthlyHighlights, summarizing, copiedMonthly } = storeToRefs(monthlyStore);
+const { localRows } = storeToRefs(dailyStore);
 
-const {
-  generateAiSummary,
-  addMonthlyRow,
-  removeMonthlyRow,
-  copyMonthlyReport,
-  monthlyHighlights,
-  isAiEnabled,
-} = useReport();
+const { generateAiSummary, addMonthlyRow, removeMonthlyRow, copyMonthlyReport } = monthlyStore;
 
 const copiedRows = ref<Record<string, boolean>>({});
 
@@ -280,7 +268,7 @@ const copyRow = (text: string, id: string) => {
 
 const formattedMonth = computed(() => {
   try {
-    const d = parse(props.selectedDate, "yyyy-MM", new Date());
+    const d = parse(selectedDate.value, "yyyy-MM", new Date());
     return format(d, "MMMM", { locale: idLocale });
   } catch {
     return "";

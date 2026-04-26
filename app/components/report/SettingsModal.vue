@@ -211,7 +211,9 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import type { SettingsData } from "~/composables/useReport";
+import { useCoreStore } from "~/stores/core";
+import { useGitlabStore } from "~/stores/gitlab";
+import type { SettingsData } from "~/types/report";
 
 defineProps<{
   modelValue: boolean;
@@ -226,5 +228,9 @@ defineEmits<{
   "update:modelValue": [value: boolean];
 }>();
 
-const { saveSettings, fetchProjects, toggleProject } = useReport();
+const coreStore = useCoreStore();
+const gitlabStore = useGitlabStore();
+
+const { saveSettings } = coreStore;
+const { fetchProjects, toggleProject } = gitlabStore;
 </script>

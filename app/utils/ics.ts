@@ -1,6 +1,8 @@
 export interface CalendarEvent {
   date: string; // YYYY-MM-DD
   summary: string;
+  startTime?: string; // HH:mm
+  endTime?: string; // HH:mm
 }
 
 /**
@@ -16,17 +18,30 @@ export function parseICS(content: string): CalendarEvent[] {
     if (!block) continue;
 
     const summaryMatch = block.match(/SUMMARY:(.*)/);
-    const dtstartMatch = block.match(/DTSTART(?:;[^:]*)?:(\d{8})/);
+    const dtstartMatch = block.match(/DTSTART(?:;[^:]*)?:(\d{8})T(\d{4})/);
+    const dtendMatch = block.match(/DTEND(?:;[^:]*)?:(\d{8})T(\d{4})/);
 
     if (summaryMatch && dtstartMatch) {
       const summary = summaryMatch[1]?.trim() || 'Meeting';
       const rawDate = dtstartMatch[1]; // YYYYMMDD
+      const rawStartTime = dtstartMatch[2]; // HHmm
       
       if (rawDate && rawDate.length === 8) {
         const year = rawDate.substring(0, 4);
         const month = rawDate.substring(4, 6);
         const day = rawDate.substring(6, 8);
         const date = `${year}-${month}-${day}`;
+
+        let startTime = "";
+        if (rawStartTime) {
+          startTime = `${rawStartTime.substring(0, 2)}:${rawStartTime.substring(2, 4)}`;
+        }
+
+        let endTime = "";
+        if (dtendMatch && dtendMatch[2]) {
+          const rawEndTime = dtendMatch[2];
+          endTime = `${rawEndTime.substring(0, 2)}:${rawEndTime.substring(2, 4)}`;
+        }
 
         // Skip recurring rules for now as they are complex to parse without a library,
         // but most exported calendars for a specific period will have expanded instances
@@ -37,7 +52,7 @@ export function parseICS(content: string): CalendarEvent[] {
           continue;
         }
 
-        events.push({ date, summary });
+        events.push({ date, summary, startTime, endTime });
       }
     }
   }

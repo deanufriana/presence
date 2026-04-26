@@ -124,7 +124,7 @@
         >
       </div>
       <div class="ml-auto text-muted-foreground/60">
-        {{ formattedDate }}
+        {{ dateDisplay }}
       </div>
     </div>
 
@@ -146,38 +146,15 @@
       </TabsList>
 
       <TabsContent value="daily">
-        <DailyReport
-          :local-rows="localRows"
-          :settings="settings"
-          :copied="copied"
-          :pending="pending"
-          :summarizing-rows="summarizingRows"
-        />
+        <DailyReport />
       </TabsContent>
 
       <TabsContent value="monthly">
-        <MonthlyReport
-          :local-rows="localRows"
-          :settings="settings"
-          :summarizing="summarizing"
-          :copied-monthly="copiedMonthly"
-          :monthly-highlights="monthlyHighlights"
-          :monthly-rows="monthlyRows"
-          :selected-date="selectedDate"
-        />
+        <MonthlyReport />
       </TabsContent>
 
       <TabsContent value="activity">
-        <ActivityCalendar
-          :formatted-date="formattedDate"
-          :fetching-gitlab="fetchingGitlab"
-          :calendar-blanks="calendarBlanks"
-          :calendar-days="calendarDays"
-          @open-manual-entry="openManualEntry"
-          @refresh-gitlab="fetchGitlabFresh"
-          @delete-manual-activity="deleteManualActivity"
-          @sync-day-activity="syncDayActivity"
-        />
+        <ActivityCalendar />
       </TabsContent>
     </Tabs>
 
@@ -242,46 +219,54 @@ import SettingsModal from "~/components/report/SettingsModal.vue";
 import SyncConfirmModal from "~/components/report/SyncConfirmModal.vue";
 import ManualActivityModal from "~/components/report/ManualActivityModal.vue";
 
+import { useCoreStore } from '~/stores/core'
+import { useDailyStore } from '~/stores/daily'
+import { useMonthlyStore } from '~/stores/monthly'
+import { useGitlabStore } from '~/stores/gitlab'
+import { useCalendarStore } from '~/stores/calendar'
+import { storeToRefs } from 'pinia'
+
+const coreStore = useCoreStore()
+const gitlabStore = useGitlabStore()
+
 const {
   selectedDate,
   showSettings,
   saving,
-  copied,
-  summarizing,
-  monthlyHighlights,
-  showManualEntry,
-  showConfirmSync,
-  syncing,
-  importingCalendar,
-  fetchingGitlab,
-  gitlabData,
-  selectedDayForEntry,
-  manualActivityText,
-  fetchingProjects,
-  allProjects,
-  summarizingRows,
-  selectedProjectIds,
-  localRows,
   pending,
   settings,
-  monthlyRows,
-  copiedMonthly,
-  formattedDate,
-  calendarBlanks,
-  calendarDays,
-  fetchGitlabFresh,
-  confirmSync,
+} = storeToRefs(coreStore)
+
+const {
+  fetchingProjects,
+  allProjects,
+  selectedProjectIds,
+  gitlabData,
+} = storeToRefs(gitlabStore)
+
+const dailyStore = useDailyStore()
+
+const {
+  showConfirmSync,
+  showManualEntry,
+  selectedDayForEntry,
+  manualActivityText,
+  syncing,
+} = storeToRefs(dailyStore)
+
+const {
   executeSync,
-  openManualEntry,
   saveManualActivity,
-  deleteManualActivity,
-  syncDayActivity,
-  importCalendar,
-  generateAiSummary,
-  copyMonthlyReport,
-  addMonthlyRow,
-  removeMonthlyRow,
-} = useReport();
+  confirmSync,
+} = dailyStore
+
+const calendarStore = useCalendarStore()
+const { importingCalendar } = storeToRefs(calendarStore)
+const { importCalendar } = calendarStore
+
+onMounted(() => {
+  coreStore.init()
+})
 
 // ─── Date Handling ────────────────────────────────
 const df = new DateFormatter("en-US", {

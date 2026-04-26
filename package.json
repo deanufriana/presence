@@ -10,17 +10,18 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.11.3",
     "@prisma/client": "^6.2.1",
     "@vueuse/core": "^14.2.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "lucide-vue-next": "^1.0.0",
+    "pinia": "^3.0.4",
     "reka-ui": "^2.9.6",
     "tailwind-merge": "^3.5.0",
     "vue": "^3.5.24",
-    "vue-router": "^4.3.0",
-    "vue-sonner": "^2.0.9"
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@prisma/config": "^7.8.0",

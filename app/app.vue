@@ -1,10 +1,19 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-    <Toaster position="top-center" richColors />
-  </NuxtLayout>
+  <div>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+    <Toaster />
+  </div>
 </template>
 
-<script setup>
-import { Toaster } from 'vue-sonner'
+<script setup lang="ts">
+import Toaster from '~/components/ui/toast/Toaster.vue'
+import { useToast } from '~/composables/use-toast'
+
+const { success } = useToast()
+
+onMounted(() => {
+  success('App Ready', 'System initialized successfully')
+})
 </script>

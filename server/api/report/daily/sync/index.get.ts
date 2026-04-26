@@ -7,7 +7,7 @@ export default defineEventHandler(async (event): Promise<any> => {
 
   try {
     const [gitlabRes, calendarCache, reports]: any = await Promise.all([
-      syncGitLabEvents(dateStr, force),
+      getGitLabCache(dateStr),
       getCalendarCache(dateStr),
       getDailyReports(dateStr)
     ])
@@ -34,8 +34,15 @@ export default defineEventHandler(async (event): Promise<any> => {
         const date = ev.date
         if (!groupedActivities[date]) groupedActivities[date] = []
 
-        if (ev.summary && !groupedActivities[date].includes(ev.summary)) {
-          groupedActivities[date].push(ev.summary)
+        let act = ev.summary
+        if (ev.startTime && ev.endTime) {
+          act = `Meeting from ${ev.startTime} to ${ev.endTime} with discuss about ${ev.summary}`
+        } else if (ev.startTime) {
+          act = `Meeting at ${ev.startTime} with discuss about ${ev.summary}`
+        }
+
+        if (act && !groupedActivities[date].includes(act)) {
+          groupedActivities[date].push(act)
         }
       })
     }
