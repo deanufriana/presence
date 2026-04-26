@@ -23,10 +23,10 @@
     "vue-sonner": "^2.0.9"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.18",
-    "nuxt": "^4.4.2",
     "@prisma/config": "^7.8.0",
+    "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^25.6.0",
+    "nuxt": "^4.4.2",
     "prisma": "^6.2.1",
     "shadcn-nuxt": "^2.6.2",
     "tailwindcss": "^4.1.18",

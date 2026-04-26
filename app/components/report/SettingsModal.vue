@@ -128,59 +128,6 @@
               </div>
             </div>
 
-            <Separator />
-
-            <!-- Microsoft Section -->
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <div
-                    class="h-5 w-5 rounded bg-blue-500/10 flex items-center justify-center"
-                  >
-                    <CalendarDays class="h-3 w-3 text-blue-500" />
-                  </div>
-                  <span class="text-sm font-medium">Microsoft (OAuth2)</span>
-                </div>
-                <Button
-                  v-if="settings.ms_client_id && settings.ms_client_secret"
-                  size="sm"
-                  variant="outline"
-                  @click="loginWithMicrosoft"
-                  class="h-7 px-2 text-[10px] gap-1"
-                >
-                  <LogIn class="h-3 w-3" />
-                  Login Now
-                </Button>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-7">
-                <div class="space-y-1.5">
-                  <Label class="text-xs">Client ID</Label>
-                  <Input
-                    v-model="settings.ms_client_id"
-                    placeholder="Azure Application ID"
-                    class="h-9 text-sm"
-                  />
-                </div>
-                <div class="space-y-1.5">
-                  <Label class="text-xs">Client Secret</Label>
-                  <Input
-                    v-model="settings.ms_client_secret"
-                    type="password"
-                    placeholder="Azure Client Secret"
-                    class="h-9 text-sm"
-                  />
-                </div>
-              </div>
-              <div class="pl-7 mt-2">
-                <div
-                  v-if="settings.ms_access_token"
-                  class="flex items-center gap-2 text-[10px] text-emerald-500 font-medium"
-                >
-                  <CheckCircle2 class="h-3 w-3" />
-                  Successfully Authenticated
-                </div>
-              </div>
-            </div>
             <!-- AI Section -->
             <div class="space-y-3 pt-2 border-t border-border/40">
               <div class="flex items-center gap-2">
@@ -250,13 +197,9 @@ import {
   Settings,
   RefreshCw,
   GitMerge,
-  CalendarDays,
-  Check,
-  LogIn,
-  CheckCircle2,
   Sparkles,
+  Check,
 } from "lucide-vue-next";
-import { Separator } from "~/components/ui/separator";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -283,10 +226,5 @@ defineEmits<{
   "update:modelValue": [value: boolean];
 }>();
 
-const {
-  saveSettings,
-  fetchProjects,
-  toggleProject,
-  loginWithMicrosoft,
-} = useReport();
+const { saveSettings, fetchProjects, toggleProject } = useReport();
 </script>

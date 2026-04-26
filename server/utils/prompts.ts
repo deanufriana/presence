@@ -1,28 +1,4 @@
-import { prisma } from '../utils/prisma'
-
-export default defineEventHandler(async (event): Promise<any> => {
-  const body = await readBody(event)
-  const { activities } = body
-
-  if (!activities || !Array.isArray(activities) || activities.length === 0) {
-    return { success: false, error: 'No activities provided' }
-  }
-
-  const aiKeySetting = await prisma.setting.findUnique({ where: { key: 'ai_api_key' } })
-  const openaiKeySetting = await prisma.setting.findUnique({ where: { key: 'openai_api_key' } })
-
-  const geminiKey = aiKeySetting?.value
-  const openaiKey = openaiKeySetting?.value
-
-  if (!geminiKey && !openaiKey) {
-    return { success: false, error: 'AI API Key (Gemini or OpenAI) not configured in settings' }
-  }
-
-  try {
-    let prompt = ''
-
-    if (body.type === 'monthly') {
-      prompt = `
+export const getMonthlyPrompt = (activities: string[]) => `
 Kamu adalah technical report writer.
 
 Tugas:
@@ -62,8 +38,8 @@ Contoh format:
 Daftar Aktivitas:
 ${activities.join('\n')}
 `
-    } else {
-      prompt = `
+
+export const getDailyPrompt = (activities: string[]) => `
 Kamu adalah technical report writer.
 
 Tugas:
@@ -91,53 +67,3 @@ Contoh format:
 Daftar Aktivitas:
 ${activities.join('\n')}
 `
-    }
-
-    let summary = ''
-
-    if (openaiKey) {
-      // Use OpenAI
-      const response: any = await (globalThis as any).$fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: {
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: 'Anda adalah asisten profesional yang membantu merangkum aktivitas kerja.' },
-            { role: 'user', content: prompt }
-          ],
-          temperature: 0.3,
-          max_tokens: body.type === 'monthly' ? 400 : 180
-        }
-      })
-      summary = response?.choices?.[0]?.message?.content?.trim()
-    } else {
-      // Use Gemini
-      const url: any = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key=${geminiKey}`
-      const response: any = await (globalThis as any).$fetch(url, {
-        method: 'POST',
-        body: {
-          contents: [{
-            parts: [{ text: prompt }]
-          }]
-        }
-      })
-      summary = response?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
-    }
-
-    if (!summary) {
-      throw new Error('AI did not return a valid summary')
-    }
-
-    // Remove quotes if any
-    summary = summary.replace(/^["']|["']$/g, '')
-
-    return { success: true, summary }
-  } catch (error: any) {
-    console.error('AI Summary Error:', error)
-    return { success: false, error: error.message || 'Failed to generate AI summary' }
-  }
-})

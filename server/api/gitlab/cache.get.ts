@@ -1,5 +1,3 @@
-import { prisma } from '../utils/prisma'
-
 export default defineEventHandler(async (event): Promise<any> => {
   const query = getQuery(event)
   const dateStr = query.date as string || new Date().toISOString().slice(0, 7)

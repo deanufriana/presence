@@ -29,7 +29,6 @@ export interface ReportResponse {
       error?: string;
       cached?: boolean;
     };
-    microsoft: { success: boolean; events: any[]; error?: string };
   };
 }
 
@@ -37,9 +36,6 @@ export interface SettingsData {
   gitlab_token: string;
   gitlab_url: string;
   gitlab_selected_projects: string;
-  ms_client_id: string;
-  ms_client_secret: string;
-  ms_access_token: string;
   ai_api_key: string;
   openai_api_key: string;
 }
@@ -84,9 +80,6 @@ export function useReport() {
     gitlab_token: "",
     gitlab_url: "https://gitlab.com",
     gitlab_selected_projects: "",
-    ms_client_id: "",
-    ms_client_secret: "",
-    ms_access_token: "",
     ai_api_key: "",
     openai_api_key: "",
   });
@@ -179,13 +172,13 @@ export function useReport() {
   async function loadCachedData() {
     try {
       const [cachedGitlab, reportRes, monthlyRes]: any = await Promise.all([
-        $fetch("/api/gitlab-cache" as any, {
+        $fetch("/api/gitlab/cache" as any, {
           query: { date: selectedDate.value },
         }),
-        $fetch("/api/daily-report" as any, {
+        $fetch("/api/report/daily" as any, {
           query: { date: selectedDate.value },
         }),
-        $fetch("/api/monthly-report" as any, {
+        $fetch("/api/report/monthly" as any, {
           query: { month: selectedDate.value },
         }),
       ]);
@@ -250,7 +243,7 @@ export function useReport() {
     syncing.value = true;
     pending.value = true;
     try {
-      const res: any = await $fetch("/api/generate-report" as any, {
+      const res: any = await $fetch("/api/report/daily/sync-gitlab" as any, {
         query: { date: selectedDate.value, force: "true" },
       });
       reportData.value = res;
@@ -264,11 +257,12 @@ export function useReport() {
           );
           if (existingRowIndex !== -1) {
             const existingRow = currentRows[existingRowIndex];
-            const existingActs = existingRow.aktivitas
+            if (!existingRow) return;
+            const existingActs = (existingRow.aktivitas || "")
               .split(";")
               .map((s: string) => s.trim())
               .filter(Boolean);
-            const incomingActs = newRow.aktivitas
+            const incomingActs = (newRow.aktivitas || "")
               .split(";")
               .map((s: string) => s.trim())
               .filter(Boolean);
@@ -292,7 +286,7 @@ export function useReport() {
         currentRows.sort((a, b) => a.date.localeCompare(b.date));
         localRows.value = currentRows;
 
-        await $fetch("/api/daily-report" as any, {
+        await $fetch("/api/report/daily" as any, {
           method: "POST",
           body: localRows.value,
         });
@@ -316,13 +310,26 @@ export function useReport() {
     await executeSyncGitlab();
   }
 
+  async function persistSettings() {
+    await $fetch("/api/settings" as any, {
+      method: "POST",
+      body: settings.value,
+    });
+  }
+
   async function fetchProjects() {
     fetchingProjects.value = true;
     try {
-      const res: any = await $fetch("/api/gitlab-projects" as any);
+      // Save settings first so backend has the latest token/url
+      await persistSettings();
+
+      const res: any = await $fetch("/api/gitlab/projects" as any);
       if (res.success) {
         allProjects.value = res.projects;
       }
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+      toast.error("Failed to fetch projects. Please check your token/url.");
     } finally {
       fetchingProjects.value = false;
     }
@@ -339,18 +346,10 @@ export function useReport() {
       selectedProjectIds.value.join(",");
   }
 
-  async function loginWithMicrosoft() {
-    await saveSettings();
-    window.location.href = "/api/auth/microsoft";
-  }
-
   async function saveSettings() {
     saving.value = true;
     try {
-      await $fetch("/api/settings" as any, {
-        method: "POST",
-        body: settings.value,
-      });
+      await persistSettings();
       showSettings.value = false;
       toast.success("Settings saved!");
       refreshReport();
@@ -384,9 +383,9 @@ export function useReport() {
       .filter((a: string) => a);
 
     try {
-      const res: any = await $fetch("/api/ai-summary" as any, {
+      const res: any = await $fetch("/api/report/daily/summary" as any, {
         method: "POST",
-        body: { activities, type: "daily" },
+        body: { activities },
       });
 
       if (res.success) {
@@ -419,11 +418,10 @@ export function useReport() {
         return;
       }
 
-      const res: any = await $fetch("/api/ai-summary" as any, {
+      const res: any = await $fetch("/api/report/monthly/summary" as any, {
         method: "POST",
         body: {
           activities: allActivities.split("\n"),
-          type: "monthly",
         },
       });
 
@@ -439,7 +437,7 @@ export function useReport() {
         toast.success("Monthly highlights generated!");
 
         // Persist highlights and rows
-        await $fetch("/api/monthly-report" as any, {
+        await $fetch("/api/report/monthly" as any, {
           method: "POST",
           body: {
             month: selectedDate.value,
@@ -561,7 +559,7 @@ export function useReport() {
   const saveManualActivity = async () => {
     if (!selectedDayForEntry.value) return;
 
-    await $fetch("/api/daily-report" as any, {
+    await $fetch("/api/report/daily" as any, {
       method: "POST",
       body: {
         date: selectedDayForEntry.value.date,
@@ -587,24 +585,26 @@ export function useReport() {
       const rowIndex = localRows.value.findIndex((r) => r.date === date);
       if (rowIndex !== -1) {
         const row = localRows.value[rowIndex];
+        if (!row) return;
         const hasOtherValues =
           !!row.masuk?.trim() || !!row.pulang?.trim() || !!row.ti?.trim();
 
         if (hasOtherValues) {
-          localRows.value[rowIndex].aktivitas = "";
-          await $fetch("/api/daily-report" as any, {
+          const target = localRows.value[rowIndex];
+          if (target) target.aktivitas = "";
+          await $fetch("/api/report/daily" as any, {
             method: "POST",
             body: { date, activity: "" },
           });
         } else {
           localRows.value.splice(rowIndex, 1);
-          await $fetch("/api/daily-report" as any, {
+          await $fetch("/api/report/daily" as any, {
             method: "DELETE",
             body: { date },
           });
         }
       } else {
-        await $fetch("/api/daily-report" as any, {
+        await $fetch("/api/report/daily" as any, {
           method: "POST",
           body: { date, activity: "" },
         });
@@ -658,7 +658,8 @@ export function useReport() {
 
       const rowIndex = localRows.value.findIndex((r) => r.date === date);
       if (rowIndex !== -1) {
-        localRows.value[rowIndex].aktivitas = nextActivity;
+        const target = localRows.value[rowIndex];
+        if (target) target.aktivitas = nextActivity;
       } else {
         localRows.value.push({
           date,
@@ -670,7 +671,7 @@ export function useReport() {
         localRows.value.sort((a, b) => a.date.localeCompare(b.date));
       }
 
-      await $fetch("/api/daily-report" as any, {
+      await $fetch("/api/report/daily" as any, {
         method: "POST",
         body: { date, activity: nextActivity },
       });
@@ -702,7 +703,7 @@ export function useReport() {
       if (saveTimeout) clearTimeout(saveTimeout);
       saveTimeout = setTimeout(async () => {
         if (newRows.length > 0) {
-          await $fetch("/api/daily-report" as any, {
+          await $fetch("/api/report/daily" as any, {
             method: "POST",
             body: newRows,
           });
@@ -724,7 +725,7 @@ export function useReport() {
       if (monthlySaveTimeout) clearTimeout(monthlySaveTimeout);
       monthlySaveTimeout = setTimeout(async () => {
         if (newRows.length >= 0) {
-          await $fetch("/api/monthly-report" as any, {
+          await $fetch("/api/report/monthly" as any, {
             method: "POST",
             body: {
               month: selectedDate.value,
@@ -792,7 +793,6 @@ export function useReport() {
     refreshReport,
     fetchProjects,
     toggleProject,
-    loginWithMicrosoft,
     saveSettings,
     copyReport,
     summarizeRow,
