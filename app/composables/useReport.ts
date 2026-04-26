@@ -8,6 +8,7 @@ import {
 } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import { toast } from "vue-sonner";
+import { parseICS } from "~/utils/ics";
 
 // ─── Types ─────────────────────────────────────────
 export interface ReportRow {
@@ -58,8 +59,11 @@ const monthlyHighlights = ref("");
 const showManualEntry = ref(false);
 const showConfirmSync = ref(false);
 const syncing = ref(false);
+const importingCalendar = ref(false);
 const fetchingGitlab = ref(false);
+const initialLoading = ref(true);
 const gitlabData = ref<any>(null);
+const calendarData = ref<any>(null);
 const selectedDayForEntry = ref<{ date: string; dayNum: number } | null>(
   null,
 );
@@ -87,6 +91,8 @@ export function useReport () {
   // ─── Instance logic (will be shared) ───────────────
 
   // ─── Computed ──────────────────────────────────────
+  const isAiEnabled = computed(() => !!(settings.value.ai_api_key || settings.value.openai_api_key));
+
   const formattedDate = computed(() => {
     const d = parse(selectedDate.value, "yyyy-MM", new Date());
     return format(d, "MMMM yyyy", { locale: idLocale });
@@ -158,11 +164,16 @@ export function useReport () {
         return cDate === dateStr;
       });
 
+      const dayEvents = (calendarData.value?.events || []).filter(
+        (e: any) => e.date === dateStr,
+      );
+
       results.push({
         dayNum: i,
         date: dateStr,
         count: dayCommits.length,
         commits: dayCommits,
+        calendarEvents: dayEvents,
         hasManual: !!manualActivitiesMap.value[dateStr],
       });
     }
@@ -172,20 +183,26 @@ export function useReport () {
   // ─── Methods ───────────────────────────────────────
 
   async function loadCachedData () {
+    initialLoading.value = true;
     try {
-      const [cachedGitlab, reportRes, monthlyRes]: any = await Promise.all([
-        $fetch("/api/gitlab/cache" as any, {
-          query: { date: selectedDate.value },
-        }),
-        $fetch("/api/report/daily" as any, {
-          query: { date: selectedDate.value },
-        }),
-        $fetch("/api/report/monthly" as any, {
-          query: { month: selectedDate.value },
-        }),
-      ]);
+      const [cachedGitlab, cachedCalendar, reportRes, monthlyRes]: any =
+        await Promise.all([
+          $fetch("/api/gitlab/cache" as any, {
+            query: { date: selectedDate.value },
+          }),
+          $fetch("/api/calendar/cache" as any, {
+            query: { date: selectedDate.value },
+          }),
+          $fetch("/api/report/daily" as any, {
+            query: { date: selectedDate.value },
+          }),
+          $fetch("/api/report/monthly" as any, {
+            query: { month: selectedDate.value },
+          }),
+        ]);
 
       gitlabData.value = cachedGitlab;
+      calendarData.value = cachedCalendar;
 
       if (reportRes.success && reportRes.reports) {
         const map: Record<string, string> = {};
@@ -215,6 +232,8 @@ export function useReport () {
       }
     } catch (error) {
       console.error("Failed to load cached data:", error);
+    } finally {
+      initialLoading.value = false;
     }
   }
 
@@ -236,16 +255,16 @@ export function useReport () {
     if (localRows.value.length > 0) {
       showConfirmSync.value = true;
     } else {
-      executeSyncGitlab();
+      executeSync();
     }
   }
 
-  async function executeSyncGitlab () {
+  async function executeSync () {
     showConfirmSync.value = false;
     syncing.value = true;
     pending.value = true;
     try {
-      const res: any = await $fetch("/api/report/daily/sync-gitlab" as any, {
+      const res: any = await $fetch("/api/report/daily/sync" as any, {
         query: { date: selectedDate.value, force: "true" },
       });
       reportData.value = res;
@@ -309,7 +328,7 @@ export function useReport () {
   }
 
   async function refreshReport () {
-    await executeSyncGitlab();
+    await executeSync();
   }
 
   async function persistSettings () {
@@ -685,6 +704,114 @@ export function useReport () {
     }
   };
 
+  const importCalendar = async (file: File) => {
+    importingCalendar.value = true;
+    const loadingToastId = toast.loading("Importing calendar events...");
+
+    try {
+      const content = await file.text();
+      const events = parseICS(content);
+
+      if (events.length === 0) {
+        toast.error("No events found in the calendar file.");
+        return;
+      }
+
+      // Group events by date
+      const groupedEvents: Record<string, string[]> = {};
+      events.forEach((ev) => {
+        let group = groupedEvents[ev.date];
+        if (!group) {
+          group = [];
+          groupedEvents[ev.date] = group;
+        }
+        // Only add if not already present
+        if (!group.includes(ev.summary)) {
+          group.push(ev.summary);
+        }
+      });
+
+      // Prepare updates
+      const updates: ReportRow[] = [];
+      const currentRows = [...localRows.value];
+
+      Object.entries(groupedEvents).forEach(([date, newActs]) => {
+        const existingRowIndex = currentRows.findIndex((r) => r.date === date);
+        let updatedAktivitas = "";
+
+        if (existingRowIndex !== -1) {
+          const row = currentRows[existingRowIndex];
+          if (!row) return;
+          const existingActs = (row.aktivitas || "")
+            .split(";")
+            .map((s) => s.trim())
+            .filter(Boolean);
+
+          newActs.forEach((act) => {
+            if (
+              !existingActs.some((ea) => ea.toLowerCase() === act.toLowerCase())
+            ) {
+              existingActs.push(act);
+            }
+          });
+          updatedAktivitas = existingActs.join("; ");
+          row.aktivitas = updatedAktivitas;
+          updates.push(row);
+        } else {
+          updatedAktivitas = newActs.join("; ");
+          const newRow: ReportRow = {
+            date,
+            masuk: "",
+            pulang: "",
+            ti: "",
+            aktivitas: updatedAktivitas,
+          };
+          currentRows.push(newRow);
+          updates.push(newRow);
+        }
+
+        manualActivitiesMap.value[date] = updatedAktivitas;
+      });
+
+      // Save to backend
+      if (updates.length > 0) {
+        currentRows.sort((a, b) => a.date.localeCompare(b.date));
+        localRows.value = currentRows;
+
+        await Promise.all([
+          $fetch("/api/report/daily" as any, {
+            method: "POST",
+            body: updates,
+          }),
+          $fetch("/api/calendar/cache" as any, {
+            method: "POST",
+            body: {
+              date: selectedDate.value,
+              events: events,
+            },
+          }),
+        ]);
+
+        // Refresh calendar data locally
+        calendarData.value = {
+          success: true,
+          events: events,
+          date: selectedDate.value,
+          cached: true,
+        };
+      }
+
+      toast.success(`Successfully imported ${events.length} events!`, {
+        id: loadingToastId,
+      });
+    } catch (error) {
+      console.error("Failed to import calendar:", error);
+      toast.error("Failed to import calendar file", { id: loadingToastId });
+    } finally {
+      importingCalendar.value = false;
+    }
+  };
+
   function formatTime (dateStr: string) {
     try {
       return format(parseISO(dateStr), "HH:mm");
@@ -765,7 +892,9 @@ export function useReport () {
     showManualEntry,
     showConfirmSync,
     syncing,
+    importingCalendar,
     fetchingGitlab,
+    initialLoading,
     gitlabData,
     selectedDayForEntry,
     manualActivityText,
@@ -782,6 +911,7 @@ export function useReport () {
     copiedMonthly,
 
     // Computed
+    isAiEnabled,
     formattedDate,
     filteredGitLab,
     calendarBlanks,
@@ -791,7 +921,7 @@ export function useReport () {
     loadCachedData,
     fetchGitlabFresh,
     confirmSync,
-    executeSyncGitlab,
+    executeSync,
     refreshReport,
     fetchProjects,
     toggleProject,
@@ -805,6 +935,7 @@ export function useReport () {
     saveManualActivity,
     deleteManualActivity,
     syncDayActivity,
+    importCalendar,
     formatTime,
     copyMonthlyReport,
   };

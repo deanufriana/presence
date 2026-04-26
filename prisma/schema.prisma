@@ -27,6 +27,13 @@ model GitLabCache {
   updatedAt DateTime @updatedAt
 }
 
+model CalendarCache {
+  id        Int      @id @default(autoincrement())
+  date      String   @unique // YYYY-MM
+  data      String   // Store JSON string of events
+  updatedAt DateTime @updatedAt
+}
+
 model DailyReport {
   id        Int      @id @default(autoincrement())
   date      String   @unique // YYYY-MM-DD

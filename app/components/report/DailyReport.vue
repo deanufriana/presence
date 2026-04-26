@@ -138,7 +138,7 @@
 
                 <button
                   v-if="
-                    (settings.ai_api_key || settings.openai_api_key) &&
+                    isAiEnabled &&
                     row.aktivitas &&
                     row.aktivitas.length > 5
                   "
@@ -195,7 +195,7 @@ defineProps<{
   summarizingRows: Record<string, boolean>;
 }>();
 
-const { copyReport, summarizeRow, openManualEntry } = useReport();
+const { copyReport, summarizeRow, openManualEntry, isAiEnabled } = useReport();
 
 const copiedRows = ref<Record<string, boolean>>({});
 

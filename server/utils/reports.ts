@@ -11,7 +11,7 @@ export async function getDailyReports (datePrefix: string) {
     },
     orderBy: { date: 'asc' }
   })
-  
+
   return reports
 }
 
@@ -27,5 +27,20 @@ export async function getMonthlyReport (month: string) {
   return {
     ...report,
     rows: report.rows ? JSON.parse(report.rows) : []
+  }
+}
+
+export async function getCalendarCache (month: string) {
+  if (!month) throw new Error('Month required')
+
+  const cache = await prisma.calendarCache.findUnique({
+    where: { date: month }
+  })
+
+  if (!cache) return null
+
+  return {
+    ...cache,
+    events: cache.data ? JSON.parse(cache.data) : []
   }
 }

@@ -6,8 +6,9 @@ export default defineEventHandler(async (event): Promise<any> => {
   const force = query.force === 'true'
 
   try {
-    const [gitlabRes, reports]: any = await Promise.all([
+    const [gitlabRes, calendarCache, reports]: any = await Promise.all([
       syncGitLabEvents(dateStr, force),
+      getCalendarCache(dateStr),
       getDailyReports(dateStr)
     ])
 
@@ -27,6 +28,18 @@ export default defineEventHandler(async (event): Promise<any> => {
       })
     }
 
+    // 1.1 Group Calendar Events by Date
+    if (calendarCache && calendarCache.events) {
+      calendarCache.events.forEach((ev: any) => {
+        const date = ev.date
+        if (!groupedActivities[date]) groupedActivities[date] = []
+
+        if (ev.summary && !groupedActivities[date].includes(ev.summary)) {
+          groupedActivities[date].push(ev.summary)
+        }
+      })
+    }
+
     // 2. Add Manual Activities
     if (reports && Array.isArray(reports)) {
       reports.forEach((ma: any) => {
@@ -42,8 +55,8 @@ export default defineEventHandler(async (event): Promise<any> => {
     const activeDates = Object.keys(groupedActivities).sort()
     const rows = activeDates.map(date => ({
       date,
-      masuk: getRandomTime(7, 8),
-      pulang: getRandomTime(17, 18),
+      masuk: getRandomTime('07:30', '08:00'),
+      pulang: getRandomTime('17:00', '17:30'),
       ti: 'TI',
       aktivitas: groupedActivities[date]!.join('; ')
     }))

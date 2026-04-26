@@ -76,16 +76,37 @@
             <Settings class="h-4 w-4" />
             <span class="hidden sm:inline">Settings</span>
           </Button>
+          <!-- Import Calendar Button -->
+          <Button
+            variant="outline"
+            size="sm"
+            @click="triggerCalendarUpload"
+            :disabled="importingCalendar"
+            class="gap-2 border-border bg-card hover:border-primary/40"
+          >
+            <Upload
+              class="h-4 w-4 text-muted-foreground"
+              :class="{ 'animate-pulse': importingCalendar }"
+            />
+            <span class="hidden sm:inline">Import Calendar</span>
+          </Button>
+          <input
+            type="file"
+            ref="calendarInput"
+            class="hidden"
+            accept=".ics"
+            @change="handleCalendarUpload"
+          />
 
-          <!-- Sync GitLab Button -->
+          <!-- Sync Button -->
           <Button
             size="sm"
             @click="confirmSync"
             :disabled="syncing"
             class="gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0 shadow-md shadow-violet-500/20"
           >
-            <GitMerge class="h-4 w-4" :class="{ 'animate-spin': syncing }" />
-            <span class="hidden sm:inline">Sync GitLab</span>
+            <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': syncing }" />
+            <span class="hidden sm:inline">Sync Activities</span>
           </Button>
         </div>
       </div>
@@ -101,11 +122,6 @@
         <span
           >GitLab {{ gitlabData?.success ? "Connected" : "Disconnected" }}</span
         >
-      </div>
-      <Separator orientation="vertical" class="h-3" />
-      <div class="flex items-center gap-1.5">
-        <div class="h-2 w-2 rounded-full bg-emerald-500" />
-        <span>Manual Activities</span>
       </div>
       <div class="ml-auto text-muted-foreground/60">
         {{ formattedDate }}
@@ -123,9 +139,9 @@
           <CalendarDays class="h-3.5 w-3.5" />
           Monthly Report
         </TabsTrigger>
-        <TabsTrigger value="gitlab" class="gap-1.5">
-          <GitMerge class="h-3.5 w-3.5" />
-          GitLab Activity
+        <TabsTrigger value="activity" class="gap-1.5">
+          <CalendarRange class="h-3.5 w-3.5" />
+          Activity Calendar
         </TabsTrigger>
       </TabsList>
 
@@ -148,16 +164,11 @@
           :monthly-highlights="monthlyHighlights"
           :monthly-rows="monthlyRows"
           :selected-date="selectedDate"
-          @clear-highlights="monthlyHighlights = ''"
-          @generate-ai-summary="generateAiSummary"
-          @add-row="addMonthlyRow"
-          @remove-row="removeMonthlyRow"
-          @copy-monthly-report="copyMonthlyReport"
         />
       </TabsContent>
 
-      <TabsContent value="gitlab">
-        <GitlabCalendar
+      <TabsContent value="activity">
+        <ActivityCalendar
           :formatted-date="formattedDate"
           :fetching-gitlab="fetchingGitlab"
           :calendar-blanks="calendarBlanks"
@@ -180,7 +191,7 @@
       :selected-project-ids="selectedProjectIds"
     />
 
-    <SyncConfirmModal v-model="showConfirmSync" @confirm="executeSyncGitlab" />
+    <SyncConfirmModal v-model="showConfirmSync" @confirm="executeSync" />
 
     <ManualActivityModal
       v-model="showManualEntry"
@@ -196,11 +207,14 @@
 import {
   Calendar as CalendarIcon,
   CalendarDays,
+  CalendarRange,
   Settings,
   GitMerge,
   FileText,
   ChevronLeft,
   ChevronRight,
+  Upload,
+  RefreshCw,
 } from "lucide-vue-next";
 import { useScrollLock } from "@vueuse/core";
 import { Separator } from "~/components/ui/separator";
@@ -223,7 +237,7 @@ import { DateFormatter, getLocalTimeZone } from "@internationalized/date";
 import { useVModel } from "@vueuse/core";
 import DailyReport from "~/components/report/DailyReport.vue";
 import MonthlyReport from "~/components/report/MonthlyReport.vue";
-import GitlabCalendar from "~/components/report/GitlabCalendar.vue";
+import ActivityCalendar from "~/components/report/ActivityCalendar.vue";
 import SettingsModal from "~/components/report/SettingsModal.vue";
 import SyncConfirmModal from "~/components/report/SyncConfirmModal.vue";
 import ManualActivityModal from "~/components/report/ManualActivityModal.vue";
@@ -238,6 +252,7 @@ const {
   showManualEntry,
   showConfirmSync,
   syncing,
+  importingCalendar,
   fetchingGitlab,
   gitlabData,
   selectedDayForEntry,
@@ -256,11 +271,12 @@ const {
   calendarDays,
   fetchGitlabFresh,
   confirmSync,
-  executeSyncGitlab,
+  executeSync,
   openManualEntry,
   saveManualActivity,
   deleteManualActivity,
   syncDayActivity,
+  importCalendar,
   generateAiSummary,
   copyMonthlyReport,
   addMonthlyRow,
@@ -325,6 +341,24 @@ const isCurrentMonth = (monthIndex: number) => {
 const dateDisplay = computed(() => {
   return df.format(internalDate.value);
 });
+
+// ─── Calendar Import ──────────────────────────────
+const calendarInput = ref<HTMLInputElement | null>(null);
+
+const triggerCalendarUpload = () => {
+  calendarInput.value?.click();
+};
+
+const handleCalendarUpload = async (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (file) {
+    await importCalendar(file);
+    // Reset input
+    if (calendarInput.value) {
+      calendarInput.value.value = "";
+    }
+  }
+};
 
 // ─── Scroll Lock ──────────────────────────────────
 const isLocked = useScrollLock(process.client ? document.body : null);

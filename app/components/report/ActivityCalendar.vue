@@ -8,25 +8,25 @@
           <div
             class="flex h-7 w-7 items-center justify-center rounded-md bg-orange-500/10"
           >
-            <GitMerge class="h-4 w-4 text-orange-500" />
+            <CalendarRange class="h-4 w-4 text-orange-500" />
           </div>
-          GitLab Activity ({{ formattedDate }})
+          Activity Calendar ({{ formattedDate }})
         </CardTitle>
         <div class="flex items-center gap-4">
           <div
             class="flex items-center gap-2 text-[10px] text-muted-foreground"
           >
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-muted"></div>
-              No commits
-            </div>
-            <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-orange-500/30"></div>
-              1-2
-            </div>
-            <div class="flex items-center gap-1">
               <div class="h-2 w-2 rounded-sm bg-orange-500"></div>
-              3+
+              GitLab
+            </div>
+            <div class="flex items-center gap-1">
+              <div class="h-2 w-2 rounded-sm bg-violet-500"></div>
+              Teams
+            </div>
+            <div class="flex items-center gap-1">
+              <div class="h-2 w-2 rounded-sm bg-blue-500"></div>
+              Manual
             </div>
           </div>
           <Button
@@ -81,11 +81,16 @@
             :class="[
               day.count > 0
                 ? 'bg-orange-500/5 border-orange-500/20'
-                : day.hasManual
-                  ? 'bg-blue-500/5 border-blue-500/20'
-                  : 'bg-muted/10',
+                : day.calendarEvents?.length > 0
+                  ? 'bg-violet-500/5 border-violet-500/20'
+                  : day.hasManual
+                    ? 'bg-blue-500/5 border-blue-500/20'
+                    : 'bg-muted/10',
               day.count >= 3 ? 'ring-1 ring-orange-500/30' : '',
-              day.hasManual && day.count === 0
+              day.calendarEvents?.length > 0 && day.count === 0
+                ? 'ring-1 ring-violet-500/30'
+                : '',
+              day.hasManual && day.count === 0 && (!day.calendarEvents || day.calendarEvents.length === 0)
                 ? 'ring-1 ring-blue-500/30'
                 : '',
             ]"
@@ -113,9 +118,11 @@
               :class="
                 day.count > 0
                   ? 'text-orange-600 dark:text-orange-400'
-                  : day.hasManual
-                    ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-muted-foreground'
+                  : day.calendarEvents?.length > 0
+                    ? 'text-violet-600 dark:text-violet-400'
+                    : day.hasManual
+                      ? 'text-blue-600 dark:text-blue-400'
+                      : 'text-muted-foreground'
               "
               >{{ day.dayNum }}</span
             >
@@ -128,6 +135,11 @@
                 :key="'c-' + dot"
                 class="h-1 w-1 rounded-full bg-orange-500"
               />
+              <!-- Calendar Event Dot (Violet) -->
+              <div
+                v-if="day.calendarEvents?.length > 0"
+                class="h-1 w-1 rounded-full bg-violet-500 shadow-sm shadow-violet-500/50"
+              />
               <!-- Manual Dot (Blue) -->
               <div
                 v-if="day.hasManual"
@@ -137,34 +149,43 @@
 
             <!-- Hover Tooltip -->
             <div
-              v-if="day.count > 0"
-              class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-popover border rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50"
+              v-if="day.count > 0 || (day.calendarEvents && day.calendarEvents.length > 0)"
+              class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2 bg-popover border rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50"
             >
               <div class="text-[10px] font-bold mb-1 pb-1 border-b">
                 {{ day.date }}
               </div>
-              <div class="space-y-1">
-                <div
-                  v-for="(commit, cIdx) in day.commits.slice(0, 3)"
-                  :key="cIdx"
-                  class="text-[9px] leading-tight flex items-start gap-1"
-                >
+              <div class="space-y-2">
+                <!-- Commits -->
+                <div v-if="day.count > 0" class="space-y-1">
+                  <div class="text-[8px] font-bold text-orange-500 uppercase tracking-tighter">GitLab Commits</div>
                   <div
-                    class="h-1 w-1 rounded-full bg-orange-500 mt-1 shrink-0"
-                  />
-                  <div class="min-w-0">
-                    <div class="truncate">{{ commit.title }}</div>
-                    <div class="truncate text-[8px] text-muted-foreground">
-                      {{ commit.project_path || commit.project_name || "Project" }}
-                      <span v-if="commit.branch_name"> • {{ commit.branch_name }}</span>
+                    v-for="(commit, cIdx) in day.commits.slice(0, 3)"
+                    :key="'commit-' + cIdx"
+                    class="text-[9px] leading-tight flex items-start gap-1"
+                  >
+                    <div class="h-1 w-1 rounded-full bg-orange-500 mt-1 shrink-0" />
+                    <div class="min-w-0">
+                      <div class="truncate">{{ commit.title }}</div>
                     </div>
                   </div>
+                  <div v-if="day.count > 3" class="text-[8px] text-muted-foreground pl-2">+ {{ day.count - 3 }} more</div>
                 </div>
-                <div
-                  v-if="day.count > 3"
-                  class="text-[8px] text-muted-foreground pl-2"
-                >
-                  + {{ day.count - 3 }} more
+
+                <!-- Calendar Events -->
+                <div v-if="day.calendarEvents?.length > 0" class="space-y-1">
+                  <div class="text-[8px] font-bold text-violet-500 uppercase tracking-tighter">Teams Calendar</div>
+                  <div
+                    v-for="(ev, eIdx) in day.calendarEvents.slice(0, 3)"
+                    :key="'event-' + eIdx"
+                    class="text-[9px] leading-tight flex items-start gap-1"
+                  >
+                    <div class="h-1 w-1 rounded-full bg-violet-500 mt-1 shrink-0" />
+                    <div class="min-w-0">
+                      <div class="truncate">{{ ev.summary }}</div>
+                    </div>
+                  </div>
+                  <div v-if="day.calendarEvents.length > 3" class="text-[8px] text-muted-foreground pl-2">+ {{ day.calendarEvents.length - 3 }} more</div>
                 </div>
               </div>
             </div>
@@ -176,7 +197,7 @@
 </template>
 
 <script setup lang="ts">
-import { GitMerge, RefreshCw, Trash2 } from "lucide-vue-next";
+import { CalendarRange, RefreshCw, Trash2 } from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
 import {
   Card,
