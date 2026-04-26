@@ -32,7 +32,7 @@ Contoh format:
 **Nama Proyek A**
 - Menambahkan fitur X untuk kebutuhan Y. [Status: Project]
 - Menyempurnakan alur Z agar lebih stabil. [Status: Project Enhance]
-- Melakukan koordinasi tim terkait pengembangan fitur baru. [Status: Continuing (Daily)]
+- Meeting koordinasi tim terkait pengembangan fitur baru. [Status: Continuing (Daily)]
 
 Daftar Aktivitas:
 ${activities.join('\n')}
@@ -57,14 +57,14 @@ Aturan output (WAJIB):
 5) Sebutkan nama proyek; sertakan branch jika tersedia.
 6) Gunakan kata kerja hasil (mis: menambahkan, memperbaiki, menyempurnakan, merapikan, mendiskusikan).
 7) Jika ada aktivitas "Meeting from [start] to [end] with discuss about [topic]", tuliskan sebagai:
-   - Mengikuti koordinasi/diskusi mengenai [topic] pada jam [start] - [end].
+   - Meeting mengenai [topic] pada jam [start] - [end].
 8) Jangan halusinasi; hanya pakai informasi dari daftar aktivitas.
 9) Maksimal 6 bullet total.
 
 Contoh format:
 - Menambahkan validasi form login di Project A (branch feature/auth) agar alur autentikasi lebih aman.
 - Memperbaiki bug sinkronisasi data di Project B.
-- Mengikuti diskusi teknis mengenai integrasi payment gateway pada jam 09:00 - 10:00.
+- Meeting mengenai integrasi payment gateway pada jam 09:00 - 10:00.
 
 Daftar Aktivitas:
 ${activities.join('\n')}

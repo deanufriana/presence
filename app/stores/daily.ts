@@ -100,15 +100,16 @@ export const useDailyStore = defineStore('daily', () => {
           if (existingRowIndex !== -1) {
             const existingRow = currentRows[existingRowIndex]
             if (!existingRow) return
-            const existingActs = (existingRow.aktivitas || "").split(";").map((s: string) => s.trim()).filter(Boolean)
-            const incomingActs = (newRow.aktivitas || "").split(";").map((s: string) => s.trim()).filter(Boolean)
+            const splitActs = (str: string) => str.split(/\n|;/).map(s => s.trim().replace(/^- /, "")).filter(Boolean)
+            const existingActs = splitActs(existingRow.aktivitas || "")
+            const incomingActs = splitActs(newRow.aktivitas || "")
 
             incomingActs.forEach((act: string) => {
               if (!existingActs.some((ea) => ea.toLowerCase() === act.toLowerCase())) {
                 existingActs.push(act)
               }
             })
-            existingRow.aktivitas = existingActs.join("; ")
+            existingRow.aktivitas = existingActs.map(a => `- ${a}`).join('\n')
             existingRow.masuk = newRow.masuk || existingRow.masuk
             existingRow.pulang = newRow.pulang || existingRow.pulang
           } else {
@@ -132,7 +133,7 @@ export const useDailyStore = defineStore('daily', () => {
   async function summarizeRow (row: ReportRow) {
     if (!row.aktivitas || row.aktivitas.length < 10) return
     summarizingRows.value[row.date] = true
-    const activities = row.aktivitas.split(";").map((a: string) => a.trim()).filter(Boolean)
+    const activities = row.aktivitas.split(/\n|;/).map(a => a.trim().replace(/^- /, "")).filter(Boolean)
     try {
       const res: any = await $fetch("/api/report/daily/summary" as any, {
         method: "POST",
