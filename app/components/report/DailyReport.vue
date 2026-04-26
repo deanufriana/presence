@@ -70,7 +70,7 @@
             class="border-b border-border/10 last:border-0 hover:bg-muted/5 transition-colors"
           >
             <td class="px-4 py-2 font-medium text-muted-foreground">
-              {{ row.date }}
+              {{ format(new Date(row.date), "dd/MM/yyyy") }}
             </td>
             <td class="p-0">
               <input
@@ -201,6 +201,7 @@ import { storeToRefs } from "pinia";
 import { useToast } from "~/composables/use-toast";
 import { useDailyStore } from "~/stores/daily";
 import { useCoreStore } from "~/stores/core";
+import { format } from "date-fns";
 import {
   FileText,
   Copy,
@@ -225,7 +226,13 @@ const { success } = useToast();
 const { isAiEnabled, pending, copied } = storeToRefs(coreStore);
 const { localRows, summarizingRows, syncingRows } = storeToRefs(dailyStore);
 
-const { copyReport, summarizeRow, openManualEntry, removeDailyRow, syncDayActivity } = dailyStore;
+const {
+  copyReport,
+  summarizeRow,
+  openManualEntry,
+  removeDailyRow,
+  syncDayActivity,
+} = dailyStore;
 
 const copiedRows = ref<Record<string, boolean>>({});
 

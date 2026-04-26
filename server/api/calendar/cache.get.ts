@@ -3,15 +3,8 @@ export default defineEventHandler(async (event): Promise<any> => {
   const dateStr = query.date as string || new Date().toISOString().slice(0, 7)
 
   try {
-    const cacheEntry = await prisma.calendarCache.findUnique({
-      where: { date: dateStr }
-    })
-
-    if (cacheEntry) {
-      return { success: true, events: JSON.parse(cacheEntry.data), date: dateStr, cached: true }
-    }
-
-    return { success: true, events: [], date: dateStr, cached: false }
+    const res = await getCalendarCache(dateStr)
+    return { success: true, ...res, date: dateStr, cached: res.events.length > 0 }
   } catch (error: any) {
     return { success: false, error: error.message, events: [] }
   }

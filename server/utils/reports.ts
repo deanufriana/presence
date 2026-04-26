@@ -33,14 +33,16 @@ export async function getMonthlyReport (month: string) {
 export async function getCalendarCache (month: string) {
   if (!month) throw new Error('Month required')
 
-  const cache = await prisma.calendarCache.findUnique({
-    where: { date: month }
+  const events = await prisma.calendarEvent.findMany({
+    where: {
+      date: {
+        startsWith: month
+      }
+    },
+    orderBy: { date: 'asc' }
   })
 
-  if (!cache) return null
-
   return {
-    ...cache,
-    events: cache.data ? JSON.parse(cache.data) : []
+    events: events || []
   }
 }

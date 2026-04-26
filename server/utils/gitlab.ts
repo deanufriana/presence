@@ -73,12 +73,9 @@ export async function syncGitLabEvents (dateStr: string, force: boolean = false)
 
   // 2. Try to load from Cache first
   if (!force) {
-    const cacheEntry = await prisma.gitLabCache.findUnique({
-      where: { date: dateStr }
-    })
-
-    if (cacheEntry) {
-      return { success: true, events: JSON.parse(cacheEntry.data), date: dateStr, cached: true }
+    const existingCommits = await getGitLabCache(dateStr)
+    if (existingCommits.events.length > 0) {
+      return { ...existingCommits, cached: true }
     }
   }
 
@@ -132,24 +129,92 @@ export async function syncGitLabEvents (dateStr: string, force: boolean = false)
   const results = await Promise.all(commitPromises)
   const allCommits = results.flat()
 
-  // Save to cache
-  await prisma.gitLabCache.upsert({
-    where: { date: dateStr },
-    update: { data: JSON.stringify(allCommits) },
-    create: { date: dateStr, data: JSON.stringify(allCommits) }
-  })
+  // Save to database
+  await Promise.all(allCommits.map(async (commit) => {
+    await prisma.gitLabCommit.upsert({
+      where: { id: commit.id },
+      update: {
+        shortId: commit.short_id,
+        title: commit.title,
+        message: commit.message,
+        authorName: commit.author_name,
+        authorEmail: commit.author_email,
+        authoredDate: new Date(commit.authored_date),
+        committerName: commit.committer_name,
+        committerEmail: commit.committer_email,
+        committedDate: new Date(commit.committed_date),
+        webUrl: commit.web_url,
+        projectName: commit.project_name,
+        projectPath: commit.project_path,
+        projectId: commit.project_id,
+        branchName: commit.branch_name,
+        branchNames: JSON.stringify(commit.branch_names),
+        actionName: commit.action_name,
+        createdAt: new Date(commit.created_at)
+      },
+      create: {
+        id: commit.id,
+        shortId: commit.short_id,
+        title: commit.title,
+        message: commit.message,
+        authorName: commit.author_name,
+        authorEmail: commit.author_email,
+        authoredDate: new Date(commit.authored_date),
+        committerName: commit.committer_name,
+        committerEmail: commit.committer_email,
+        committedDate: new Date(commit.committed_date),
+        webUrl: commit.web_url,
+        projectName: commit.project_name,
+        projectPath: commit.project_path,
+        projectId: commit.project_id,
+        branchName: commit.branch_name,
+        branchNames: JSON.stringify(commit.branch_names),
+        actionName: commit.action_name,
+        createdAt: new Date(commit.created_at)
+      }
+    })
+  }))
 
   return { success: true, events: allCommits, date: dateStr }
 }
 
 export async function getGitLabCache (dateStr: string) {
-  const cacheEntry = await prisma.gitLabCache.findUnique({
-    where: { date: dateStr }
+  const { startOfMonth, endOfMonth, parse } = await import('date-fns')
+  const baseDate = parse(dateStr, 'yyyy-MM', new Date())
+  const firstDay = startOfMonth(baseDate)
+  const lastDay = endOfMonth(baseDate)
+
+  const commits = await prisma.gitLabCommit.findMany({
+    where: {
+      createdAt: {
+        gte: firstDay,
+        lte: lastDay
+      }
+    },
+    orderBy: { createdAt: 'desc' }
   })
 
-  if (cacheEntry) {
-    return { success: true, events: JSON.parse(cacheEntry.data), date: dateStr, cached: true }
-  }
+  // Map back to the expected structure if needed, or update consumers
+  const events = commits.map(c => ({
+    id: c.id,
+    short_id: c.shortId,
+    title: c.title,
+    message: c.message,
+    author_name: c.authorName,
+    author_email: c.authorEmail,
+    authored_date: c.authoredDate.toISOString(),
+    committer_name: c.committerName,
+    committer_email: c.committerEmail,
+    committed_date: c.committedDate.toISOString(),
+    web_url: c.webUrl,
+    project_name: c.projectName,
+    project_path: c.projectPath,
+    project_id: c.projectId,
+    branch_name: c.branchName,
+    branch_names: c.branchNames ? JSON.parse(c.branchNames) : [],
+    action_name: c.actionName,
+    created_at: c.createdAt.toISOString()
+  }))
 
-  return { success: true, events: [], date: dateStr, cached: true }
+  return { success: true, events, date: dateStr, cached: true }
 }

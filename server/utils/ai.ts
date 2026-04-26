@@ -25,6 +25,7 @@ async function callOpenAi (prompt: string, options: AiOptions): Promise<string> 
   const aiKeySetting = await prisma.setting.findUnique({ where: { key: 'openai_api_key' } })
   if (!aiKeySetting?.value) throw new Error('AI API Key not configured in settings')
 
+  const isJson = prompt.toLowerCase().includes('json')
   const response: any = await (globalThis as any).$fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -38,7 +39,8 @@ async function callOpenAi (prompt: string, options: AiOptions): Promise<string> 
         { role: 'user', content: prompt }
       ],
       temperature: 0.3,
-      max_tokens: options.max_tokens
+      max_tokens: options.max_tokens,
+      response_format: isJson ? { type: "json_object" } : undefined
     }
   })
 

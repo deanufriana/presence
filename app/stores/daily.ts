@@ -45,16 +45,16 @@ export const useDailyStore = defineStore('daily', () => {
   const copyReport = async () => {
     if (!localRows.value.length) return
     let tsv = ""
-    let html = `<table border="1" style="border-collapse: collapse; width: 100%; font-family: sans-serif; font-size: 11pt;"><tbody>`
+    let html = `<table style="border-collapse: collapse; width: 100%;"><tbody>`
 
     localRows.value.forEach((row) => {
       tsv += `${row.date}\t${row.masuk}\t${row.pulang}\t${row.ti}\t${row.aktivitas}\n`
       html += `<tr>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.date}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.masuk}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.pulang}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.ti}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.aktivitas}</td>
+        <td>${row.date}</td>
+        <td>${row.masuk}</td>
+        <td>${row.pulang}</td>
+        <td>${row.ti}</td>
+        <td>${row.aktivitas}</td>
       </tr>`
     })
 

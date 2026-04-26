@@ -5,16 +5,26 @@ export default defineEventHandler(async (event): Promise<any> => {
 
     if (!date) return { success: false, error: 'Date required' }
 
-    await prisma.calendarCache.upsert({
-      where: { date },
-      update: {
-        data: JSON.stringify(events)
-      },
-      create: {
-        date,
-        data: JSON.stringify(events)
+    // Clear existing events for this month to avoid duplicates
+    await prisma.calendarEvent.deleteMany({
+      where: {
+        date: {
+          startsWith: date
+        }
       }
     })
+
+    // Bulk insert new events
+    if (events && Array.isArray(events)) {
+      await prisma.calendarEvent.createMany({
+        data: events.map((ev: any) => ({
+          date: ev.date,
+          summary: ev.summary,
+          startTime: ev.startTime,
+          endTime: ev.endTime
+        }))
+      })
+    }
 
     return { success: true }
   } catch (error: any) {

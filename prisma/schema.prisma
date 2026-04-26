@@ -20,18 +20,40 @@ model Setting {
   updatedAt DateTime @updatedAt
 }
 
-model GitLabCache {
-  id        Int      @id @default(autoincrement())
-  date      String   @unique
-  data      String   // Store JSON string of events
-  updatedAt DateTime @updatedAt
+model GitLabCommit {
+  id             String   @id // Full commit hash
+  shortId        String
+  title          String
+  message        String?
+  authorName     String
+  authorEmail    String
+  authoredDate   DateTime
+  committerName  String
+  committerEmail String
+  committedDate  DateTime
+  webUrl         String
+  projectName    String
+  projectPath    String
+  projectId      Int
+  branchName     String?
+  branchNames    String?  // JSON string of branches
+  actionName     String?  // e.g., "pushed_commit"
+  createdAt      DateTime // From created_at in response
+  updatedAt      DateTime @updatedAt
+
+  @@index([authorEmail])
+  @@index([createdAt])
 }
 
-model CalendarCache {
+model CalendarEvent {
   id        Int      @id @default(autoincrement())
-  date      String   @unique // YYYY-MM
-  data      String   // Store JSON string of events
+  date      String   // YYYY-MM-DD
+  summary   String
+  startTime String?
+  endTime   String?
   updatedAt DateTime @updatedAt
+
+  @@index([date])
 }
 
 model DailyReport {

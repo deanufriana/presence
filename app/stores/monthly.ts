@@ -1,20 +1,19 @@
 import { defineStore } from 'pinia'
 import { watchDebounced } from '@vueuse/core'
 import { useCoreStore } from '~/stores/core'
-import { useDailyStore } from '~/stores/daily'
 import { useToast } from '~/composables/use-toast'
 import type { MonthlyReportRow } from '~/types/report'
 
 export const useMonthlyStore = defineStore('monthly', () => {
   const core = useCoreStore()
   const { success, error, loading, dismiss } = useToast()
-  
+
   const monthlyRows = ref<MonthlyReportRow[]>([])
   const monthlyHighlights = ref("")
   const summarizing = ref(false)
   const copiedMonthly = ref(false)
 
-  function setCache(monthlyRes: any) {
+  function setCache (monthlyRes: any) {
     if (monthlyRes?.success && monthlyRes.report) {
       monthlyRows.value = monthlyRes.report.rows || []
       monthlyHighlights.value = monthlyRes.report.summary || ""
@@ -24,38 +23,21 @@ export const useMonthlyStore = defineStore('monthly', () => {
     }
   }
 
-  async function generateAiSummary() {
-    const dailyStore = useDailyStore()
-    if (!dailyStore.localRows.length) return
+  async function generateAiSummary () {
     summarizing.value = true
     const loadingToastId = loading("Generating monthly report with AI...")
     try {
-      const allActivities = dailyStore.localRows
-        .filter((r) => r.aktivitas && r.aktivitas.length > 5)
-        .map((r) => r.aktivitas)
-        .join("\n")
-
-      if (!allActivities) {
-        summarizing.value = false
-        error("Not enough activity data to generate summary", { id: loadingToastId })
-        return
-      }
-
       const res: any = await $fetch("/api/report/monthly/summary" as any, {
         method: "POST",
-        body: { activities: allActivities, month: core.selectedDate },
+        body: { month: core.selectedDate },
       })
 
-      if (res.success && res.summary) {
-        // Fix: API only returns summary, it does not return rows.
-        monthlyHighlights.value = res.summary
-        success("Monthly report generated!", { id: loadingToastId })
-        
-        // Explicitly trigger a save since we only updated the highlights
-        await $fetch("/api/report/monthly" as any, {
-          method: "POST",
-          body: { month: core.selectedDate, rows: monthlyRows.value, summary: monthlyHighlights.value },
-        })
+      if (res.success) {
+        monthlyHighlights.value = res.summary || ""
+        if (res.rows && Array.isArray(res.rows)) {
+          monthlyRows.value = res.rows
+        }
+        success("Monthly report and table generated!", { id: loadingToastId })
       } else {
         error(res.error || "Failed to generate monthly report", { id: loadingToastId })
       }
@@ -67,7 +49,7 @@ export const useMonthlyStore = defineStore('monthly', () => {
     }
   }
 
-  function addMonthlyRow(monthName?: string) {
+  function addMonthlyRow (monthName?: string) {
     monthlyRows.value.push({
       bulan: monthName || "",
       project: "",
@@ -77,7 +59,7 @@ export const useMonthlyStore = defineStore('monthly', () => {
     })
   }
 
-  function removeMonthlyRow(idx: number) {
+  function removeMonthlyRow (idx: number) {
     monthlyRows.value.splice(idx, 1)
   }
 
