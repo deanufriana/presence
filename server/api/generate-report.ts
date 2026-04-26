@@ -33,12 +33,26 @@ export default defineEventHandler(async (event): Promise<any> => {
     })
   }
 
+  // 1.5. Group Microsoft Events by Date
+  if (msRes.success && msRes.events) {
+    msRes.events.forEach((ev: any) => {
+      const date = new Date(ev.start.dateTime).toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' })
+      if (!groupedActivities[date]) groupedActivities[date] = []
+
+      const desc = ev.subject || ''
+      if (desc && !groupedActivities[date].includes(desc)) {
+        groupedActivities[date].push(desc)
+      }
+    })
+  }
+
   // 2. Add Manual Activities
   if (manualRes.success && manualRes.activities) {
     manualRes.activities.forEach((ma: any) => {
       if (!groupedActivities[ma.date]) groupedActivities[ma.date] = []
-      if (!groupedActivities[ma.date].includes(ma.activity)) {
-        groupedActivities[ma.date].push(ma.activity)
+      const current = groupedActivities[ma.date]!
+      if (!current.includes(ma.activity)) {
+        current.push(ma.activity)
       }
     })
   }
@@ -50,7 +64,7 @@ export default defineEventHandler(async (event): Promise<any> => {
     masuk: getRandomTime(7, 8),
     pulang: getRandomTime(17, 18),
     ti: 'TI',
-    aktivitas: groupedActivities[date].join('; ')
+    aktivitas: groupedActivities[date]!.join('; ')
   }))
 
   return {

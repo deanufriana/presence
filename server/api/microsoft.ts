@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event): Promise<any> => {
   const query = getQuery(event)
-  const date = query.date as string || new Date().toISOString().split('T')[0]
+  const date = query.date as string || new Date().toISOString().slice(0, 7)
 
   const tokenSetting = await prisma.setting.findUnique({ where: { key: 'ms_access_token' } })
   const refreshSetting = await prisma.setting.findUnique({ where: { key: 'ms_refresh_token' } })
@@ -25,9 +25,9 @@ export default defineEventHandler(async (event): Promise<any> => {
       const tokenResponse: any = await (globalThis as any).$fetch(tokenUrl, {
         method: 'POST',
         body: new URLSearchParams({
-          client_id: clientId,
-          client_secret: clientSecret,
-          refresh_token: msRefreshToken,
+          client_id: clientId as string,
+          client_secret: clientSecret as string,
+          refresh_token: msRefreshToken as string,
           grant_type: 'refresh_token',
           scope: 'offline_access Calendars.ReadBasic'
         })
