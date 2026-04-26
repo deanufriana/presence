@@ -13,7 +13,7 @@
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
         @click.self="$emit('update:modelValue', false)"
       >
-        <Card class="w-full max-w-md shadow-2xl border-primary/20">
+        <Card class="w-full max-w-2xl shadow-2xl border-primary/20">
           <CardHeader>
             <CardTitle class="flex items-center gap-2">
               <div
@@ -34,7 +34,7 @@
                 :value="activityText"
                 @input="$emit('update:activityText', ($event.target as HTMLTextAreaElement).value)"
                 placeholder="What did you work on today? (e.g. Documentation, Meeting, etc.)"
-                class="w-full min-h-[120px] rounded-lg border border-border bg-muted/20 p-3 text-sm outline-none focus:ring-1 focus:ring-primary transition-all resize-none"
+                class="w-full min-h-[200px] rounded-lg border border-border bg-muted/20 p-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
                 autofocus
               />
             </div>

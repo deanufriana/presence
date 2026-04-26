@@ -48,41 +48,43 @@ export interface MonthlyReportRow {
   status: string;
 }
 
-export function useReport() {
-  // ─── State ─────────────────────────────────────────
-  const selectedDate = ref(format(new Date(), "yyyy-MM"));
-  const showSettings = ref(false);
-  const saving = ref(false);
-  const copied = ref(false);
-  const summarizing = ref(false);
-  const monthlyHighlights = ref("");
-  const showManualEntry = ref(false);
-  const showConfirmSync = ref(false);
-  const syncing = ref(false);
-  const fetchingGitlab = ref(false);
-  const gitlabData = ref<any>(null);
-  const selectedDayForEntry = ref<{ date: string; dayNum: number } | null>(
-    null,
-  );
-  const manualActivityText = ref("");
-  const manualActivitiesMap = ref<Record<string, string>>({});
-  const fetchingProjects = ref(false);
-  const allProjects = ref<{ id: number; name: string; path: string }[]>([]);
-  const summarizingRows = ref<Record<string, boolean>>({});
-  const selectedProjectIds = ref<number[]>([]);
-  const localRows = ref<ReportRow[]>([]);
-  const monthlyRows = ref<MonthlyReportRow[]>([]);
-  const copiedMonthly = ref(false);
-  const reportData = ref<ReportResponse | null>(null);
-  const pending = ref(false);
+// ─── Shared State ────────────────────────────────
+const selectedDate = ref(format(new Date(), "yyyy-MM"));
+const showSettings = ref(false);
+const saving = ref(false);
+const copied = ref(false);
+const summarizing = ref(false);
+const monthlyHighlights = ref("");
+const showManualEntry = ref(false);
+const showConfirmSync = ref(false);
+const syncing = ref(false);
+const fetchingGitlab = ref(false);
+const gitlabData = ref<any>(null);
+const selectedDayForEntry = ref<{ date: string; dayNum: number } | null>(
+  null,
+);
+const manualActivityText = ref("");
+const manualActivitiesMap = ref<Record<string, string>>({});
+const fetchingProjects = ref(false);
+const allProjects = ref<{ id: number; name: string; path: string }[]>([]);
+const summarizingRows = ref<Record<string, boolean>>({});
+const selectedProjectIds = ref<number[]>([]);
+const localRows = ref<ReportRow[]>([]);
+const monthlyRows = ref<MonthlyReportRow[]>([]);
+const copiedMonthly = ref(false);
+const reportData = ref<ReportResponse | null>(null);
+const pending = ref(false);
 
-  const settings = ref<SettingsData>({
-    gitlab_token: "",
-    gitlab_url: "https://gitlab.com",
-    gitlab_selected_projects: "",
-    ai_api_key: "",
-    openai_api_key: "",
-  });
+const settings = ref<SettingsData>({
+  gitlab_token: "",
+  gitlab_url: "https://gitlab.com",
+  gitlab_selected_projects: "",
+  ai_api_key: "",
+  openai_api_key: "",
+});
+
+export function useReport () {
+  // ─── Instance logic (will be shared) ───────────────
 
   // ─── Computed ──────────────────────────────────────
   const formattedDate = computed(() => {
@@ -169,7 +171,7 @@ export function useReport() {
 
   // ─── Methods ───────────────────────────────────────
 
-  async function loadCachedData() {
+  async function loadCachedData () {
     try {
       const [cachedGitlab, reportRes, monthlyRes]: any = await Promise.all([
         $fetch("/api/gitlab/cache" as any, {
@@ -216,7 +218,7 @@ export function useReport() {
     }
   }
 
-  async function fetchGitlabFresh() {
+  async function fetchGitlabFresh () {
     fetchingGitlab.value = true;
     try {
       const res: any = await $fetch("/api/gitlab" as any, {
@@ -230,7 +232,7 @@ export function useReport() {
     }
   }
 
-  function confirmSync() {
+  function confirmSync () {
     if (localRows.value.length > 0) {
       showConfirmSync.value = true;
     } else {
@@ -238,7 +240,7 @@ export function useReport() {
     }
   }
 
-  async function executeSyncGitlab() {
+  async function executeSyncGitlab () {
     showConfirmSync.value = false;
     syncing.value = true;
     pending.value = true;
@@ -306,18 +308,18 @@ export function useReport() {
     }
   }
 
-  async function refreshReport() {
+  async function refreshReport () {
     await executeSyncGitlab();
   }
 
-  async function persistSettings() {
+  async function persistSettings () {
     await $fetch("/api/settings" as any, {
       method: "POST",
       body: settings.value,
     });
   }
 
-  async function fetchProjects() {
+  async function fetchProjects () {
     fetchingProjects.value = true;
     try {
       // Save settings first so backend has the latest token/url
@@ -335,7 +337,7 @@ export function useReport() {
     }
   }
 
-  function toggleProject(projectId: number) {
+  function toggleProject (projectId: number) {
     const index = selectedProjectIds.value.indexOf(projectId);
     if (index === -1) {
       selectedProjectIds.value.push(projectId);
@@ -346,7 +348,7 @@ export function useReport() {
       selectedProjectIds.value.join(",");
   }
 
-  async function saveSettings() {
+  async function saveSettings () {
     saving.value = true;
     try {
       await persistSettings();
@@ -459,7 +461,7 @@ export function useReport() {
     }
   };
 
-  function parseMonthlySummaryToRows(
+  function parseMonthlySummaryToRows (
     summary: string,
     selectedMonth: string,
   ): MonthlyReportRow[] {
@@ -516,14 +518,14 @@ export function useReport() {
     return rows;
   }
 
-  function normalizeMonthlyStatus(status: string): string {
+  function normalizeMonthlyStatus (status: string): string {
     const normalized = status.trim().toLowerCase();
     if (normalized === "project enhance") return "Project Enhance";
     if (normalized === "continuing (daily)") return "Continuing (Daily)";
     return "Project";
   }
 
-  function addMonthlyRow(monthName?: string) {
+  function addMonthlyRow (monthName?: string) {
     monthlyRows.value.push({
       bulan: monthName || "",
       project: "",
@@ -533,7 +535,7 @@ export function useReport() {
     });
   }
 
-  function removeMonthlyRow(idx: number) {
+  function removeMonthlyRow (idx: number) {
     monthlyRows.value.splice(idx, 1);
   }
 
@@ -683,7 +685,7 @@ export function useReport() {
     }
   };
 
-  function formatTime(dateStr: string) {
+  function formatTime (dateStr: string) {
     try {
       return format(parseISO(dateStr), "HH:mm");
     } catch (e) {

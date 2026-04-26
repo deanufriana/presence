@@ -6,14 +6,24 @@ export interface AiOptions {
 }
 
 export const generateSummary = async (prompt: string, options: AiOptions): Promise<string> => {
-  return await callGemini(prompt, options).catch(async () => {
-    return await callOpenAi(prompt, options)
-  })
+  try {
+    return await callGemini(prompt, options)
+  } catch (geminiError: any) {
+    console.error('Gemini failed:', geminiError.message)
+
+    // Only fallback to OpenAI if a key is provided
+    const openAiKey = await prisma.setting.findUnique({ where: { key: 'openai_api_key' } })
+    if (openAiKey?.value) {
+      return await callOpenAi(prompt, options)
+    }
+
+    throw geminiError
+  }
 }
 
 async function callOpenAi (prompt: string, options: AiOptions): Promise<string> {
   const aiKeySetting = await prisma.setting.findUnique({ where: { key: 'openai_api_key' } })
-  if (!aiKeySetting) throw new Error('AI API Key not configured in settings')
+  if (!aiKeySetting?.value) throw new Error('AI API Key not configured in settings')
 
   const response: any = await (globalThis as any).$fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -42,7 +52,7 @@ async function callGemini (prompt: string, options: AiOptions): Promise<string> 
   const aiKeySetting = await prisma.setting.findUnique({ where: { key: 'ai_api_key' } })
   if (!aiKeySetting) throw new Error('AI API Key not configured in settings')
 
-  const url: any = `https://generativelanguage.googleapis.com/v1/models/${options.model ?? 'gemini-3.1-flash'}:generateContent?key=${aiKeySetting.value}`
+  const url: any = `https://generativelanguage.googleapis.com/v1/models/${options.model ?? 'gemini-2.5-flash-lite'}:generateContent?key=${aiKeySetting.value}`
   const response: any = await (globalThis as any).$fetch(url, {
     method: 'POST',
     body: {

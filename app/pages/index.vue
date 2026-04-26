@@ -28,11 +28,21 @@
             <PopoverContent class="w-64 p-3" align="end">
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <Button variant="outline" size="icon" class="h-7 w-7" @click="changeYear(-1)">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    class="h-7 w-7"
+                    @click="changeYear(-1)"
+                  >
                     <ChevronLeft class="h-4 w-4" />
                   </Button>
                   <div class="text-sm font-bold">{{ pickerYear }}</div>
-                  <Button variant="outline" size="icon" class="h-7 w-7" @click="changeYear(1)">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    class="h-7 w-7"
+                    @click="changeYear(1)"
+                  >
                     <ChevronRight class="h-4 w-4" />
                   </Button>
                 </div>
@@ -43,7 +53,10 @@
                     size="sm"
                     variant="ghost"
                     class="h-9 w-full text-[10px] font-medium"
-                    :class="{ 'bg-primary text-primary-foreground hover:bg-primary/90': isCurrentMonth(i) }"
+                    :class="{
+                      'bg-primary text-primary-foreground hover:bg-primary/90':
+                        isCurrentMonth(i),
+                    }"
                     @click="selectMonth(i)"
                   >
                     {{ m }}
@@ -117,7 +130,7 @@
       </TabsList>
 
       <TabsContent value="daily">
-        <ReportTable
+        <DailyReport
           :local-rows="localRows"
           :settings="settings"
           :copied="copied"
@@ -167,10 +180,7 @@
       :selected-project-ids="selectedProjectIds"
     />
 
-    <SyncConfirmModal
-      v-model="showConfirmSync"
-      @confirm="executeSyncGitlab"
-    />
+    <SyncConfirmModal v-model="showConfirmSync" @confirm="executeSyncGitlab" />
 
     <ManualActivityModal
       v-model="showManualEntry"
@@ -196,11 +206,22 @@ import { useScrollLock } from "@vueuse/core";
 import { Separator } from "~/components/ui/separator";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { format, parse, isValid, startOfMonth, setMonth, setYear } from "date-fns";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import {
+  format,
+  parse,
+  isValid,
+  startOfMonth,
+  setMonth,
+  setYear,
+} from "date-fns";
 import { DateFormatter, getLocalTimeZone } from "@internationalized/date";
 import { useVModel } from "@vueuse/core";
-import ReportTable from "~/components/report/ReportTable.vue";
+import DailyReport from "~/components/report/DailyReport.vue";
 import MonthlyReport from "~/components/report/MonthlyReport.vue";
 import GitlabCalendar from "~/components/report/GitlabCalendar.vue";
 import SettingsModal from "~/components/report/SettingsModal.vue";
@@ -253,25 +274,42 @@ const df = new DateFormatter("en-US", {
 });
 
 const months = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const internalDate = ref(new Date());
 
 // Sync string "YYYY-MM" to internalDate
-watch(selectedDate, (newVal) => {
-  if (!newVal) return;
-  const parsed = parse(newVal, "yyyy-MM", new Date());
-  if (isValid(parsed)) {
-    internalDate.value = parsed;
-  }
-}, { immediate: true });
+watch(
+  selectedDate,
+  (newVal) => {
+    if (!newVal) return;
+    const parsed = parse(newVal, "yyyy-MM", new Date());
+    if (isValid(parsed)) {
+      internalDate.value = parsed;
+    }
+  },
+  { immediate: true },
+);
 
 const pickerYear = computed(() => internalDate.value.getFullYear());
 
 const changeYear = (delta: number) => {
-  internalDate.value = setYear(internalDate.value, internalDate.value.getFullYear() + delta);
+  internalDate.value = setYear(
+    internalDate.value,
+    internalDate.value.getFullYear() + delta,
+  );
   selectedDate.value = format(internalDate.value, "yyyy-MM");
 };
 
