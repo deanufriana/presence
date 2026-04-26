@@ -558,6 +558,10 @@ export function useReport () {
     monthlyRows.value.splice(idx, 1);
   }
 
+  function removeDailyRow (idx: number) {
+    localRows.value.splice(idx, 1);
+  }
+
   const copyMonthlyReport = () => {
     if (!monthlyRows.value.length) return;
 
@@ -931,6 +935,7 @@ export function useReport () {
     generateAiSummary,
     addMonthlyRow,
     removeMonthlyRow,
+    removeDailyRow,
     openManualEntry,
     saveManualActivity,
     deleteManualActivity,

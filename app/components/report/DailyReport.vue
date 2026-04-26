@@ -156,6 +156,14 @@
                   />
                   <Sparkles v-else class="h-3.5 w-3.5" />
                 </button>
+
+                <button
+                  @click.stop="removeDailyRow(idx)"
+                  class="h-6 w-6 flex items-center justify-center rounded-md text-red-400 hover:bg-red-500/10 transition-all"
+                  title="Delete row"
+                >
+                  <Trash2 class="h-3.5 w-3.5" />
+                </button>
               </div>
             </td>
           </tr>
@@ -176,7 +184,7 @@
 </template>
 
 <script setup lang="ts">
-import { FileText, Copy, Check, Sparkles, RefreshCw } from "lucide-vue-next";
+import { FileText, Copy, Check, Sparkles, RefreshCw, Trash2 } from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -195,7 +203,7 @@ defineProps<{
   summarizingRows: Record<string, boolean>;
 }>();
 
-const { copyReport, summarizeRow, openManualEntry, isAiEnabled } = useReport();
+const { copyReport, summarizeRow, openManualEntry, isAiEnabled, removeDailyRow } = useReport();
 
 const copiedRows = ref<Record<string, boolean>>({});
 
