@@ -67,7 +67,21 @@
               class="h-3.5 w-3.5"
               :class="{ 'animate-bounce': exportingDocx }"
             />
-            {{ exportingDocx ? "Exporting..." : "Export Word" }}
+            Export Task Job
+          </Button>
+
+          <Button
+            variant="outline"
+            size="xs"
+            @click="handleBastExport"
+            :disabled="!localRows.length || exportingDocx"
+            class="border-orange-500/20 hover:border-orange-500/50 hover:bg-orange-500/5 text-orange-600 dark:text-orange-400"
+          >
+            <File
+              class="h-3.5 w-3.5"
+              :class="{ 'animate-bounce': exportingDocx }"
+            />
+            Export BAST
           </Button>
         </div>
       </div>
@@ -294,7 +308,7 @@ const {
   removeMonthlyRow,
   copyMonthlyReport,
 } = monthlyStore;
-const { exportToDocx, exportingDocx } = useDocxExport();
+const { exportToDocx, exportBAST, exportingDocx } = useDocxExport();
 const { success, error } = useToast();
 
 const handleDocxExport = async () => {
@@ -307,6 +321,15 @@ const handleDocxExport = async () => {
     success("Monthly report exported to Word!");
   } catch (err) {
     error("Failed to export Word document");
+  }
+};
+
+const handleBastExport = async () => {
+  try {
+    await exportBAST(monthlyRows.value, selectedDate.value, coreStore.settings);
+    success("BAST document exported to Word!");
+  } catch (err) {
+    error("Failed to export BAST document");
   }
 };
 
