@@ -231,7 +231,12 @@ export const useDailyStore = defineStore('daily', () => {
       body: { date, activity },
     })
     manualActivitiesMap.value[date] = activity
-    core.refreshReport()
+
+    // Update local state if not already updated
+    const row = localRows.value.find(r => r.date === date)
+    if (row && row.aktivitas !== activity) {
+      row.aktivitas = activity
+    }
   }
 
   const saveManualActivity = async () => {
@@ -264,15 +269,21 @@ export const useDailyStore = defineStore('daily', () => {
     try { return format(parseISO(dateStr), "HH:mm") } catch (e) { return dateStr }
   }
 
-  watchDebounced(localRows, async (newRows) => {
-    if (newRows.length >= 0) {
-      await $fetch("/api/report/daily" as any, { method: "POST", body: newRows })
-      newRows.forEach((r) => {
-        if (r.aktivitas) manualActivitiesMap.value[r.date] = r.aktivitas
-        else delete manualActivitiesMap.value[r.date]
+  const updateRow = async (row: ReportRow) => {
+    try {
+      await $fetch("/api/report/daily" as any, {
+        method: "POST",
+        body: row,
       })
+      if (row.aktivitas) {
+        manualActivitiesMap.value[row.date] = row.aktivitas
+      } else {
+        delete manualActivitiesMap.value[row.date]
+      }
+    } catch (err) {
+      console.error("Failed to update row:", err)
     }
-  }, { deep: true, debounce: 1000 })
+  }
 
   return {
     localRows,
@@ -296,5 +307,6 @@ export const useDailyStore = defineStore('daily', () => {
     saveManualActivity,
     syncDayActivity,
     formatTime,
+    updateRow,
   }
 })

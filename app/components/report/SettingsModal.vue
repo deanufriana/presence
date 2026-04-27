@@ -155,16 +155,19 @@
                   <Card
                     v-for="p in allProjects"
                     :key="p.id"
-                    class="p-2 flex items-center gap-2 cursor-pointer transition-all hover:border-primary/50 hover:bg-accent/50 group relative"
+                    class="p-2 flex items-center gap-2 cursor-pointer transition-all hover:border-primary/50 hover:bg-accent/50 group relative focus-visible:ring-1 focus-visible:ring-primary outline-none"
                     :class="{
-                      'border-primary/50 bg-primary/5':
+                      'border-primary/50 bg-primary/5 shadow-sm':
                         selectedProjectIds.includes(p.id),
                     }"
-                    @click="toggleProject(p.id)"
+                    tabindex="0"
+                    @click="gitlabStore.toggleProject(p.id)"
+                    @keydown.enter.prevent="gitlabStore.toggleProject(p.id)"
+                    @keydown.space.prevent="gitlabStore.toggleProject(p.id)"
                   >
                     <Checkbox
                       :checked="selectedProjectIds.includes(p.id)"
-                      class="h-3.5 w-3.5"
+                      class="h-4 w-4 pointer-events-none"
                     />
                     <div class="flex flex-col min-w-0">
                       <span

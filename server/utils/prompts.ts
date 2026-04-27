@@ -13,7 +13,7 @@ Bahasa & Gaya:
 
 Aturan Pengelompokan & Format (WAJIB):
 1. Gunakan format Markdown.
-2. Kelompokkan berdasarkan proyek/aplikasi. Jika nama proyek tidak teridentifikasi, masukkan ke **Project Lainnya**.
+2. Kelompokkan berdasarkan proyek/aplikasi. Gunakan tag [Project: Nama Proyek] yang ada pada aktivitas sebagai referensi utama. Jika nama proyek tidak teridentifikasi, masukkan ke **Project Lainnya**.
 3. Urutkan proyek dari volume aktivitas tertinggi ke terendah.
 4. Judul proyek wajib menggunakan format tebal: **Nama Proyek**
 5. Di bawah tiap proyek, gunakan bullet "-" dengan MAKSIMAL 3 bullet per proyek. Pilih 3 pencapaian yang paling berdampak/penting.
@@ -25,6 +25,7 @@ Aturan Konten & Sintesis:
 9. Gabungkan aktivitas/commit yang serupa menjadi 1 bullet umum yang komprehensif tanpa menghilangkan konteks teknis utamanya.
 10. Ringkas log aktivitas meeting (misal: "Meeting from... with discuss about...") menjadi satu ringkasan koordinasi/diskusi teknis yang relevan dengan proyek.
 11. DILARANG halusinasi; ekstrak data murni dari daftar aktivitas yang diberikan.
+12. JANGAN menyertakan nama branch (misal: feature/api, develop) ke dalam ringkasan.
 
 Aturan Label Status (WAJIB):
 12. Setiap bullet WAJIB diakhiri dengan salah satu dari 3 label status berikut (tulis persis seperti ini):
@@ -67,17 +68,17 @@ Aturan Output & Format (WAJIB):
 4. Urutkan dari dampak terbesar ke terkecil (Prioritas: Rilis Fitur/Proyek > Perbaikan Bug > Meeting/Operasional).
 
 Aturan Konten & Sintesis:
-5. WAJIB menyebutkan nama proyek dan modul/fitur spesifik pada setiap poin. JANGAN menghapus detail mengenai "di mana" implementasi dilakukan.
-6. Sertakan nama branch di dalam kurung jika tersedia (misal: '(branch: feature/auth)').
-7. Awali kalimat dengan kata kerja profesional (misal: Mengimplementasi, Mengoptimasi, Mengintegrasi, Menyelesaikan, Memvalidasi, Memfasilitasi).
-8. Gabungkan aktivitas sejenis menjadi satu poin yang menyoroti progres signifikan serta dampaknya, namun tetap pertahankan detail lokasi kerjanya.
-9. Jika terdapat log dengan format "Meeting from [start] to [end] with discuss about [topic]", WAJIB tuliskan persis seperti ini:
+5. WAJIB menyebutkan nama proyek dan modul/fitur spesifik pada setiap poin. Gunakan informasi dari tag [Project: Nama Proyek] yang tersedia. JANGAN menghapus detail mengenai "di mana" implementasi dilakukan.
+6. Awali kalimat dengan kata kerja profesional (misal: Mengimplementasi, Mengoptimasi, Mengintegrasi, Menyelesaikan, Memvalidasi, Memfasilitasi).
+7. Gabungkan aktivitas sejenis menjadi satu poin yang menyoroti progres signifikan serta dampaknya, namun tetap pertahankan detail lokasi kerjanya.
+8. Jika terdapat log dengan format "Meeting from [start] to [end] with discuss about [topic]", WAJIB tuliskan persis seperti ini:
    - Meeting mengenai [topic] pada jam [start] - [end].
-10. DILARANG halusinasi; ekstrak data murni dari daftar aktivitas yang diberikan.
+9. DILARANG halusinasi; ekstrak data murni dari daftar aktivitas yang diberikan.
+10. JANGAN menyertakan nama branch (misal: feature/api, develop) ke dalam ringkasan.
 </instructions>
 
 <example>
-- Menambahkan fitur pengingat jadwal otomatis pada modul Notification Engine di NotiFi (branch: feature/scheduler) agar pengiriman lebih akurat.
+- Menambahkan fitur pengingat jadwal otomatis pada modul Notification Engine di NotiFi agar pengiriman lebih akurat.
 - Memperbaiki bug sinkronisasi data pada middleware API Gateway untuk menjamin konsistensi data user.
 - Merapikan struktur folder aset di repository Frontend untuk mempermudah navigasi tim developer.
 - Meeting mengenai rancangan arsitektur database baru pada jam 09:00 - 10:00.

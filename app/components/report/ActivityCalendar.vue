@@ -89,12 +89,19 @@
               <Trash2 class="h-4 w-4" />
             </button>
             <button
-              v-else-if="day.count > 0"
+              v-if="day.count > 0"
               @click.stop="syncDayActivity(day.date)"
-              class="absolute -top-1.5 -right-1.5 h-7 w-7 flex items-center justify-center rounded-full border border-orange-500/50 bg-orange-500/20 text-orange-200 hover:bg-orange-500/35 hover:text-white shadow-lg shadow-orange-500/20 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
+              class="absolute -top-1.5 -left-1.5 h-7 w-7 flex items-center justify-center rounded-full border border-emerald-500/50 bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/35 hover:text-white shadow-lg shadow-emerald-500/20 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
+              :class="{
+                'opacity-100 bg-emerald-500/40': syncingRows[day.date],
+              }"
+              :disabled="syncingRows[day.date]"
               title="Sync activity from commits"
             >
-              <RefreshCw class="h-4 w-4" />
+              <RefreshCw
+                class="h-4 w-4"
+                :class="{ 'animate-spin': syncingRows[day.date] }"
+              />
             </button>
 
             <span
@@ -217,6 +224,7 @@ const calendarStore = useCalendarStore();
 const { fetchingGitlab } = storeToRefs(gitlabStore);
 const { calendarBlanks, calendarDays } = storeToRefs(calendarStore);
 
+const { syncingRows } = storeToRefs(dailyStore);
 const { openManualEntry, deleteActivity, syncDayActivity } = dailyStore;
 const { fetchGitlabFresh } = gitlabStore;
 

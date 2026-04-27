@@ -2,50 +2,10 @@ import { format } from 'date-fns'
 
 export default defineEventHandler(async (event): Promise<any> => {
   const query = getQuery(event)
-  const dateStr = query.date as string || new Date().toISOString().slice(0, 7)
+  const dateStr = query.date as string || format(new Date(), 'yyyy-MM')
 
   try {
-    const [gitlabRes, calendarCache]: any = await Promise.all([
-      getGitLabCache(dateStr),
-      getCalendarCache(dateStr)
-    ])
-
-    // 1. Group GitLab Commits by Date
-    const groupedActivities: Record<string, string[]> = {}
-
-    if (gitlabRes.success && gitlabRes.events) {
-      gitlabRes.events.forEach((ev: any) => {
-        const date = format(new Date(ev.created_at), 'yyyy-MM-dd')
-        if (!groupedActivities[date]) groupedActivities[date] = []
-
-        let desc = ev.title || ''
-
-        if (desc && !groupedActivities[date].includes(desc)) {
-          groupedActivities[date].push(desc)
-        }
-      })
-    }
-
-    // 1.1 Group Calendar Events by Date
-    if (calendarCache && calendarCache.events) {
-      calendarCache.events.forEach((ev: any) => {
-        const date = ev.date
-        if (!groupedActivities[date]) groupedActivities[date] = []
-
-        let act = ev.summary
-        if (ev.startTime && ev.endTime) {
-          act = `Meeting from ${ev.startTime} to ${ev.endTime} with discuss about ${ev.summary}`
-        } else if (ev.startTime) {
-          act = `Meeting at ${ev.startTime} with discuss about ${ev.summary}`
-        }
-
-        if (act && !groupedActivities[date].includes(act)) {
-          groupedActivities[date].push(act)
-        }
-      })
-    }
-
-    // 2. Build the Rows and Save to DB
+    const groupedActivities = await fetchAndGroupActivities(dateStr, true)
     const activeDates = Object.keys(groupedActivities).sort()
     const rows = await Promise.all(activeDates.map(async (date) => {
       return await upsertDailyReport({
@@ -56,8 +16,7 @@ export default defineEventHandler(async (event): Promise<any> => {
 
     return {
       success: true,
-      rows,
-      raw: { gitlab: gitlabRes }
+      rows
     }
   } catch (error: any) {
     return { success: false, error: error.message }

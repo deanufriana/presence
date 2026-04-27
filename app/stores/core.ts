@@ -57,10 +57,6 @@ export const useCoreStore = defineStore('core', () => {
     }
   }
 
-  function refreshReport () {
-    loadCachedData()
-  }
-
   async function saveSettings () {
     saving.value = true
     try {
@@ -75,7 +71,6 @@ export const useCoreStore = defineStore('core', () => {
       settings.value = payload
       success("Settings saved successfully")
       showSettings.value = false
-      refreshReport()
     } catch (err) {
       console.error("Failed to save settings:", err)
       error("Failed to save settings")
@@ -112,7 +107,6 @@ export const useCoreStore = defineStore('core', () => {
     settings,
     isAiEnabled,
     loadCachedData,
-    refreshReport,
     saveSettings,
     init,
   }

@@ -86,10 +86,13 @@ export const useGitlabStore = defineStore('gitlab', () => {
     }
   }
 
-  function toggleProject (id: number) {
-    const index = selectedProjectIds.value.indexOf(id)
+  function toggleProject (id: number | string) {
+    const numId = typeof id === 'string' ? parseInt(id, 10) : id
+    if (isNaN(numId)) return
+
+    const index = selectedProjectIds.value.indexOf(numId)
     if (index === -1) {
-      selectedProjectIds.value.push(id)
+      selectedProjectIds.value.push(numId)
     } else {
       selectedProjectIds.value.splice(index, 1)
     }

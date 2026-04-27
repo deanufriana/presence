@@ -106,18 +106,21 @@
             <td class="p-0">
               <input
                 v-model="row.masuk"
+                @change="updateRow(row)"
                 class="w-full h-full px-4 py-2 bg-transparent border-0 outline-none focus:ring-1 focus:ring-violet-500/30 transition-all"
               />
             </td>
             <td class="p-0">
               <input
                 v-model="row.pulang"
+                @change="updateRow(row)"
                 class="w-full h-full px-4 py-2 bg-transparent border-0 outline-none focus:ring-1 focus:ring-violet-500/30 transition-all"
               />
             </td>
             <td class="p-0">
               <input
                 v-model="row.ti"
+                @change="updateRow(row)"
                 class="w-full h-full px-4 py-2 bg-transparent border-0 outline-none focus:ring-1 focus:ring-violet-500/30 transition-all"
               />
             </td>
@@ -269,6 +272,7 @@ const {
   openManualEntry,
   deleteActivity,
   syncDayActivity,
+  updateRow,
 } = dailyStore;
 
 const { monthlyRows } = storeToRefs(useMonthlyStore());

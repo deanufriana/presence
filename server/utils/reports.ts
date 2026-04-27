@@ -1,4 +1,58 @@
 import { prisma } from './prisma'
+import { format } from 'date-fns'
+
+export function formatGitLabActivity (ev: any): string {
+  const desc = ev.title || ''
+  const projectName = ev.project_name || 'Unknown Project'
+  const branchName = ev.branch_name ? ` (branch: ${ev.branch_name})` : ''
+  return `[Project: ${projectName}] ${desc}${branchName}`
+}
+
+export function formatCalendarActivity (ev: any): string {
+  let act = ev.summary
+  if (ev.startTime && ev.endTime) {
+    act = `Meeting from ${ev.startTime} to ${ev.endTime} with discuss about ${ev.summary}`
+  } else if (ev.startTime) {
+    act = `Meeting at ${ev.startTime} with discuss about ${ev.summary}`
+  }
+  return act
+}
+
+export async function fetchAndGroupActivities (dateStr: string, isMonth: boolean = false) {
+  const monthStr = isMonth ? dateStr : dateStr.slice(0, 7)
+  const [gitlabRes, calendarCache]: any = await Promise.all([
+    getGitLabCache(monthStr),
+    getCalendarCache(monthStr)
+  ])
+
+  const grouped: Record<string, string[]> = {}
+
+  // 1. Process GitLab
+  if (gitlabRes.success && gitlabRes.events) {
+    gitlabRes.events.forEach((ev: any) => {
+      const evDate = format(new Date(ev.created_at), 'yyyy-MM-dd')
+      if (isMonth || evDate === dateStr) {
+        if (!grouped[evDate]) grouped[evDate] = []
+        const desc = formatGitLabActivity(ev)
+        if (desc && !grouped[evDate].includes(desc)) grouped[evDate].push(desc)
+      }
+    })
+  }
+
+  // 2. Process Calendar
+  if (calendarCache && calendarCache.events) {
+    calendarCache.events.forEach((ev: any) => {
+      const evDate = ev.date
+      if (isMonth || evDate === dateStr) {
+        if (!grouped[evDate]) grouped[evDate] = []
+        const act = formatCalendarActivity(ev)
+        if (act && !grouped[evDate].includes(act)) grouped[evDate].push(act)
+      }
+    })
+  }
+
+  return grouped
+}
 
 export async function getDailyReports (datePrefix: string) {
   if (!datePrefix) throw new Error('Date prefix required')
