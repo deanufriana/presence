@@ -30,11 +30,10 @@
             </div>
           </div>
           <Button
-            variant="outline"
-            size="sm"
+            variant="orange"
+            size="xxs"
             @click="fetchGitlabFresh()"
             :disabled="fetchingGitlab"
-            class="gap-1.5 text-xs h-7 border-orange-500/20 hover:bg-orange-500/5 text-orange-600 dark:text-orange-400"
           >
             <RefreshCw
               class="h-3 w-3"

@@ -103,9 +103,8 @@
                     :key="p.id"
                     class="p-2 flex items-center gap-2 cursor-pointer transition-all hover:border-primary/50 hover:bg-accent/50 group relative"
                     :class="{
-                      'border-primary/50 bg-primary/5': selectedProjectIds.includes(
-                        p.id
-                      ),
+                      'border-primary/50 bg-primary/5':
+                        selectedProjectIds.includes(p.id),
                     }"
                     @click="toggleProject(p.id)"
                   >
@@ -144,11 +143,16 @@
                   :model-value="settings.ai_provider"
                   @update:model-value="
                     (v) => {
-                      settings.ai_provider = v as 'gemini' | 'openai';
+                      settings.ai_provider = v as
+                        | 'gemini'
+                        | 'openai'
+                        | 'ollama';
                       settings.ai_model =
                         v === 'gemini'
                           ? 'gemini-2.0-flash-lite'
-                          : 'gpt-4o-mini';
+                          : v === 'openai'
+                            ? 'gpt-4o-mini'
+                            : 'gemma:latest';
                     }
                   "
                   class="w-auto"
@@ -159,6 +163,9 @@
                     </TabsTrigger>
                     <TabsTrigger value="openai" class="text-[10px] px-3 h-7">
                       OpenAI
+                    </TabsTrigger>
+                    <TabsTrigger value="ollama" class="text-[10px] px-3 h-7">
+                      Ollama
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
@@ -190,13 +197,33 @@
                           Gemini 1.5 Pro
                         </SelectItem>
                       </SelectGroup>
-                      <SelectGroup v-else>
+                      <SelectGroup
+                        v-else-if="settings.ai_provider === 'openai'"
+                      >
                         <SelectItem value="gpt-4o-mini">
                           GPT-4o Mini
                         </SelectItem>
                         <SelectItem value="gpt-4o"> GPT-4o </SelectItem>
                         <SelectItem value="gpt-3.5-turbo">
                           GPT-3.5 Turbo
+                        </SelectItem>
+                      </SelectGroup>
+                      <SelectGroup
+                        v-else-if="settings.ai_provider === 'ollama'"
+                      >
+                        <SelectItem
+                          v-for="m in ollamaModels"
+                          :key="m.name"
+                          :value="m.name"
+                        >
+                          {{ m.name }}
+                        </SelectItem>
+                        <SelectItem
+                          v-if="!ollamaModels.length"
+                          value="gemma:latest"
+                          disabled
+                        >
+                          No models found
                         </SelectItem>
                       </SelectGroup>
                     </SelectContent>
@@ -219,7 +246,10 @@
                   </p>
                 </div>
 
-                <div v-else class="space-y-1.5">
+                <div
+                  v-else-if="settings.ai_provider === 'openai'"
+                  class="space-y-1.5"
+                >
                   <Label class="text-xs">OpenAI API Key</Label>
                   <Input
                     v-model="settings.openai_api_key"
@@ -230,6 +260,37 @@
                   <p class="text-[10px] text-muted-foreground">
                     Standard industry provider for GPT models.
                   </p>
+                </div>
+
+                <div
+                  v-else-if="settings.ai_provider === 'ollama'"
+                  class="space-y-3"
+                >
+                  <div class="space-y-1.5">
+                    <Label class="text-xs">Ollama Base URL</Label>
+                    <div class="flex gap-2">
+                      <Input
+                        v-model="settings.ollama_url"
+                        placeholder="http://localhost:11434"
+                        class="h-9 text-sm"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        @click="fetchOllamaModels"
+                        :disabled="fetchingModels"
+                        class="h-9 px-3"
+                      >
+                        <RefreshCw
+                          class="h-3.5 w-3.5"
+                          :class="{ 'animate-spin': fetchingModels }"
+                        />
+                      </Button>
+                    </div>
+                    <p class="text-[10px] text-muted-foreground">
+                      The URL where your Ollama instance is running.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -291,7 +352,7 @@ import { useCoreStore } from "~/stores/core";
 import { useGitlabStore } from "~/stores/gitlab";
 import type { SettingsData } from "~/types/report";
 
-defineProps<{
+const props = defineProps<{
   modelValue: boolean;
   settings: SettingsData;
   saving: boolean;
@@ -309,4 +370,43 @@ const gitlabStore = useGitlabStore();
 
 const { saveSettings } = coreStore;
 const { fetchProjects, toggleProject } = gitlabStore;
+
+const ollamaModels = ref<any[]>([]);
+const fetchingModels = ref(false);
+
+async function fetchOllamaModels() {
+  fetchingModels.value = true;
+  try {
+    const res: any = await $fetch("/api/ollama/models");
+    if (res.success) {
+      ollamaModels.value = res.models;
+      // If current model is not in the list and list is not empty, select the first one
+      if (
+        ollamaModels.value.length > 0 &&
+        !ollamaModels.value.find((m) => m.name === props.settings.ai_model)
+      ) {
+        props.settings.ai_model = ollamaModels.value[0].name;
+      }
+    }
+  } catch (err) {
+    console.error("Failed to fetch Ollama models:", err);
+  } finally {
+    fetchingModels.value = false;
+  }
+}
+
+watch(
+  () => props.settings.ai_provider,
+  (newVal) => {
+    if (newVal === "ollama" && ollamaModels.value.length === 0) {
+      fetchOllamaModels();
+    }
+  },
+);
+
+onMounted(() => {
+  if (props.settings.ai_provider === "ollama") {
+    fetchOllamaModels();
+  }
+});
 </script>

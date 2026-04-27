@@ -12,6 +12,7 @@ export const useDailyStore = defineStore('daily', () => {
   const localRows = ref<ReportRow[]>([])
   const manualActivitiesMap = ref<Record<string, string>>({})
   const summarizingRows = ref<Record<string, boolean>>({})
+  const summarizingAll = ref(false)
   const syncingRows = ref<Record<string, boolean>>({})
 
   const showManualEntry = ref(false)
@@ -153,6 +154,38 @@ export const useDailyStore = defineStore('daily', () => {
     }
   }
 
+  async function summarizeAll () {
+    if (summarizingAll.value) return
+    summarizingAll.value = true
+    
+    // Get list of rows that need summary at the start
+    const rowsToProcess = localRows.value.filter(row => 
+      row.aktivitas && row.aktivitas.length > 5 && !summarizingRows.value[row.date]
+    )
+
+    const processSequentially = async (index: number) => {
+      if (index >= rowsToProcess.length) return
+      
+      const row = rowsToProcess[index]
+      if (row) {
+        await summarizeRow(row)
+        // Explicitly wait before next to be safe
+        await new Promise(resolve => setTimeout(resolve, 500))
+        await processSequentially(index + 1)
+      }
+    }
+
+    try {
+      await processSequentially(0)
+      success("All available rows summarized!")
+    } catch (err) {
+      console.error("Failed to summarize all:", err)
+      error("Error during batch summary")
+    } finally {
+      summarizingAll.value = false
+    }
+  }
+
   function removeDailyRow (idx: number) {
     const row = localRows.value[idx]
     localRows.value.splice(idx, 1)
@@ -249,11 +282,13 @@ export const useDailyStore = defineStore('daily', () => {
     manualActivityText,
     showConfirmSync,
     syncing,
+    summarizingAll,
     setCache,
     copyReport,
     confirmSync,
     executeSync,
     summarizeRow,
+    summarizeAll,
     removeDailyRow,
     openManualEntry,
     saveManualActivity,

@@ -25,9 +25,10 @@ export const useCoreStore = defineStore('core', () => {
     openai_api_key: "",
     ai_provider: "gemini",
     ai_model: "gemini-2.0-flash-lite",
+    ollama_url: "http://localhost:11434",
   })
 
-  const isAiEnabled = computed(() => !!(settings.value.ai_api_key || settings.value.openai_api_key))
+  const isAiEnabled = computed(() => !!(settings.value.ai_api_key || settings.value.openai_api_key || settings.value.ai_provider === 'ollama'))
 
   async function loadCachedData () {
     initialLoading.value = true

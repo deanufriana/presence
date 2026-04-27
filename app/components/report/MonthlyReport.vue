@@ -20,11 +20,11 @@
         <div class="flex items-center gap-2">
           <Button
             v-if="isAiEnabled"
-            variant="outline"
-            size="sm"
+            variant="ai"
+            size="xs"
             @click="generateAiSummary"
             :disabled="!localRows.length || summarizing"
-            class="gap-1.5 text-xs h-8 border-violet-500/20 hover:bg-violet-500/5 text-violet-600 dark:text-violet-400 relative overflow-hidden group"
+            class="relative overflow-hidden group"
           >
             <div
               v-if="summarizing"
@@ -38,19 +38,17 @@
           </Button>
           <Button
             variant="outline"
-            size="sm"
+            size="xs"
             @click="addMonthlyRow(formattedMonth)"
-            class="gap-1.5 text-xs h-8"
           >
             <Plus class="h-3.5 w-3.5" />
             Add Row
           </Button>
           <Button
             variant="outline"
-            size="sm"
+            size="xs"
             @click="copyMonthlyReport"
             :disabled="!monthlyRows.length"
-            class="gap-1.5 text-xs h-8"
           >
             <Check v-if="copiedMonthly" class="h-3.5 w-3.5 text-emerald-500" />
             <Copy v-else class="h-3.5 w-3.5" />

@@ -19,6 +19,10 @@ export const generateSummary = async (prompt: string, options: AiOptions): Promi
       return await callOpenAi(prompt, { ...options, model })
     }
 
+    if (provider === 'ollama') {
+      return await callOllama(prompt, { ...options, model })
+    }
+
     return await callGemini(prompt, { ...options, model })
   } catch (error: any) {
     console.error('AI Summary failed:', error.message)
@@ -68,6 +72,28 @@ async function callGemini (prompt: string, options: AiOptions): Promise<string> 
 
   const content = response.text?.trim()
   if (!content) throw new Error('Gemini did not return a valid summary')
+
+  return content.replace(/^["']|["']$/g, '')
+}
+async function callOllama (prompt: string, options: AiOptions): Promise<string> {
+  const baseUrlSetting = await prisma.setting.findUnique({ where: { key: 'ollama_url' } })
+  const baseUrl = baseUrlSetting?.value || 'http://localhost:11434'
+
+  const response: any = await (globalThis as any).$fetch(`${baseUrl}/api/generate`, {
+    method: 'POST',
+    body: {
+      model: options.model || 'gemma:latest',
+      prompt: prompt,
+      stream: false,
+      options: {
+        temperature: 0.3,
+        num_predict: options.max_tokens,
+      }
+    }
+  })
+
+  const content = response?.response?.trim()
+  if (!content) throw new Error('Ollama did not return a valid summary')
 
   return content.replace(/^["']|["']$/g, '')
 }

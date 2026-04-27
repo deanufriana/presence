@@ -14,57 +14,7 @@
 
         <div class="flex items-center gap-2">
           <!-- Date Picker -->
-          <Popover>
-            <PopoverTrigger as-child>
-              <Button
-                variant="outline"
-                size="sm"
-                class="w-[180px] justify-start text-left font-medium gap-2 border-border bg-card hover:border-primary/40"
-              >
-                <CalendarIcon class="h-4 w-4 text-muted-foreground shrink-0" />
-                {{ dateDisplay }}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-64 p-3" align="end">
-              <div class="space-y-4">
-                <div class="flex items-center justify-between">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    class="h-7 w-7"
-                    @click="changeYear(-1)"
-                  >
-                    <ChevronLeft class="h-4 w-4" />
-                  </Button>
-                  <div class="text-sm font-bold">{{ pickerYear }}</div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    class="h-7 w-7"
-                    @click="changeYear(1)"
-                  >
-                    <ChevronRight class="h-4 w-4" />
-                  </Button>
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                  <Button
-                    v-for="(m, i) in months"
-                    :key="m"
-                    size="sm"
-                    variant="ghost"
-                    class="h-9 w-full text-[10px] font-medium"
-                    :class="{
-                      'bg-primary text-primary-foreground hover:bg-primary/90':
-                        isCurrentMonth(i),
-                    }"
-                    @click="selectMonth(i)"
-                  >
-                    {{ m }}
-                  </Button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <MonthPicker v-model="selectedDate" />
 
           <!-- Settings Button -->
           <Button
@@ -100,10 +50,10 @@
 
           <!-- Sync Button -->
           <Button
+            variant="gradient"
             size="sm"
             @click="confirmSync"
             :disabled="syncing"
-            class="gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0 shadow-md shadow-violet-500/20"
           >
             <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': syncing }" />
             <span class="hidden sm:inline">Sync Activities</span>
@@ -182,69 +132,42 @@
 
 <script setup lang="ts">
 import {
-  Calendar as CalendarIcon,
   CalendarDays,
   CalendarRange,
   Settings,
-  GitMerge,
   FileText,
-  ChevronLeft,
-  ChevronRight,
   Upload,
   RefreshCw,
 } from "lucide-vue-next";
 import { useScrollLock } from "@vueuse/core";
-import { Separator } from "~/components/ui/separator";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
-import {
-  format,
-  parse,
-  isValid,
-  startOfMonth,
-  setMonth,
-  setYear,
-} from "date-fns";
-import { DateFormatter, getLocalTimeZone } from "@internationalized/date";
-import { useVModel } from "@vueuse/core";
+import { format, parse } from "date-fns";
 import DailyReport from "~/components/report/DailyReport.vue";
 import MonthlyReport from "~/components/report/MonthlyReport.vue";
 import ActivityCalendar from "~/components/report/ActivityCalendar.vue";
+import MonthPicker from "~/components/report/MonthPicker.vue";
 import SettingsModal from "~/components/report/SettingsModal.vue";
 import SyncConfirmModal from "~/components/report/SyncConfirmModal.vue";
 import ManualActivityModal from "~/components/report/ManualActivityModal.vue";
 
-import { useCoreStore } from '~/stores/core'
-import { useDailyStore } from '~/stores/daily'
-import { useMonthlyStore } from '~/stores/monthly'
-import { useGitlabStore } from '~/stores/gitlab'
-import { useCalendarStore } from '~/stores/calendar'
-import { storeToRefs } from 'pinia'
+import { useCoreStore } from "~/stores/core";
+import { useDailyStore } from "~/stores/daily";
+import { useMonthlyStore } from "~/stores/monthly";
+import { useGitlabStore } from "~/stores/gitlab";
+import { useCalendarStore } from "~/stores/calendar";
+import { storeToRefs } from "pinia";
 
-const coreStore = useCoreStore()
-const gitlabStore = useGitlabStore()
+const coreStore = useCoreStore();
+const gitlabStore = useGitlabStore();
 
-const {
-  selectedDate,
-  showSettings,
-  saving,
-  pending,
-  settings,
-} = storeToRefs(coreStore)
+const { selectedDate, showSettings, saving, pending, settings } =
+  storeToRefs(coreStore);
 
-const {
-  fetchingProjects,
-  allProjects,
-  selectedProjectIds,
-  gitlabData,
-} = storeToRefs(gitlabStore)
+const { fetchingProjects, allProjects, selectedProjectIds, gitlabData } =
+  storeToRefs(gitlabStore);
 
-const dailyStore = useDailyStore()
+const dailyStore = useDailyStore();
 
 const {
   showConfirmSync,
@@ -252,79 +175,26 @@ const {
   selectedDayForEntry,
   manualActivityText,
   syncing,
-} = storeToRefs(dailyStore)
+} = storeToRefs(dailyStore);
 
-const {
-  executeSync,
-  saveManualActivity,
-  confirmSync,
-} = dailyStore
+const { executeSync, saveManualActivity, confirmSync } = dailyStore;
 
-const calendarStore = useCalendarStore()
-const { importingCalendar } = storeToRefs(calendarStore)
-const { importCalendar } = calendarStore
+const calendarStore = useCalendarStore();
+const { importingCalendar } = storeToRefs(calendarStore);
+const { importCalendar } = calendarStore;
 
 onMounted(() => {
-  coreStore.init()
-})
-
-// ─── Date Handling ────────────────────────────────
-const df = new DateFormatter("en-US", {
-  month: "long",
-  year: "numeric",
+  coreStore.init();
 });
 
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-const internalDate = ref(new Date());
-
-// Sync string "YYYY-MM" to internalDate
-watch(
-  selectedDate,
-  (newVal) => {
-    if (!newVal) return;
-    const parsed = parse(newVal, "yyyy-MM", new Date());
-    if (isValid(parsed)) {
-      internalDate.value = parsed;
-    }
-  },
-  { immediate: true },
-);
-
-const pickerYear = computed(() => internalDate.value.getFullYear());
-
-const changeYear = (delta: number) => {
-  internalDate.value = setYear(
-    internalDate.value,
-    internalDate.value.getFullYear() + delta,
-  );
-  selectedDate.value = format(internalDate.value, "yyyy-MM");
-};
-
-const selectMonth = (monthIndex: number) => {
-  internalDate.value = setMonth(internalDate.value, monthIndex);
-  selectedDate.value = format(internalDate.value, "yyyy-MM");
-};
-
-const isCurrentMonth = (monthIndex: number) => {
-  return internalDate.value.getMonth() === monthIndex;
-};
-
+// ─── Date Display ────────────────────────────────
 const dateDisplay = computed(() => {
-  return df.format(internalDate.value);
+  try {
+    const d = parse(selectedDate.value, "yyyy-MM", new Date());
+    return format(d, "MMMM yyyy");
+  } catch {
+    return selectedDate.value;
+  }
 });
 
 // ─── Calendar Import ──────────────────────────────

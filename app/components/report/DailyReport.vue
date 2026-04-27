@@ -17,13 +17,27 @@
             >Daily attendance and activity log</CardDescription
           >
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex gap-4">
+          <Button
+            v-if="
+              isAiEnabled &&
+              localRows.some((r) => r.aktivitas && r.aktivitas.length > 5)
+            "
+            variant="ai"
+            size="xs"
+            @click="summarizeAll"
+            :disabled="summarizingAll"
+          >
+            <RefreshCw v-if="summarizingAll" class="h-3.5 w-3.5 animate-spin" />
+            <Sparkles v-else class="h-3.5 w-3.5" />
+            Summarize All
+          </Button>
+
           <Button
             variant="outline"
-            size="sm"
+            size="xs"
             @click="copyReport"
             :disabled="!localRows.length"
-            class="gap-1.5 text-xs h-8"
           >
             <Check v-if="copied" class="h-3.5 w-3.5 text-emerald-500" />
             <Copy v-else class="h-3.5 w-3.5" />
@@ -224,11 +238,13 @@ const dailyStore = useDailyStore();
 const { success } = useToast();
 
 const { isAiEnabled, pending, copied } = storeToRefs(coreStore);
-const { localRows, summarizingRows, syncingRows } = storeToRefs(dailyStore);
+const { localRows, summarizingRows, syncingRows, summarizingAll } =
+  storeToRefs(dailyStore);
 
 const {
   copyReport,
   summarizeRow,
+  summarizeAll,
   openManualEntry,
   removeDailyRow,
   syncDayActivity,

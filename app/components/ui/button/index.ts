@@ -17,6 +17,10 @@ export const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        ai: "border border-violet-500/20 bg-transparent text-violet-600 hover:bg-violet-500/5 hover:text-violet-700 dark:text-violet-400",
+        orange: "border border-orange-500/20 bg-transparent text-orange-600 hover:bg-orange-500/5 dark:text-orange-400",
+        emerald: "border border-emerald-500/20 bg-transparent text-emerald-600 hover:bg-emerald-500/5 dark:text-emerald-400",
+        gradient: "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0 shadow-md shadow-violet-500/20",
       },
       size: {
         "default": "h-10 px-4 py-2",
@@ -25,6 +29,8 @@ export const buttonVariants = cva(
         "icon": "h-10 w-10",
         "icon-sm": "size-9",
         "icon-lg": "size-11",
+        "xs": "h-8 rounded-md px-3 text-xs gap-1.5",
+        "xxs": "h-7 rounded-md px-2 text-[10px] gap-1",
       },
     },
     defaultVariants: {
