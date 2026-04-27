@@ -62,6 +62,30 @@
                     class="h-9 text-sm"
                   />
                 </div>
+                <div class="space-y-1.5">
+                  <Label class="text-xs">Nopeg</Label>
+                  <Input
+                    v-model="settings.user_nopeg"
+                    placeholder="700012410952025"
+                    class="h-9 text-sm"
+                  />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-xs">Unit Kerja</Label>
+                  <Input
+                    v-model="settings.user_unit"
+                    placeholder="Teknologi Informasi"
+                    class="h-9 text-sm"
+                  />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-xs">Bagian / Fungsi Kerja</Label>
+                  <Input
+                    v-model="settings.user_function"
+                    placeholder="Developer"
+                    class="h-9 text-sm"
+                  />
+                </div>
               </div>
             </div>
 

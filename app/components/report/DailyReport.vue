@@ -49,7 +49,10 @@
             @click="handleExport"
             :disabled="exporting"
           >
-            <Download class="h-3.5 w-3.5" :class="{ 'animate-bounce': exporting }" />
+            <Download
+              class="h-3.5 w-3.5"
+              :class="{ 'animate-bounce': exporting }"
+            />
             {{ exporting ? "Exporting..." : "Export Excel" }}
           </Button>
         </div>
@@ -90,7 +93,12 @@
           <tr
             v-for="(row, idx) in localRows"
             :key="idx"
-            class="border-b border-border/10 last:border-0 hover:bg-muted/5 transition-colors"
+            :class="[
+              'border-b border-border/10 last:border-0 transition-colors',
+              isWeekend(new Date(row.date))
+                ? 'bg-red-50/50 dark:bg-red-950/20 hover:bg-red-100/50 dark:hover:bg-red-900/30'
+                : 'hover:bg-muted/5',
+            ]"
           >
             <td class="px-4 py-2 font-medium text-muted-foreground">
               {{ format(new Date(row.date), "dd/MM/yyyy") }}
@@ -224,7 +232,7 @@ import { storeToRefs } from "pinia";
 import { useToast } from "~/composables/use-toast";
 import { useDailyStore } from "~/stores/daily";
 import { useCoreStore } from "~/stores/core";
-import { format } from "date-fns";
+import { format, isWeekend } from "date-fns";
 import {
   FileText,
   Copy,
@@ -282,7 +290,7 @@ const handleExport = async () => {
       localRows.value,
       monthlyRows.value,
       dateDisplay.value,
-      coreStore.settings
+      coreStore.settings,
     );
     success("Report exported successfully!");
   } catch (err) {

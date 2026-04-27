@@ -205,7 +205,7 @@ import { useGitlabStore } from "~/stores/gitlab";
 import { useCalendarStore } from "~/stores/calendar";
 import { CalendarRange, RefreshCw, Trash2 } from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
-import { format, parse } from "date-fns";
+import { format, parse, isWeekend } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 
@@ -240,6 +240,8 @@ const getDayContainerClasses = (day: any) => {
     classes.push("bg-violet-500/5 border-violet-500/20");
   } else if (day.hasManual) {
     classes.push("bg-blue-500/5 border-blue-500/20");
+  } else if (isWeekend(new Date(day.date))) {
+    classes.push("bg-red-500/10 border-red-500/20");
   } else {
     classes.push("bg-muted/10");
   }
@@ -269,6 +271,7 @@ const getDayTextClasses = (day: any) => {
   if (day.calendarEvents?.length > 0)
     return "text-violet-600 dark:text-violet-400";
   if (day.hasManual) return "text-blue-600 dark:text-blue-400";
+  if (isWeekend(new Date(day.date))) return "text-red-600 dark:text-red-400 font-bold";
   return "text-muted-foreground";
 };
 </script>

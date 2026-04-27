@@ -28,6 +28,9 @@ export const useCoreStore = defineStore('core', () => {
     ollama_url: "http://localhost:11434",
     user_name: "",
     user_position: "",
+    user_nopeg: "",
+    user_unit: "",
+    user_function: "",
   })
 
   const isAiEnabled = computed(() => !!(settings.value.ai_api_key || settings.value.openai_api_key || settings.value.ai_provider === 'ollama'))

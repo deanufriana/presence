@@ -44,18 +44,18 @@ export function useExcelExport() {
       dailySheet.mergeCells('B2:G2');
       const titleCell = dailySheet.getCell('B2');
       titleCell.value = 'DATA KEHADIRAN PEKERJA PT.PKSS';
-      titleCell.font = { name: 'Arial', size: 14, bold: true };
+      titleCell.font = { name: 'Calibri', size: 14, bold: true };
       titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
 
       // Metadata
       const addMeta = (row: number, label: string, value: string) => {
         const labelCell = dailySheet.getCell(`B${row}`);
         labelCell.value = label;
-        labelCell.font = { name: 'Arial', size: 11, bold: true };
+        labelCell.font = { name: 'Calibri', size: 11, bold: true };
         
         const valueCell = dailySheet.getCell(`C${row}`);
         valueCell.value = `: ${value}`;
-        valueCell.font = { name: 'Arial', size: 11, bold: true };
+        valueCell.font = { name: 'Calibri', size: 11, bold: true };
       };
 
       addMeta(4, 'NAMA', settings.user_name || 'Devi Adi Nufriana');
@@ -134,19 +134,19 @@ export function useExcelExport() {
       // BRI LIFE
       const briLifeCell = dailySheet.getCell(`H${signatureStartRow}`);
       briLifeCell.value = 'BRI LIFE';
-      briLifeCell.font = { name: 'Arial', size: 11, bold: true };
+      briLifeCell.font = { name: 'Calibri', size: 11, bold: true };
       briLifeCell.alignment = { horizontal: 'center' };
 
       // Name with dotted line
       const nameCell = dailySheet.getCell(`H${signatureStartRow + 4}`);
       nameCell.value = '...........................Adhel Ekonofian................................';
-      nameCell.font = { name: 'Arial', size: 10, bold: true };
+      nameCell.font = { name: 'Calibri', size: 10, bold: true };
       nameCell.alignment = { horizontal: 'center' };
 
       // Role
       const roleCell = dailySheet.getCell(`H${signatureStartRow + 5}`);
       roleCell.value = 'TEAM LEADER';
-      roleCell.font = { name: 'Arial', size: 11, bold: true };
+      roleCell.font = { name: 'Calibri', size: 11, bold: true };
       roleCell.alignment = { horizontal: 'center' };
 
 

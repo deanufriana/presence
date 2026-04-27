@@ -44,6 +44,7 @@
             <Plus class="h-3.5 w-3.5" />
             Add Row
           </Button>
+
           <Button
             variant="outline"
             size="xs"
@@ -53,6 +54,20 @@
             <Check v-if="copiedMonthly" class="h-3.5 w-3.5 text-emerald-500" />
             <Copy v-else class="h-3.5 w-3.5" />
             {{ copiedMonthly ? "Copied!" : "Copy" }}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="xs"
+            @click="handleDocxExport"
+            :disabled="!monthlyRows.length || exportingDocx"
+            class="border-blue-500/20 hover:border-blue-500/50 hover:bg-blue-500/5 text-blue-600 dark:text-blue-400"
+          >
+            <File
+              class="h-3.5 w-3.5"
+              :class="{ 'animate-bounce': exportingDocx }"
+            />
+            {{ exportingDocx ? "Exporting..." : "Export Word" }}
           </Button>
         </div>
       </div>
@@ -190,7 +205,9 @@
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Project">Project</SelectItem>
-                  <SelectItem value="Project Enhance">Project Enhance</SelectItem>
+                  <SelectItem value="Project Enhance"
+                    >Project Enhance</SelectItem
+                  >
                   <SelectItem value="Continuing (Daily)">
                     Continuing (Daily)
                   </SelectItem>
@@ -236,7 +253,10 @@ import {
   Plus,
   X,
   Trash2,
+  File,
 } from "lucide-vue-next";
+import { useDocxExport } from "~/composables/useDocxExport";
+import { useToast } from "~/composables/use-toast";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -264,10 +284,31 @@ const monthlyStore = useMonthlyStore();
 const dailyStore = useDailyStore();
 
 const { isAiEnabled, selectedDate } = storeToRefs(coreStore);
-const { monthlyRows, monthlyHighlights, summarizing, copiedMonthly } = storeToRefs(monthlyStore);
+const { monthlyRows, monthlyHighlights, summarizing, copiedMonthly } =
+  storeToRefs(monthlyStore);
 const { localRows } = storeToRefs(dailyStore);
 
-const { generateAiSummary, addMonthlyRow, removeMonthlyRow, copyMonthlyReport } = monthlyStore;
+const {
+  generateAiSummary,
+  addMonthlyRow,
+  removeMonthlyRow,
+  copyMonthlyReport,
+} = monthlyStore;
+const { exportToDocx, exportingDocx } = useDocxExport();
+const { success, error } = useToast();
+
+const handleDocxExport = async () => {
+  try {
+    await exportToDocx(
+      monthlyRows.value,
+      selectedDate.value,
+      coreStore.settings,
+    );
+    success("Monthly report exported to Word!");
+  } catch (err) {
+    error("Failed to export Word document");
+  }
+};
 
 const copiedRows = ref<Record<string, boolean>>({});
 

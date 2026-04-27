@@ -31,6 +31,9 @@ export interface SettingsData {
   ollama_url: string;
   user_name: string;
   user_position: string;
+  user_nopeg: string;
+  user_unit: string;
+  user_function: string;
 }
 
 export interface MonthlyReportRow {
