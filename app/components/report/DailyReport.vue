@@ -42,6 +42,16 @@
             <Copy v-else class="h-3.5 w-3.5" />
             {{ copied ? "Copied!" : "Copy" }}
           </Button>
+
+          <Button
+            variant="excel"
+            size="xs"
+            @click="handleExport"
+            :disabled="exporting"
+          >
+            <Download class="h-3.5 w-3.5" :class="{ 'animate-bounce': exporting }" />
+            {{ exporting ? "Exporting..." : "Export Excel" }}
+          </Button>
         </div>
       </div>
     </CardHeader>
@@ -222,7 +232,11 @@ import {
   Sparkles,
   RefreshCw,
   Trash2,
+  Download,
 } from "lucide-vue-next";
+import { useExcelExport } from "~/composables/useExcelExport";
+import { useMonthlyStore } from "~/stores/monthly";
+import { parse } from "date-fns";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -248,6 +262,33 @@ const {
   removeDailyRow,
   syncDayActivity,
 } = dailyStore;
+
+const { monthlyRows } = storeToRefs(useMonthlyStore());
+const { selectedDate } = storeToRefs(coreStore);
+const { exportToExcel, exporting } = useExcelExport();
+
+const dateDisplay = computed(() => {
+  try {
+    const d = parse(selectedDate.value, "yyyy-MM", new Date());
+    return format(d, "MMMM yyyy");
+  } catch {
+    return selectedDate.value;
+  }
+});
+
+const handleExport = async () => {
+  try {
+    await exportToExcel(
+      localRows.value,
+      monthlyRows.value,
+      dateDisplay.value,
+      coreStore.settings
+    );
+    success("Report exported successfully!");
+  } catch (err) {
+    console.error("Export failed:", err);
+  }
+};
 
 const copiedRows = ref<Record<string, boolean>>({});
 

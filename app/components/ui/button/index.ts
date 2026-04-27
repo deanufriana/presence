@@ -20,6 +20,7 @@ export const buttonVariants = cva(
         ai: "border border-violet-500/20 bg-transparent text-violet-600 hover:bg-violet-500/5 hover:text-violet-700 dark:text-violet-400",
         orange: "border border-orange-500/20 bg-transparent text-orange-600 hover:bg-orange-500/5 dark:text-orange-400",
         emerald: "border border-emerald-500/20 bg-transparent text-emerald-600 hover:bg-emerald-500/5 dark:text-emerald-400",
+        excel: "border border-emerald-500/20 bg-transparent text-emerald-600 hover:border-emerald-500/50 hover:bg-emerald-500/5 dark:text-emerald-400 dark:hover:text-emerald-300",
         gradient: "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0 shadow-md shadow-violet-500/20",
       },
       size: {

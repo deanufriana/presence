@@ -29,6 +29,8 @@ export interface SettingsData {
   ai_provider: 'gemini' | 'openai' | 'ollama';
   ai_model: string;
   ollama_url: string;
+  user_name: string;
+  user_position: string;
 }
 
 export interface MonthlyReportRow {

@@ -17,6 +17,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "lucide-vue-next": "^1.0.0",
     "ollama": "^0.6.3",
     "pinia": "^3.0.4",
@@ -28,6 +30,7 @@
   "devDependencies": {
     "@prisma/config": "^7.8.0",
     "@tailwindcss/vite": "^4.1.18",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^25.6.0",
     "nuxt": "^4.4.2",
     "prisma": "^6.2.1",
