@@ -5,10 +5,9 @@ export default defineEventHandler(async (event): Promise<any> => {
   const dateStr = query.date as string || new Date().toISOString().slice(0, 7)
 
   try {
-    const [gitlabRes, calendarCache, reports]: any = await Promise.all([
+    const [gitlabRes, calendarCache]: any = await Promise.all([
       getGitLabCache(dateStr),
-      getCalendarCache(dateStr),
-      getDailyReports(dateStr)
+      getCalendarCache(dateStr)
     ])
 
     // 1. Group GitLab Commits by Date
@@ -46,18 +45,7 @@ export default defineEventHandler(async (event): Promise<any> => {
       })
     }
 
-    // 2. Add Manual Activities
-    if (reports && Array.isArray(reports)) {
-      reports.forEach((ma: any) => {
-        if (!groupedActivities[ma.date]) groupedActivities[ma.date] = []
-        const current = groupedActivities[ma.date]!
-        if (!current.includes(ma.aktivitas)) {
-          current.push(ma.aktivitas)
-        }
-      })
-    }
-
-    // 3. Build the Rows and Save to DB
+    // 2. Build the Rows and Save to DB
     const activeDates = Object.keys(groupedActivities).sort()
     const rows = await Promise.all(activeDates.map(async (date) => {
       return await upsertDailyReport({

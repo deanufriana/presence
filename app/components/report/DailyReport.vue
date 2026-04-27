@@ -23,14 +23,13 @@
               isAiEnabled &&
               localRows.some((r) => r.aktivitas && r.aktivitas.length > 5)
             "
-            variant="ai"
+            :variant="summarizingAll ? 'destructive' : 'ai'"
             size="xs"
             @click="summarizeAll"
-            :disabled="summarizingAll"
           >
             <RefreshCw v-if="summarizingAll" class="h-3.5 w-3.5 animate-spin" />
             <Sparkles v-else class="h-3.5 w-3.5" />
-            Summarize All
+            {{ summarizingAll ? "Stop Summarizing" : "Summarize All" }}
           </Button>
 
           <Button

@@ -8,7 +8,7 @@ export default defineEventHandler(async (event): Promise<any> => {
 
   try {
     const prompt = getDailyPrompt(activities)
-    const summary = await generateSummary(prompt, { max_tokens: 180 })
+    const summary = await generateSummary(prompt, { max_tokens: 500 })
 
     return { success: true, summary }
   } catch (error: any) {

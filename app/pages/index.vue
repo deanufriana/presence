@@ -52,7 +52,7 @@
           <Button
             variant="gradient"
             size="sm"
-            @click="confirmSync"
+            @click="confirmSync()"
             :disabled="syncing"
           >
             <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': syncing }" />
@@ -153,7 +153,6 @@ import ManualActivityModal from "~/components/report/ManualActivityModal.vue";
 
 import { useCoreStore } from "~/stores/core";
 import { useDailyStore } from "~/stores/daily";
-import { useMonthlyStore } from "~/stores/monthly";
 import { useGitlabStore } from "~/stores/gitlab";
 import { useCalendarStore } from "~/stores/calendar";
 import { storeToRefs } from "pinia";

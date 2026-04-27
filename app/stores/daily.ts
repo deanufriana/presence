@@ -13,6 +13,8 @@ export const useDailyStore = defineStore('daily', () => {
   const manualActivitiesMap = ref<Record<string, string>>({})
   const summarizingRows = ref<Record<string, boolean>>({})
   const summarizingAll = ref(false)
+  const shouldStopSummarizing = ref(false)
+  let currentAbortController: AbortController | null = null
   const syncingRows = ref<Record<string, boolean>>({})
 
   const showManualEntry = ref(false)
@@ -37,10 +39,27 @@ export const useDailyStore = defineStore('daily', () => {
       })
       manualActivitiesMap.value = map
       localRows.value = rows
-    } else {
-      manualActivitiesMap.value = {}
-      localRows.value = []
     }
+  }
+
+  function applySyncedRows (newRows: ReportRow[]) {
+    const currentRows = [...localRows.value]
+    newRows.forEach((newRow) => {
+      const existingRowIndex = currentRows.findIndex((r) => r.date === newRow.date)
+      if (existingRowIndex !== -1) {
+        const existingRow = currentRows[existingRowIndex]
+        if (existingRow) {
+          existingRow.aktivitas = newRow.aktivitas
+          existingRow.masuk = newRow.masuk
+          existingRow.pulang = newRow.pulang
+          existingRow.ti = newRow.ti || existingRow.ti
+        }
+      } else {
+        currentRows.push(newRow)
+      }
+    })
+    currentRows.sort((a, b) => a.date.localeCompare(b.date))
+    localRows.value = currentRows
   }
 
   const copyReport = async () => {
@@ -93,33 +112,7 @@ export const useDailyStore = defineStore('daily', () => {
         query: { date: core.selectedDate, force: "true" },
       })
       if (res?.success && res.rows) {
-        const newRows = res.rows
-        const currentRows = [...localRows.value]
-
-        newRows.forEach((newRow: any) => {
-          const existingRowIndex = currentRows.findIndex((r) => r.date === newRow.date)
-          if (existingRowIndex !== -1) {
-            const existingRow = currentRows[existingRowIndex]
-            if (!existingRow) return
-            const splitActs = (str: string) => str.split(/\n|;/).map(s => s.trim().replace(/^- /, "")).filter(Boolean)
-            const existingActs = splitActs(existingRow.aktivitas || "")
-            const incomingActs = splitActs(newRow.aktivitas || "")
-
-            incomingActs.forEach((act: string) => {
-              if (!existingActs.some((ea) => ea.toLowerCase() === act.toLowerCase())) {
-                existingActs.push(act)
-              }
-            })
-            existingRow.aktivitas = existingActs.map(a => `- ${a}`).join('\n')
-            existingRow.masuk = newRow.masuk || existingRow.masuk
-            existingRow.pulang = newRow.pulang || existingRow.pulang
-          } else {
-            currentRows.push(newRow)
-          }
-        })
-
-        currentRows.sort((a, b) => a.date.localeCompare(b.date))
-        localRows.value = currentRows
+        applySyncedRows(res.rows)
         success("Synced successfully!")
       }
     } catch (err) {
@@ -135,10 +128,14 @@ export const useDailyStore = defineStore('daily', () => {
     if (!row.aktivitas || row.aktivitas.length < 10) return
     summarizingRows.value[row.date] = true
     const activities = row.aktivitas.split(/\n|;/).map(a => a.trim().replace(/^- /, "")).filter(Boolean)
+    
+    currentAbortController = new AbortController()
+    
     try {
       const res: any = await $fetch("/api/report/daily/summary" as any, {
         method: "POST",
         body: { activities },
+        signal: currentAbortController.signal
       })
       if (res.success) {
         row.aktivitas = res.summary
@@ -147,25 +144,33 @@ export const useDailyStore = defineStore('daily', () => {
         error(res.error || "Failed to generate summary")
       }
     } catch (error: any) {
+      if (error.name === 'AbortError') return
       console.error("Failed to summarize row:", error)
       error("Failed to connect to AI service")
     } finally {
       summarizingRows.value[row.date] = false
+      currentAbortController = null
     }
   }
 
   async function summarizeAll () {
-    if (summarizingAll.value) return
+    if (summarizingAll.value) {
+      shouldStopSummarizing.value = true
+      currentAbortController?.abort()
+      return
+    }
+
     summarizingAll.value = true
-    
+    shouldStopSummarizing.value = false
+
     // Get list of rows that need summary at the start
-    const rowsToProcess = localRows.value.filter(row => 
+    const rowsToProcess = localRows.value.filter(row =>
       row.aktivitas && row.aktivitas.length > 5 && !summarizingRows.value[row.date]
     )
 
     const processSequentially = async (index: number) => {
-      if (index >= rowsToProcess.length) return
-      
+      if (index >= rowsToProcess.length || shouldStopSummarizing.value) return
+
       const row = rowsToProcess[index]
       if (row) {
         await summarizeRow(row)
@@ -177,12 +182,17 @@ export const useDailyStore = defineStore('daily', () => {
 
     try {
       await processSequentially(0)
-      success("All available rows summarized!")
+      if (shouldStopSummarizing.value) {
+        success("Summarization stopped")
+      } else {
+        success("All available rows summarized!")
+      }
     } catch (err) {
       console.error("Failed to summarize all:", err)
       error("Error during batch summary")
     } finally {
       summarizingAll.value = false
+      shouldStopSummarizing.value = false
     }
   }
 
@@ -231,21 +241,8 @@ export const useDailyStore = defineStore('daily', () => {
     try {
       const res: any = await $fetch(`/api/report/daily/sync/${date}` as any)
       if (res.success && res.data) {
-        const { aktivitas, masuk, pulang, ti } = res.data
-        const rowIndex = localRows.value.findIndex((r) => r.date === date)
-        if (rowIndex !== -1) {
-          const row = localRows.value[rowIndex]
-          if (row) {
-            row.aktivitas = aktivitas
-            row.masuk = masuk
-            row.pulang = pulang
-            row.ti = ti
-          }
-        } else {
-          localRows.value.push(res.data)
-          localRows.value.sort((a, b) => a.date.localeCompare(b.date))
-        }
-        manualActivitiesMap.value[date] = aktivitas
+        applySyncedRows([res.data])
+        manualActivitiesMap.value[date] = res.data.aktivitas
         success(`Activity synced for ${date}`)
       } else {
         error(res.error || `No activity found for ${date}`)

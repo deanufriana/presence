@@ -1,5 +1,6 @@
 import { prisma } from './prisma'
 import { GoogleGenAI } from '@google/genai';
+import ollama from 'ollama'
 export interface AiOptions {
   model?: string;
   max_tokens?: number;
@@ -76,24 +77,29 @@ async function callGemini (prompt: string, options: AiOptions): Promise<string> 
   return content.replace(/^["']|["']$/g, '')
 }
 async function callOllama (prompt: string, options: AiOptions): Promise<string> {
-  const baseUrlSetting = await prisma.setting.findUnique({ where: { key: 'ollama_url' } })
-  const baseUrl = baseUrlSetting?.value || 'http://localhost:11434'
-
-  const response: any = await (globalThis as any).$fetch(`${baseUrl}/api/generate`, {
-    method: 'POST',
-    body: {
+  try {
+    const response = await ollama.chat({
       model: options.model || 'gemma:latest',
-      prompt: prompt,
-      stream: false,
+      messages: [
+        { role: 'system', content: 'Anda adalah asisten profesional yang membantu merangkum aktivitas kerja.' },
+        { role: 'user', content: prompt }
+      ],
+      think: false,
       options: {
-        temperature: 0.3,
+        temperature: 0.5,
         num_predict: options.max_tokens,
       }
+    })
+
+    const content = response.message.content
+    if (!content) {
+      console.error('Ollama empty response:', response)
+      throw new Error('Ollama did not return a valid summary')
     }
-  })
 
-  const content = response?.response?.trim()
-  if (!content) throw new Error('Ollama did not return a valid summary')
-
-  return content.replace(/^["']|["']$/g, '')
+    return content.replace(/^["']|["']$/g, '')
+  } catch (error: any) {
+    console.error('Ollama call failed:', error)
+    throw error
+  }
 }
