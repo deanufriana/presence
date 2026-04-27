@@ -170,26 +170,34 @@
               />
             </td>
             <td class="p-0">
-              <select
-                v-model="row.done"
-                class="w-full h-full px-4 py-2 bg-transparent border-0 outline-none focus:ring-1 focus:ring-violet-500/30 transition-all cursor-pointer"
-              >
-                <option value="">—</option>
-                <option value="Done">Done</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Pending">Pending</option>
-              </select>
+              <Select v-model="row.done">
+                <SelectTrigger
+                  class="w-full h-full border-0 shadow-none focus:ring-0 focus:ring-offset-0 bg-transparent px-4 py-2 text-xs"
+                >
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Done">Done</SelectItem>
+                  <SelectItem value="In Progress">In Progress</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                </SelectContent>
+              </Select>
             </td>
             <td class="p-0">
-              <select
-                v-model="row.status"
-                class="w-full h-full px-4 py-2 bg-transparent border-0 outline-none focus:ring-1 focus:ring-violet-500/30 transition-all cursor-pointer"
-              >
-                <option value="">—</option>
-                <option value="Project">Project</option>
-                <option value="Project Enhance">Project Enhance</option>
-                <option value="Continuing (Daily)">Continuing (Daily)</option>
-              </select>
+              <Select v-model="row.status">
+                <SelectTrigger
+                  class="w-full h-full border-0 shadow-none focus:ring-0 focus:ring-offset-0 bg-transparent px-4 py-2 text-xs"
+                >
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Project">Project</SelectItem>
+                  <SelectItem value="Project Enhance">Project Enhance</SelectItem>
+                  <SelectItem value="Continuing (Daily)">
+                    Continuing (Daily)
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </td>
             <td class="p-0 text-center">
               <button
@@ -239,6 +247,13 @@ import {
   CardDescription,
   CardContent,
 } from "~/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { storeToRefs } from "pinia";
 import { useCoreStore } from "~/stores/core";
 import { useMonthlyStore } from "~/stores/monthly";

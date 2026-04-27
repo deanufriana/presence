@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   app: {
     head: {
-      title: 'Report Absensi',
+      title: 'Presence',
       link: [
         { rel: 'icon', type: 'image/png', href: '/favicon.ico' }
       ]

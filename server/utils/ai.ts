@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-
+import { GoogleGenAI } from '@google/genai';
 export interface AiOptions {
   model?: string;
   max_tokens?: number;
@@ -57,19 +57,16 @@ async function callOpenAi (prompt: string, options: AiOptions): Promise<string> 
 
 async function callGemini (prompt: string, options: AiOptions): Promise<string> {
   const aiKeySetting = await prisma.setting.findUnique({ where: { key: 'ai_api_key' } })
-  if (!aiKeySetting) throw new Error('AI API Key not configured in settings')
+  if (!aiKeySetting?.value) throw new Error('AI API Key not configured in settings')
 
-  const url: any = `https://generativelanguage.googleapis.com/v1/models/${options.model ?? 'gemini-2.5-flash-lite'}:generateContent?key=${aiKeySetting.value}`
-  const response: any = await (globalThis as any).$fetch(url, {
-    method: 'POST',
-    body: {
-      contents: [{
-        parts: [{ text: prompt }]
-      }]
-    }
-  })
+  const ai = new GoogleGenAI({ apiKey: aiKeySetting.value });
 
-  const content = response?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+  const response = await ai.models.generateContent({
+    model: options.model || 'gemini-2.5-flash-lite',
+    contents: prompt,
+  });
+
+  const content = response.text?.trim()
   if (!content) throw new Error('Gemini did not return a valid summary')
 
   return content.replace(/^["']|["']$/g, '')

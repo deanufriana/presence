@@ -1,5 +1,5 @@
 {
-  "name": "report-absen",
+  "name": "presence",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@google/genai": "^1.50.1",
     "@pinia/nuxt": "^0.11.3",
     "@prisma/client": "^6.2.1",
     "@vueuse/core": "^14.2.1",

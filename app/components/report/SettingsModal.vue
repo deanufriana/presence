@@ -84,46 +84,46 @@
                 </div>
 
                 <div
-                  class="max-h-40 overflow-y-auto border rounded-md bg-muted/20 p-2 space-y-1"
+                  class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"
                 >
                   <div
                     v-if="!allProjects.length && !fetchingProjects"
-                    class="text-[10px] text-muted-foreground text-center py-2"
+                    class="col-span-full text-[10px] text-muted-foreground text-center py-4 border rounded-md bg-muted/20"
                   >
                     No projects fetched. Click "Fetch List".
                   </div>
                   <div
                     v-else-if="fetchingProjects"
-                    class="text-[10px] text-center py-2 animate-pulse"
+                    class="col-span-full text-[10px] text-center py-4 border rounded-md bg-muted/20 animate-pulse"
                   >
                     Loading projects...
                   </div>
-                  <div
+                  <Card
                     v-for="p in allProjects"
                     :key="p.id"
-                    class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent/50 cursor-pointer"
+                    class="p-2 flex items-center gap-2 cursor-pointer transition-all hover:border-primary/50 hover:bg-accent/50 group relative"
+                    :class="{
+                      'border-primary/50 bg-primary/5': selectedProjectIds.includes(
+                        p.id
+                      ),
+                    }"
                     @click="toggleProject(p.id)"
                   >
-                    <div
-                      class="h-3.5 w-3.5 rounded border border-primary flex items-center justify-center shrink-0"
-                      :class="{
-                        'bg-primary': selectedProjectIds.includes(p.id),
-                      }"
-                    >
-                      <Check
-                        v-if="selectedProjectIds.includes(p.id)"
-                        class="h-2.5 w-2.5 text-primary-foreground"
-                      />
+                    <Checkbox
+                      :checked="selectedProjectIds.includes(p.id)"
+                      class="h-3.5 w-3.5"
+                    />
+                    <div class="flex flex-col min-w-0">
+                      <span
+                        class="text-[10px] font-semibold truncate leading-tight"
+                        >{{ p.name }}</span
+                      >
+                      <span
+                        class="text-[9px] text-muted-foreground truncate leading-tight"
+                        >{{ p.path }}</span
+                      >
                     </div>
-                    <div class="flex flex-col">
-                      <span class="text-[10px] font-medium leading-none">{{
-                        p.name
-                      }}</span>
-                      <span class="text-[9px] text-muted-foreground">{{
-                        p.path
-                      }}</span>
-                    </div>
-                  </div>
+                  </Card>
                 </div>
               </div>
             </div>
@@ -139,43 +139,74 @@
                   </div>
                   <span class="text-sm font-medium">AI Configuration</span>
                 </div>
-                
-                <div class="flex bg-muted rounded-lg p-0.5 border">
-                  <button 
-                    class="px-2 py-1 text-[10px] rounded-md transition-all font-medium"
-                    :class="settings.ai_provider === 'gemini' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:bg-background/50'"
-                    @click="settings.ai_provider = 'gemini'; settings.ai_model = 'gemini-2.0-flash-lite'"
-                  >Gemini</button>
-                  <button 
-                    class="px-2 py-1 text-[10px] rounded-md transition-all font-medium"
-                    :class="settings.ai_provider === 'openai' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:bg-background/50'"
-                    @click="settings.ai_provider = 'openai'; settings.ai_model = 'gpt-4o-mini'"
-                  >OpenAI</button>
-                </div>
+
+                <Tabs
+                  :model-value="settings.ai_provider"
+                  @update:model-value="
+                    (v) => {
+                      settings.ai_provider = v as 'gemini' | 'openai';
+                      settings.ai_model =
+                        v === 'gemini'
+                          ? 'gemini-2.0-flash-lite'
+                          : 'gpt-4o-mini';
+                    }
+                  "
+                  class="w-auto"
+                >
+                  <TabsList class="h-8">
+                    <TabsTrigger value="gemini" class="text-[10px] px-3 h-7">
+                      Gemini
+                    </TabsTrigger>
+                    <TabsTrigger value="openai" class="text-[10px] px-3 h-7">
+                      OpenAI
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
 
               <div class="space-y-3 pl-7">
                 <!-- Model Selection -->
                 <div class="space-y-1.5">
                   <Label class="text-xs">Model Selection</Label>
-                  <select 
-                    v-model="settings.ai_model"
-                    class="w-full h-9 bg-card border border-border/50 rounded-md px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
-                  >
-                    <template v-if="settings.ai_provider === 'gemini'">
-                      <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite (Fastest)</option>
-                      <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                      <option value="gemini-1.5-pro">Gemini 1.5 Pro (Powerful)</option>
-                    </template>
-                    <template v-else>
-                      <option value="gpt-4o-mini">GPT-4o Mini (Recommended)</option>
-                      <option value="gpt-4o">GPT-4o</option>
-                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                    </template>
-                  </select>
+                  <Select v-model="settings.ai_model">
+                    <SelectTrigger class="h-9 text-sm">
+                      <SelectValue placeholder="Select a model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup v-if="settings.ai_provider === 'gemini'">
+                        <SelectItem value="gemini-3.1-flash-lite-preview">
+                          Gemini 3.1 Flash Lite Preview
+                        </SelectItem>
+                        <SelectItem value="gemini-2.5-flash-lite">
+                          Gemini 2.5 Flash Lite
+                        </SelectItem>
+                        <SelectItem value="gemini-2.0-flash-lite">
+                          Gemini 2.0 Flash Lite
+                        </SelectItem>
+                        <SelectItem value="gemini-1.5-flash">
+                          Gemini 1.5 Flash
+                        </SelectItem>
+                        <SelectItem value="gemini-1.5-pro">
+                          Gemini 1.5 Pro
+                        </SelectItem>
+                      </SelectGroup>
+                      <SelectGroup v-else>
+                        <SelectItem value="gpt-4o-mini">
+                          GPT-4o Mini
+                        </SelectItem>
+                        <SelectItem value="gpt-4o"> GPT-4o </SelectItem>
+                        <SelectItem value="gpt-3.5-turbo">
+                          GPT-3.5 Turbo
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div v-if="settings.ai_provider === 'gemini'" class="space-y-1.5">
+                <div
+                  v-if="settings.ai_provider === 'gemini'"
+                  class="space-y-1.5"
+                >
                   <Label class="text-xs">Gemini API Key</Label>
                   <Input
                     v-model="settings.ai_api_key"
@@ -187,7 +218,7 @@
                     Google's high-speed AI for text processing.
                   </p>
                 </div>
-                
+
                 <div v-else class="space-y-1.5">
                   <Label class="text-xs">OpenAI API Key</Label>
                   <Input
@@ -246,6 +277,16 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Checkbox } from "~/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useCoreStore } from "~/stores/core";
 import { useGitlabStore } from "~/stores/gitlab";
 import type { SettingsData } from "~/types/report";

@@ -15,7 +15,7 @@
           >
             <ClipboardCheck class="h-4 w-4 text-white" :stroke-width="2.5" />
           </div>
-          <span class="text-lg font-semibold tracking-tight">Report Absen</span>
+          <span class="text-lg font-semibold tracking-tight">Presence</span>
           <Badge variant="secondary" class="text-[10px] px-1.5 py-0 font-medium"
             >v1.0</Badge
           >

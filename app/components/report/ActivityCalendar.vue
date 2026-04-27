@@ -22,7 +22,7 @@
             </div>
             <div class="flex items-center gap-1">
               <div class="h-2 w-2 rounded-sm bg-violet-500"></div>
-              Teams
+              Calendar
             </div>
             <div class="flex items-center gap-1">
               <div class="h-2 w-2 rounded-sm bg-blue-500"></div>
@@ -78,22 +78,7 @@
             :key="day.date"
             @click="openManualEntry(day)"
             class="relative aspect-square rounded-md border border-border/40 flex flex-col items-center justify-center group transition-all cursor-pointer hover:border-primary"
-            :class="[
-              day.count > 0
-                ? 'bg-orange-500/5 border-orange-500/20'
-                : day.calendarEvents?.length > 0
-                  ? 'bg-violet-500/5 border-violet-500/20'
-                  : day.hasManual
-                    ? 'bg-blue-500/5 border-blue-500/20'
-                    : 'bg-muted/10',
-              day.count >= 3 ? 'ring-1 ring-orange-500/30' : '',
-              day.calendarEvents?.length > 0 && day.count === 0
-                ? 'ring-1 ring-violet-500/30'
-                : '',
-              day.hasManual && day.count === 0 && (!day.calendarEvents || day.calendarEvents.length === 0)
-                ? 'ring-1 ring-blue-500/30'
-                : '',
-            ]"
+            :class="getDayContainerClasses(day)"
           >
             <!-- Day Action Button (top-right) -->
             <button
@@ -115,15 +100,7 @@
 
             <span
               class="text-[10px] font-medium"
-              :class="
-                day.count > 0
-                  ? 'text-orange-600 dark:text-orange-400'
-                  : day.calendarEvents?.length > 0
-                    ? 'text-violet-600 dark:text-violet-400'
-                    : day.hasManual
-                      ? 'text-blue-600 dark:text-blue-400'
-                      : 'text-muted-foreground'
-              "
+              :class="getDayTextClasses(day)"
               >{{ day.dayNum }}</span
             >
 
@@ -149,7 +126,10 @@
 
             <!-- Hover Tooltip -->
             <div
-              v-if="day.count > 0 || (day.calendarEvents && day.calendarEvents.length > 0)"
+              v-if="
+                day.count > 0 ||
+                (day.calendarEvents && day.calendarEvents.length > 0)
+              "
               class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2 bg-popover border rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50"
             >
               <div class="text-[10px] font-bold mb-1 pb-1 border-b">
@@ -158,34 +138,56 @@
               <div class="space-y-2">
                 <!-- Commits -->
                 <div v-if="day.count > 0" class="space-y-1">
-                  <div class="text-[8px] font-bold text-orange-500 uppercase tracking-tighter">GitLab Commits</div>
+                  <div
+                    class="text-[8px] font-bold text-orange-500 uppercase tracking-tighter"
+                  >
+                    GitLab Commits
+                  </div>
                   <div
                     v-for="(commit, cIdx) in day.commits.slice(0, 3)"
                     :key="'commit-' + cIdx"
                     class="text-[9px] leading-tight flex items-start gap-1"
                   >
-                    <div class="h-1 w-1 rounded-full bg-orange-500 mt-1 shrink-0" />
+                    <div
+                      class="h-1 w-1 rounded-full bg-orange-500 mt-1 shrink-0"
+                    />
                     <div class="min-w-0">
                       <div class="truncate">{{ commit.title }}</div>
                     </div>
                   </div>
-                  <div v-if="day.count > 3" class="text-[8px] text-muted-foreground pl-2">+ {{ day.count - 3 }} more</div>
+                  <div
+                    v-if="day.count > 3"
+                    class="text-[8px] text-muted-foreground pl-2"
+                  >
+                    + {{ day.count - 3 }} more
+                  </div>
                 </div>
 
                 <!-- Calendar Events -->
                 <div v-if="day.calendarEvents?.length > 0" class="space-y-1">
-                  <div class="text-[8px] font-bold text-violet-500 uppercase tracking-tighter">Teams Calendar</div>
+                  <div
+                    class="text-[8px] font-bold text-violet-500 uppercase tracking-tighter"
+                  >
+                    Calendar
+                  </div>
                   <div
                     v-for="(ev, eIdx) in day.calendarEvents.slice(0, 3)"
                     :key="'event-' + eIdx"
                     class="text-[9px] leading-tight flex items-start gap-1"
                   >
-                    <div class="h-1 w-1 rounded-full bg-violet-500 mt-1 shrink-0" />
+                    <div
+                      class="h-1 w-1 rounded-full bg-violet-500 mt-1 shrink-0"
+                    />
                     <div class="min-w-0">
                       <div class="truncate">{{ ev.summary }}</div>
                     </div>
                   </div>
-                  <div v-if="day.calendarEvents.length > 3" class="text-[8px] text-muted-foreground pl-2">+ {{ day.calendarEvents.length - 3 }} more</div>
+                  <div
+                    v-if="day.calendarEvents.length > 3"
+                    class="text-[8px] text-muted-foreground pl-2"
+                  >
+                    + {{ day.calendarEvents.length - 3 }} more
+                  </div>
                 </div>
               </div>
             </div>
@@ -206,12 +208,7 @@ import { CalendarRange, RefreshCw, Trash2 } from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
 import { format, parse } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "~/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 
 const coreStore = useCoreStore();
 const dailyStore = useDailyStore();
@@ -232,4 +229,47 @@ const formattedDate = computed(() => {
     return "";
   }
 });
+
+// ─── Class Helpers ────────────────────────────────
+const getDayContainerClasses = (day: any) => {
+  const classes = [];
+
+  // Background and border base
+  if (day.count > 0) {
+    classes.push("bg-orange-500/5 border-orange-500/20");
+  } else if (day.calendarEvents?.length > 0) {
+    classes.push("bg-violet-500/5 border-violet-500/20");
+  } else if (day.hasManual) {
+    classes.push("bg-blue-500/5 border-blue-500/20");
+  } else {
+    classes.push("bg-muted/10");
+  }
+
+  // Ring indicators
+  if (day.count >= 3) {
+    classes.push("ring-1 ring-orange-500/30");
+  }
+
+  if (day.calendarEvents?.length > 0 && day.count === 0) {
+    classes.push("ring-1 ring-violet-500/30");
+  }
+
+  if (
+    day.hasManual &&
+    day.count === 0 &&
+    (!day.calendarEvents || day.calendarEvents.length === 0)
+  ) {
+    classes.push("ring-1 ring-blue-500/30");
+  }
+
+  return classes;
+};
+
+const getDayTextClasses = (day: any) => {
+  if (day.count > 0) return "text-orange-600 dark:text-orange-400";
+  if (day.calendarEvents?.length > 0)
+    return "text-violet-600 dark:text-violet-400";
+  if (day.hasManual) return "text-blue-600 dark:text-blue-400";
+  return "text-muted-foreground";
+};
 </script>
