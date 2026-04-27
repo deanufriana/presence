@@ -4,6 +4,7 @@ import ollama from 'ollama'
 export interface AiOptions {
   model?: string;
   max_tokens?: number;
+  think?: boolean;
 }
 
 export const generateSummary = async (prompt: string, options: AiOptions): Promise<string> => {
@@ -76,6 +77,7 @@ async function callGemini (prompt: string, options: AiOptions): Promise<string> 
 
   return content.replace(/^["']|["']$/g, '')
 }
+
 async function callOllama (prompt: string, options: AiOptions): Promise<string> {
   try {
     const response = await ollama.chat({
@@ -84,7 +86,7 @@ async function callOllama (prompt: string, options: AiOptions): Promise<string> 
         { role: 'system', content: 'Anda adalah asisten profesional yang membantu merangkum aktivitas kerja.' },
         { role: 'user', content: prompt }
       ],
-      think: false,
+      think: options.think,
       options: {
         temperature: 0.5,
         num_predict: options.max_tokens,

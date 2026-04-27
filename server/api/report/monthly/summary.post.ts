@@ -17,7 +17,7 @@ export default defineEventHandler(async (event): Promise<any> => {
     }
 
     const prompt = getMonthlyPrompt(activities)
-    const rawContent = await generateSummary(prompt, { max_tokens: 1000 })
+    const rawContent = await generateSummary(prompt, { max_tokens: 3000, think: true })
 
     // Parse the markdown output into structured rows
     const rows = parseMonthlyMarkdown(rawContent)
