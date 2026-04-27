@@ -1,10 +1,12 @@
 export default defineEventHandler(async (event): Promise<any> => {
   try {
-    const body = await readBody(event)
-    const date = body?.date
+    const body = await readBody(event).catch(() => ({}))
+    const query = getQuery(event)
+    const date = (body?.date || query?.date) as string
+
     if (!date) return { success: false, error: 'Date required' }
 
-    await prisma.dailyReport.delete({
+    await prisma.dailyReport.deleteMany({
       where: { date }
     })
 

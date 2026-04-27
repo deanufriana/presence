@@ -82,7 +82,7 @@
             <!-- Day Action Button (top-right) -->
             <button
               v-if="day.hasManual"
-              @click.stop="deleteManualActivity(day.date)"
+              @click.stop="deleteActivity(day.date)"
               class="absolute -top-1.5 -right-1.5 h-7 w-7 flex items-center justify-center rounded-full border border-red-500/50 bg-red-500/25 text-red-200 hover:bg-red-500/40 hover:text-white shadow-lg shadow-red-500/20 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
               title="Delete activity"
             >
@@ -217,7 +217,7 @@ const calendarStore = useCalendarStore();
 const { fetchingGitlab } = storeToRefs(gitlabStore);
 const { calendarBlanks, calendarDays } = storeToRefs(calendarStore);
 
-const { openManualEntry, deleteManualActivity, syncDayActivity } = dailyStore;
+const { openManualEntry, deleteActivity, syncDayActivity } = dailyStore;
 const { fetchGitlabFresh } = gitlabStore;
 
 const formattedDate = computed(() => {

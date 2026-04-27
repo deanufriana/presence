@@ -202,7 +202,7 @@
                 </button>
 
                 <button
-                  @click.stop="removeDailyRow(idx)"
+                  @click.stop="deleteActivity(row.date)"
                   class="h-6 w-6 flex items-center justify-center rounded-md text-red-400 hover:bg-red-500/10 transition-all"
                   title="Delete row"
                 >
@@ -267,7 +267,7 @@ const {
   summarizeRow,
   summarizeAll,
   openManualEntry,
-  removeDailyRow,
+  deleteActivity,
   syncDayActivity,
 } = dailyStore;
 

@@ -128,9 +128,9 @@ export const useDailyStore = defineStore('daily', () => {
     if (!row.aktivitas || row.aktivitas.length < 10) return
     summarizingRows.value[row.date] = true
     const activities = row.aktivitas.split(/\n|;/).map(a => a.trim().replace(/^- /, "")).filter(Boolean)
-    
+
     currentAbortController = new AbortController()
-    
+
     try {
       const res: any = await $fetch("/api/report/daily/summary" as any, {
         method: "POST",
@@ -139,6 +139,8 @@ export const useDailyStore = defineStore('daily', () => {
       })
       if (res.success) {
         row.aktivitas = res.summary
+        // Explicitly save to database
+        await saveActivity(row.date, res.summary)
         success(`Summary generated for ${row.date}`)
       } else {
         error(res.error || "Failed to generate summary")
@@ -196,10 +198,25 @@ export const useDailyStore = defineStore('daily', () => {
     }
   }
 
-  function removeDailyRow (idx: number) {
-    const row = localRows.value[idx]
-    localRows.value.splice(idx, 1)
-    if (row) success(`Removed report for ${row.date}`)
+  async function deleteActivity (date: string) {
+    try {
+      await $fetch("/api/report/daily" as any, {
+        method: "DELETE",
+        body: { date }
+      })
+
+      delete manualActivitiesMap.value[date]
+
+      const rowIndex = localRows.value.findIndex((r) => r.date === date)
+      if (rowIndex !== -1) {
+        localRows.value.splice(rowIndex, 1)
+      }
+
+      success(`Activity removed for ${date}`)
+    } catch (err) {
+      console.error("Failed to delete activity:", err)
+      error("Failed to delete activity")
+    }
   }
 
   const openManualEntry = (day: any) => {
@@ -208,32 +225,20 @@ export const useDailyStore = defineStore('daily', () => {
     showManualEntry.value = true
   }
 
-  const saveManualActivity = async () => {
-    if (!selectedDayForEntry.value) return
+  const saveActivity = async (date: string, activity: string) => {
     await $fetch("/api/report/daily" as any, {
       method: "POST",
-      body: { date: selectedDayForEntry.value.date, activity: manualActivityText.value },
+      body: { date, activity },
     })
-    manualActivitiesMap.value[selectedDayForEntry.value.date] = manualActivityText.value
-    showManualEntry.value = false
-    success(`Activity saved for ${selectedDayForEntry.value.date}`)
+    manualActivitiesMap.value[date] = activity
     core.refreshReport()
   }
 
-  const deleteManualActivity = async (date: string) => {
-    try {
-      await $fetch("/api/report/daily" as any, { method: "DELETE", query: { date } })
-      delete manualActivitiesMap.value[date]
-      const rowIndex = localRows.value.findIndex((r) => r.date === date)
-      if (rowIndex !== -1) {
-        const target = localRows.value[rowIndex]
-        if (target) target.aktivitas = ""
-      }
-      success(`Activity removed for ${date}`)
-    } catch (err) {
-      console.error("Failed to delete activity:", err)
-      error("Failed to delete activity")
-    }
+  const saveManualActivity = async () => {
+    if (!selectedDayForEntry.value) return
+    await saveActivity(selectedDayForEntry.value.date, manualActivityText.value)
+    showManualEntry.value = false
+    success(`Activity saved for ${selectedDayForEntry.value.date}`)
   }
 
   const syncDayActivity = async (date: string) => {
@@ -286,10 +291,9 @@ export const useDailyStore = defineStore('daily', () => {
     executeSync,
     summarizeRow,
     summarizeAll,
-    removeDailyRow,
+    deleteActivity,
     openManualEntry,
     saveManualActivity,
-    deleteManualActivity,
     syncDayActivity,
     formatTime,
   }

@@ -50,7 +50,7 @@
                   <Label class="text-xs">Full Name</Label>
                   <Input
                     v-model="settings.user_name"
-                    placeholder="Devi Adi Nufriana"
+                    placeholder="Michael Johnson"
                     class="h-9 text-sm"
                   />
                 </div>
