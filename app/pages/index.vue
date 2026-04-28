@@ -13,28 +13,6 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- Date Picker Navigation -->
-          <div class="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              class="h-8 w-8 border-border bg-card hover:border-primary/40"
-              @click="prevMonth"
-            >
-              <ChevronLeft class="h-4 w-4" />
-            </Button>
-            <MonthPicker v-model="selectedDate" />
-            <Button
-              variant="outline"
-              size="icon"
-              class="h-8 w-8 border-border bg-card hover:border-primary/40"
-              @click="nextMonth"
-              :disabled="isNextDisabled"
-            >
-              <ChevronRight class="h-4 w-4" />
-            </Button>
-          </div>
-
           <!-- Settings Button -->
           <Button
             variant="outline"
@@ -97,43 +75,46 @@
       </div>
     </div>
 
-    <!-- Tabs -->
-    <Tabs default-value="daily" class="w-full">
-      <TabsList class="grid w-full grid-cols-4">
-        <TabsTrigger value="daily" class="gap-1.5">
-          <FileText class="h-3.5 w-3.5" />
-          Daily Report
-        </TabsTrigger>
-        <TabsTrigger value="monthly" class="gap-1.5">
-          <CalendarDays class="h-3.5 w-3.5" />
-          Monthly Report
-        </TabsTrigger>
-        <TabsTrigger value="yearly" class="gap-1.5">
-          <Calendar class="h-3.5 w-3.5" />
-          Yearly Report
-        </TabsTrigger>
-        <TabsTrigger value="activity" class="gap-1.5">
-          <CalendarRange class="h-3.5 w-3.5" />
-          Activity Calendar
-        </TabsTrigger>
-      </TabsList>
+    <!-- Main Content Area -->
+    <div class="space-y-6 mt-2">
+      <!-- Activity Grid (Always Visible) -->
+      <YearlyActivityGrid />
 
-      <TabsContent value="daily">
-        <DailyReport />
-      </TabsContent>
-
-      <TabsContent value="monthly">
-        <MonthlyReport />
-      </TabsContent>
-
-      <TabsContent value="yearly">
+      <!-- Yearly Mode Content (Table) -->
+      <div v-if="viewMode === 'yearly'">
         <YearlyReport />
-      </TabsContent>
+      </div>
 
-      <TabsContent value="activity">
-        <ActivityCalendar />
-      </TabsContent>
-    </Tabs>
+      <!-- Monthly Mode Content (Tabs) -->
+      <Tabs v-else default-value="daily" class="w-full">
+        <TabsList class="grid w-full grid-cols-3">
+          <TabsTrigger value="daily" class="gap-1.5">
+            <FileText class="h-3.5 w-3.5" />
+            Daily Report
+          </TabsTrigger>
+          <TabsTrigger value="monthly" class="gap-1.5">
+            <CalendarDays class="h-3.5 w-3.5" />
+            Monthly Report
+          </TabsTrigger>
+          <TabsTrigger value="activity" class="gap-1.5">
+            <CalendarRange class="h-3.5 w-3.5" />
+            Activity Calendar
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="daily">
+          <DailyReport />
+        </TabsContent>
+
+        <TabsContent value="monthly">
+          <MonthlyReport />
+        </TabsContent>
+
+        <TabsContent value="activity">
+          <ActivityCalendar />
+        </TabsContent>
+      </Tabs>
+    </div>
 
     <!-- Modals -->
     <SettingsModal
@@ -181,6 +162,7 @@ import MonthPicker from "~/components/report/MonthPicker.vue";
 import SettingsModal from "~/components/report/SettingsModal.vue";
 import SyncConfirmModal from "~/components/report/SyncConfirmModal.vue";
 import ManualActivityModal from "~/components/report/ManualActivityModal.vue";
+import YearlyActivityGrid from "~/components/report/YearlyActivityGrid.vue";
 
 import { useCoreStore } from "~/stores/core";
 import { useDailyStore } from "~/stores/daily";
@@ -191,7 +173,7 @@ import { storeToRefs } from "pinia";
 const coreStore = useCoreStore();
 const gitlabStore = useGitlabStore();
 
-const { selectedDate, showSettings, saving, pending, settings } =
+const { selectedDate, showSettings, saving, pending, settings, viewMode } =
   storeToRefs(coreStore);
 
 const { fetchingProjects, allProjects, selectedProjectIds, gitlabData } =
@@ -208,22 +190,6 @@ const {
 } = storeToRefs(dailyStore);
 
 const { executeSync, saveManualActivity, confirmSync } = dailyStore;
-const { nextMonth, prevMonth } = coreStore;
-
-const isNextDisabled = computed(() => {
-  try {
-    const current = parse(selectedDate.value, "yyyy-MM", new Date());
-    const now = new Date();
-    // Disable if current month/year is same as or after now month/year
-    return (
-      current.getFullYear() > now.getFullYear() ||
-      (current.getFullYear() === now.getFullYear() &&
-        current.getMonth() >= now.getMonth())
-    );
-  } catch {
-    return false;
-  }
-});
 
 const calendarStore = useCalendarStore();
 const { importingCalendar } = storeToRefs(calendarStore);

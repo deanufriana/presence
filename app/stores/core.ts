@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { format, addMonths, subMonths, parse } from "date-fns"
+import { format, addMonths, subMonths, addYears, subYears, parse } from "date-fns"
 import { useToast } from "~/composables/use-toast"
 import type { SettingsData } from '~/types/report'
 import { useGitlabStore } from '~/stores/gitlab'
@@ -17,6 +17,7 @@ export const useCoreStore = defineStore('core', () => {
   const isInitialized = ref(false)
   const pending = ref(false)
   const copied = ref(false)
+  const viewMode = ref<"monthly" | "yearly">("monthly")
 
   const settings = ref<SettingsData>({
     gitlab_token: "",
@@ -116,6 +117,16 @@ export const useCoreStore = defineStore('core', () => {
     selectedDate.value = format(subMonths(current, 1), "yyyy-MM")
   }
 
+  function nextYear() {
+    const current = parse(selectedDate.value, "yyyy-MM", new Date())
+    selectedDate.value = format(addYears(current, 1), "yyyy-MM")
+  }
+
+  function prevYear() {
+    const current = parse(selectedDate.value, "yyyy-MM", new Date())
+    selectedDate.value = format(subYears(current, 1), "yyyy-MM")
+  }
+
   async function syncAllActivities (force = true) {
     pending.value = true
     try {
@@ -155,5 +166,8 @@ export const useCoreStore = defineStore('core', () => {
     init,
     nextMonth,
     prevMonth,
+    nextYear,
+    prevYear,
+    viewMode,
   }
 })

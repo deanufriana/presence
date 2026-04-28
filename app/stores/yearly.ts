@@ -10,8 +10,10 @@ export const useYearlyStore = defineStore('yearly', () => {
 
   const yearlyRows = ref<YearlyReportRow[]>([])
   const yearlyHighlights = ref("")
+  const yearlyActivities = ref<any[]>([])
   const summarizing = ref(false)
   const copiedYearly = ref(false)
+  const fetchingActivities = ref(false)
 
   const currentYear = computed(() => core.selectedDate.split('-')[0])
 
@@ -26,6 +28,22 @@ export const useYearlyStore = defineStore('yearly', () => {
       }
     } catch (err) {
       console.error("Failed to fetch yearly data:", err)
+    }
+  }
+
+  async function fetchYearlyActivities () {
+    fetchingActivities.value = true
+    try {
+      const res: any = await $fetch("/api/report/yearly/activities" as any, {
+        query: { year: currentYear.value },
+      })
+      if (res.success) {
+        yearlyActivities.value = res.months || []
+      }
+    } catch (err) {
+      console.error("Failed to fetch yearly activities:", err)
+    } finally {
+      fetchingActivities.value = false
     }
   }
 
@@ -98,10 +116,13 @@ export const useYearlyStore = defineStore('yearly', () => {
   return {
     yearlyRows,
     yearlyHighlights,
+    yearlyActivities,
     summarizing,
     copiedYearly,
+    fetchingActivities,
     currentYear,
     fetchYearlyData,
+    fetchYearlyActivities,
     generateAiSummary,
     addYearlyRow,
     removeYearlyRow,

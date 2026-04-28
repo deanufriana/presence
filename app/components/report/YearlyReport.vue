@@ -258,6 +258,7 @@ import {
 import { storeToRefs } from "pinia";
 import { useCoreStore } from "~/stores/core";
 import { useYearlyStore } from "~/stores/yearly";
+import { useMonthlyStore } from "~/stores/monthly";
 
 const coreStore = useCoreStore();
 const yearlyStore = useYearlyStore();
