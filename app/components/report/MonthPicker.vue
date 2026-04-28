@@ -27,6 +27,7 @@
             size="icon"
             class="h-7 w-7"
             @click="changeYear(1)"
+            :disabled="pickerYear >= new Date().getFullYear()"
           >
             <ChevronRight class="h-4 w-4" />
           </Button>
@@ -42,6 +43,7 @@
               'bg-primary text-primary-foreground hover:bg-primary/90':
                 isCurrentMonth(i),
             }"
+            :disabled="isMonthDisabled(i)"
             @click="selectMonth(i)"
           >
             {{ m }}
@@ -117,6 +119,16 @@ const selectMonth = (monthIndex: number) => {
 
 const isCurrentMonth = (monthIndex: number) => {
   return internalDate.value.getMonth() === monthIndex;
+};
+
+const isMonthDisabled = (monthIndex: number) => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  
+  if (pickerYear.value > currentYear) return true;
+  if (pickerYear.value === currentYear && monthIndex > currentMonth) return true;
+  return false;
 };
 
 const dateDisplay = computed(() => {

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { format } from "date-fns"
+import { format, addMonths, subMonths, parse } from "date-fns"
 import { useToast } from "~/composables/use-toast"
 import type { SettingsData } from '~/types/report'
 import { useGitlabStore } from '~/stores/gitlab'
@@ -104,6 +104,18 @@ export const useCoreStore = defineStore('core', () => {
     await loadCachedData()
   }
 
+  function nextMonth() {
+    const current = parse(selectedDate.value, "yyyy-MM", new Date())
+    selectedDate.value = format(addMonths(current, 1), "yyyy-MM")
+  }
+
+  function prevMonth() {
+    const current = parse(selectedDate.value, "yyyy-MM", new Date())
+    // Basic validation to prevent going too far back if needed, 
+    // but the picker will handle the strict "not before current month" rule.
+    selectedDate.value = format(subMonths(current, 1), "yyyy-MM")
+  }
+
   async function syncAllActivities (force = true) {
     pending.value = true
     try {
@@ -141,5 +153,7 @@ export const useCoreStore = defineStore('core', () => {
     saveSettings,
     syncAllActivities,
     init,
+    nextMonth,
+    prevMonth,
   }
 })

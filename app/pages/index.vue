@@ -13,8 +13,27 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- Date Picker -->
-          <MonthPicker v-model="selectedDate" />
+          <!-- Date Picker Navigation -->
+          <div class="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              class="h-8 w-8 border-border bg-card hover:border-primary/40"
+              @click="prevMonth"
+            >
+              <ChevronLeft class="h-4 w-4" />
+            </Button>
+            <MonthPicker v-model="selectedDate" />
+            <Button
+              variant="outline"
+              size="icon"
+              class="h-8 w-8 border-border bg-card hover:border-primary/40"
+              @click="nextMonth"
+              :disabled="isNextDisabled"
+            >
+              <ChevronRight class="h-4 w-4" />
+            </Button>
+          </div>
 
           <!-- Settings Button -->
           <Button
@@ -147,6 +166,8 @@ import {
   FileText,
   Upload,
   RefreshCw,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-vue-next";
 import { useScrollLock } from "@vueuse/core";
 import { Button } from "~/components/ui/button";
@@ -187,6 +208,22 @@ const {
 } = storeToRefs(dailyStore);
 
 const { executeSync, saveManualActivity, confirmSync } = dailyStore;
+const { nextMonth, prevMonth } = coreStore;
+
+const isNextDisabled = computed(() => {
+  try {
+    const current = parse(selectedDate.value, "yyyy-MM", new Date());
+    const now = new Date();
+    // Disable if current month/year is same as or after now month/year
+    return (
+      current.getFullYear() > now.getFullYear() ||
+      (current.getFullYear() === now.getFullYear() &&
+        current.getMonth() >= now.getMonth())
+    );
+  } catch {
+    return false;
+  }
+});
 
 const calendarStore = useCalendarStore();
 const { importingCalendar } = storeToRefs(calendarStore);
