@@ -95,13 +95,18 @@
             :key="idx"
             :class="[
               'border-b border-border/10 last:border-0 transition-colors',
-              isWeekend(new Date(row.date))
+              isWeekend(new Date(row.date)) || isHoliday(row.date)
                 ? 'bg-red-50/50 dark:bg-red-950/20 hover:bg-red-100/50 dark:hover:bg-red-900/30'
                 : 'hover:bg-muted/5',
             ]"
           >
             <td class="px-4 py-2 font-medium text-muted-foreground">
-              {{ format(new Date(row.date), "dd/MM/yyyy") }}
+              <div class="flex flex-col">
+                <span>{{ format(new Date(row.date), "dd/MM/yyyy") }}</span>
+                <span v-if="isHoliday(row.date)" class="text-[9px] text-red-500 font-bold leading-tight mt-0.5">
+                  {{ getHolidayName(row.date) }}
+                </span>
+              </div>
             </td>
             <td class="p-0">
               <input
@@ -249,6 +254,7 @@ import { useExcelExport } from "~/composables/useExcelExport";
 import { useMonthlyStore } from "~/stores/monthly";
 import { parse } from "date-fns";
 import { Button } from "~/components/ui/button";
+import { useCalendarStore } from "~/stores/calendar";
 import {
   Card,
   CardHeader,
@@ -259,6 +265,7 @@ import {
 
 const coreStore = useCoreStore();
 const dailyStore = useDailyStore();
+const calendarStore = useCalendarStore();
 const { success } = useToast();
 
 const { isAiEnabled, pending, copied } = storeToRefs(coreStore);
@@ -287,6 +294,15 @@ const dateDisplay = computed(() => {
     return selectedDate.value;
   }
 });
+
+const isHoliday = (date: string) => {
+  return calendarStore.holidays.some((h: any) => h.date === date);
+};
+
+const getHolidayName = (date: string) => {
+  const holiday = calendarStore.holidays.find((h: any) => h.date === date);
+  return holiday ? holiday.name : "";
+};
 
 const handleExport = async () => {
   try {

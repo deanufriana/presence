@@ -102,7 +102,10 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 pl-7">
                 <!-- Team Leader -->
                 <div class="space-y-1.5">
-                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">Team Leader</Label>
+                  <Label
+                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                    >Team Leader</Label
+                  >
                   <Input
                     v-model="settings.team_leader_name"
                     placeholder="Name"
@@ -110,7 +113,10 @@
                   />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">TL Position</Label>
+                  <Label
+                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                    >TL Position</Label
+                  >
                   <Input
                     v-model="settings.team_leader_position"
                     placeholder="Position"
@@ -120,7 +126,10 @@
 
                 <!-- Dept Head -->
                 <div class="space-y-1.5">
-                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">Dept Head</Label>
+                  <Label
+                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                    >Dept Head</Label
+                  >
                   <Input
                     v-model="settings.dept_head_name"
                     placeholder="Name"
@@ -128,7 +137,10 @@
                   />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">Dept Head Position</Label>
+                  <Label
+                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                    >Dept Head Position</Label
+                  >
                   <Input
                     v-model="settings.dept_head_position"
                     placeholder="Position"
@@ -138,7 +150,10 @@
 
                 <!-- Div Head -->
                 <div class="space-y-1.5">
-                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">Division Head</Label>
+                  <Label
+                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                    >Division Head</Label
+                  >
                   <Input
                     v-model="settings.div_head_name"
                     placeholder="Name"
@@ -146,7 +161,10 @@
                   />
                 </div>
                 <div class="space-y-1.5">
-                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">Div Head Position</Label>
+                  <Label
+                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                    >Div Head Position</Label
+                  >
                   <Input
                     v-model="settings.div_head_position"
                     placeholder="Position"
@@ -488,7 +506,6 @@ import {
   RefreshCw,
   GitMerge,
   Sparkles,
-  Check,
   User,
   FileText,
   Trello,

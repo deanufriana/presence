@@ -32,6 +32,10 @@
               <div class="h-2 w-2 rounded-sm bg-emerald-500"></div>
               Manual
             </div>
+            <div class="flex items-center gap-1">
+              <div class="h-2 w-2 rounded-sm bg-red-500"></div>
+              Holiday
+            </div>
           </div>
           <Button
             variant="outline"
@@ -78,7 +82,7 @@
 
           <!-- Days with indicators -->
           <div
-            v-for="day in calendarDays"
+            v-for="(day, idx) in calendarDays"
             :key="day.date"
             @click="openManualEntry(day)"
             class="relative aspect-square rounded-md border border-border/40 flex flex-col items-center justify-center group transition-all cursor-pointer hover:border-primary"
@@ -138,21 +142,36 @@
                 v-if="day.hasManual"
                 class="h-1 w-1 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"
               />
+              <!-- Holiday Dot (Red) -->
+              <div
+                v-if="day.isHoliday"
+                class="h-1 w-1 rounded-full bg-red-500 shadow-sm shadow-red-500/50"
+              />
             </div>
+
 
             <!-- Hover Tooltip -->
             <div
               v-if="
                 day.count > 0 ||
                 day.jiraCount > 0 ||
+                day.isHoliday ||
                 (day.calendarEvents && day.calendarEvents.length > 0)
               "
-              class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2 bg-popover border rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50"
+              class="absolute bottom-full mb-2 w-56 p-2 bg-popover border rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50"
+              :class="getTooltipPositionClasses(idx)"
             >
-              <div class="text-[10px] font-bold mb-1 pb-1 border-b">
-                {{ day.date }}
+              <div class="text-[10px] font-bold mb-1 pb-1 border-b flex justify-between items-center">
+                <span>{{ day.date }}</span>
+                <span v-if="day.isHoliday" class="text-[8px] px-1 bg-red-500/20 text-red-600 dark:text-red-400 rounded">
+                  {{ day.holiday?.type === 'leave' ? 'Cuti Bersama' : 'Holiday' }}
+                </span>
               </div>
               <div class="space-y-2">
+                <!-- Holiday Name -->
+                <div v-if="day.isHoliday" class="text-[9px] font-bold text-red-600 dark:text-red-400 leading-tight">
+                  {{ day.holiday?.name }}
+                </div>
                 <!-- Commits -->
                 <div v-if="day.count > 0" class="space-y-1">
                   <div
@@ -251,8 +270,6 @@
 import { storeToRefs } from "pinia";
 import { useCoreStore } from "~/stores/core";
 import { useDailyStore } from "~/stores/daily";
-import { useGitlabStore } from "~/stores/gitlab";
-import { useJiraStore } from "~/stores/jira";
 import { useCalendarStore } from "~/stores/calendar";
 import { CalendarRange, RefreshCw, Trash2 } from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
@@ -262,10 +279,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 
 const coreStore = useCoreStore();
 const dailyStore = useDailyStore();
-const gitlabStore = useGitlabStore();
 const calendarStore = useCalendarStore();
 
-const { fetchingGitlab } = storeToRefs(gitlabStore);
 const { calendarBlanks, calendarDays } = storeToRefs(calendarStore);
 
 const { syncingRows } = storeToRefs(dailyStore);
@@ -298,8 +313,10 @@ const getDayContainerClasses = (day: any) => {
     classes.push("bg-violet-500/5 border-violet-500/20");
   } else if (day.hasManual) {
     classes.push("bg-emerald-500/5 border-emerald-500/20");
+  } else if (day.isHoliday) {
+    classes.push("bg-red-500/10 border-red-500/30 ring-1 ring-red-500/20");
   } else if (isWeekend(new Date(day.date))) {
-    classes.push("bg-red-500/10 border-red-500/20");
+    classes.push("bg-red-500/5 border-red-500/10");
   } else {
     classes.push("bg-muted/10");
   }
@@ -337,8 +354,16 @@ const getDayTextClasses = (day: any) => {
   if (day.calendarEvents?.length > 0)
     return "text-violet-600 dark:text-violet-400";
   if (day.hasManual) return "text-emerald-600 dark:text-emerald-400";
+  if (day.isHoliday) return "text-red-600 dark:text-red-400 font-bold";
   if (isWeekend(new Date(day.date)))
-    return "text-red-600 dark:text-red-400 font-bold";
+    return "text-red-600/70 dark:text-red-400/70";
   return "text-muted-foreground";
+};
+
+const getTooltipPositionClasses = (idx: number) => {
+  const column = (calendarBlanks.value + idx) % 7;
+  if (column < 2) return "left-0 translate-x-0";
+  if (column > 4) return "right-0 left-auto translate-x-0";
+  return "left-1/2 -translate-x-1/2";
 };
 </script>

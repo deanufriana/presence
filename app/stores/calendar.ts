@@ -12,7 +12,9 @@ export const useCalendarStore = defineStore('calendar', () => {
   const { success, error, loading } = useToast()
 
   const calendarData = ref<any>(null)
+  const holidays = ref<any[]>([])
   const importingCalendar = ref(false)
+  const fetchingHolidays = ref(false)
 
   function setCache (cachedCalendar: any) {
     calendarData.value = cachedCalendar
@@ -51,6 +53,8 @@ export const useCalendarStore = defineStore('calendar', () => {
         return ev.updated_at.startsWith(dayDate)
       })
 
+      const dayHoliday = holidays.value.find((h: any) => h.date === dayDate)
+
       days.push({
         dayNum: i,
         date: dayDate,
@@ -61,6 +65,8 @@ export const useCalendarStore = defineStore('calendar', () => {
         jiraEvents: dayJiraEvents,
         jiraCount: dayJiraEvents.length,
         hasManual: !!dailyStore.manualActivitiesMap[dayDate],
+        holiday: dayHoliday,
+        isHoliday: !!dayHoliday
       })
     }
     return days
@@ -92,12 +98,39 @@ export const useCalendarStore = defineStore('calendar', () => {
     }
   }
 
+  const fetchHolidays = async () => {
+    if (!core.selectedDate) return
+    fetchingHolidays.value = true
+    try {
+      const [year, month] = core.selectedDate.split('-')
+      if (!month) {
+        return
+      }
+      const data: any = await $fetch('/api/holidays', {
+        query: { year, month: parseInt(month) }
+      })
+      holidays.value = Array.isArray(data) ? data : []
+    } catch (err) {
+      console.error('Failed to fetch holidays:', err)
+    } finally {
+      fetchingHolidays.value = false
+    }
+  }
+
+  // Watch for date changes to refetch holidays
+  watch(() => core.selectedDate, () => {
+    fetchHolidays()
+  }, { immediate: true })
+
   return {
     calendarData,
+    holidays,
     importingCalendar,
+    fetchingHolidays,
     calendarBlanks,
     calendarDays,
     setCache,
     importCalendar,
+    fetchHolidays
   }
 })
