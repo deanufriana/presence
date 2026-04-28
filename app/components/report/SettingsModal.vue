@@ -251,6 +251,45 @@
               </div>
             </div>
 
+            <!-- Jira Section -->
+            <div class="space-y-3 pt-2 border-t border-border/40">
+              <div class="flex items-center gap-2">
+                <div
+                  class="h-5 w-5 rounded bg-blue-600/10 flex items-center justify-center"
+                >
+                  <Trello class="h-3 w-3 text-blue-600" />
+                </div>
+                <span class="text-sm font-medium">Jira (Atlassian)</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-7">
+                <div class="space-y-1.5">
+                  <Label class="text-xs">Jira Email</Label>
+                  <Input
+                    v-model="settings.jira_email"
+                    placeholder="name@company.com"
+                    class="h-9 text-sm"
+                  />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-xs">API Token</Label>
+                  <Input
+                    v-model="settings.jira_token"
+                    type="password"
+                    placeholder="Enter Jira API Token"
+                    class="h-9 text-sm"
+                  />
+                </div>
+                <div class="col-span-full space-y-1.5">
+                  <Label class="text-xs">Instance URL</Label>
+                  <Input
+                    v-model="settings.jira_url"
+                    placeholder="https://company.atlassian.net"
+                    class="h-9 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
             <!-- AI Section -->
             <div class="space-y-3 pt-2 border-t border-border/40">
               <div class="flex items-center justify-between">
@@ -452,6 +491,7 @@ import {
   Check,
   User,
   FileText,
+  Trello,
 } from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
 import {

@@ -5,6 +5,7 @@ import { parseICS } from "~/utils/ics"
 import { useCoreStore } from '~/stores/core'
 import { useGitlabStore } from '~/stores/gitlab'
 import { useDailyStore } from '~/stores/daily'
+import { useJiraStore } from '~/stores/jira'
 
 export const useCalendarStore = defineStore('calendar', () => {
   const core = useCoreStore()
@@ -29,9 +30,11 @@ export const useCalendarStore = defineStore('calendar', () => {
 
     const gitlabStore = useGitlabStore()
     const dailyStore = useDailyStore()
+    const jiraStore = useJiraStore()
 
     const gitlabEvents = Array.isArray(gitlabStore.gitlabData?.events) ? gitlabStore.gitlabData.events : []
     const calEvents = Array.isArray(calendarData.value?.events) ? calendarData.value.events : []
+    const jiraEvents = Array.isArray(jiraStore.jiraData?.events) ? jiraStore.jiraData.events : []
 
     for (let i = 1; i <= count; i++) {
       const dayDate = format(new Date(d.getFullYear(), d.getMonth(), i), "yyyy-MM-dd")
@@ -43,6 +46,11 @@ export const useCalendarStore = defineStore('calendar', () => {
 
       const dayCalendarEvents = calEvents.filter((ev: any) => ev.date === dayDate)
 
+      const dayJiraEvents = jiraEvents.filter((ev: any) => {
+        if (!ev.updated_at) return false
+        return ev.updated_at.startsWith(dayDate)
+      })
+
       days.push({
         dayNum: i,
         date: dayDate,
@@ -50,6 +58,8 @@ export const useCalendarStore = defineStore('calendar', () => {
         count: dayGitlabEvents.length,
         commits: dayGitlabEvents,
         calendarEvents: dayCalendarEvents,
+        jiraEvents: dayJiraEvents,
+        jiraCount: dayJiraEvents.length,
         hasManual: !!dailyStore.manualActivitiesMap[dayDate],
       })
     }

@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { watchDebounced } from '@vueuse/core'
 import { useCoreStore } from '~/stores/core'
 import { useToast } from '~/composables/use-toast'
 import { format, parseISO } from "date-fns"
@@ -108,6 +107,7 @@ export const useDailyStore = defineStore('daily', () => {
     syncing.value = true
     core.pending = true
     try {
+      await core.syncAllActivities(true)
       const res: any = await $fetch("/api/report/daily/sync" as any, {
         query: { date: core.selectedDate, force: "true" },
       })

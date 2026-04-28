@@ -17,6 +17,12 @@ export interface ReportResponse {
       error?: string;
       cached?: boolean;
     };
+    jira?: {
+      success: boolean;
+      events: any[];
+      error?: string;
+      cached?: boolean;
+    };
   };
 }
 
@@ -24,6 +30,9 @@ export interface SettingsData {
   gitlab_token: string;
   gitlab_url: string;
   gitlab_selected_projects: string;
+  jira_token: string;
+  jira_url: string;
+  jira_email: string;
   ai_api_key: string;
   openai_api_key: string;
   ai_provider: 'gemini' | 'openai' | 'ollama';

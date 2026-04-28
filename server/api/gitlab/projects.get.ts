@@ -1,5 +1,3 @@
-
-
 export default defineEventHandler(async (event): Promise<any> => {
   const config = await getGitLabConfig()
 
@@ -10,8 +8,8 @@ export default defineEventHandler(async (event): Promise<any> => {
   try {
     const response: any = await getGitLabProjects(config)
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       projects: (response || []).map((p: any) => ({
         id: p.id,
         name: p.name,

@@ -55,19 +55,6 @@ export const useGitlabStore = defineStore('gitlab', () => {
     gitlabData.value = cachedGitlab
   }
 
-  async function fetchGitlabFresh () {
-    fetchingGitlab.value = true
-    try {
-      const res: any = await $fetch("/api/gitlab" as any, {
-        query: { date: core.selectedDate, force: "true" },
-      })
-      gitlabData.value = res
-    } catch (error) {
-      console.error("Failed to fetch GitLab data:", error)
-    } finally {
-      fetchingGitlab.value = false
-    }
-  }
 
   async function fetchProjects () {
     if (!core.settings.gitlab_token) {
@@ -106,7 +93,6 @@ export const useGitlabStore = defineStore('gitlab', () => {
     selectedProjectIds,
     filteredGitLab,
     setCache,
-    fetchGitlabFresh,
     fetchProjects,
     toggleProject,
   }

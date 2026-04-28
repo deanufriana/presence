@@ -6,6 +6,7 @@ import { useGitlabStore } from '~/stores/gitlab'
 import { useCalendarStore } from '~/stores/calendar'
 import { useDailyStore } from '~/stores/daily'
 import { useMonthlyStore } from '~/stores/monthly'
+import { useJiraStore } from '~/stores/jira'
 
 export const useCoreStore = defineStore('core', () => {
   const { success, error } = useToast()
@@ -21,6 +22,9 @@ export const useCoreStore = defineStore('core', () => {
     gitlab_token: "",
     gitlab_url: "https://gitlab.com",
     gitlab_selected_projects: "",
+    jira_token: "",
+    jira_url: "",
+    jira_email: "",
     ai_api_key: "",
     openai_api_key: "",
     ai_provider: "gemini",
@@ -44,18 +48,20 @@ export const useCoreStore = defineStore('core', () => {
   async function loadCachedData () {
     initialLoading.value = true
     try {
-      const [cachedGitlab, cachedCalendar, reportRes, monthlyRes]: any =
+      const [cachedGitlab, cachedCalendar, reportRes, monthlyRes, cachedJira]: any =
         await Promise.all([
           $fetch("/api/gitlab/cache" as any, { query: { date: selectedDate.value } }),
           $fetch("/api/calendar/cache" as any, { query: { date: selectedDate.value } }),
           $fetch("/api/report/daily" as any, { query: { date: selectedDate.value } }),
           $fetch("/api/report/monthly" as any, { query: { month: selectedDate.value } }),
+          $fetch("/api/jira/cache" as any, { query: { date: selectedDate.value } }),
         ])
 
-      useGitlabStore().setCache(cachedGitlab)
       useCalendarStore().setCache(cachedCalendar)
       useDailyStore().setCache(reportRes)
       useMonthlyStore().setCache(monthlyRes)
+      useGitlabStore().setCache(cachedGitlab)
+      useJiraStore().setCache(cachedJira)
     } catch (error) {
       console.error("Failed to load cached data:", error)
     } finally {
@@ -98,6 +104,25 @@ export const useCoreStore = defineStore('core', () => {
     await loadCachedData()
   }
 
+  async function syncAllActivities (force = true) {
+    pending.value = true
+    try {
+      const res: any = await $fetch(`/api/activities/${selectedDate.value}`, {
+        query: { force: force ? "true" : "false" }
+      })
+      if (res.success) {
+        useGitlabStore().setCache(res.gitlab)
+        useJiraStore().setCache(res.jira)
+        success("Activities synced successfully")
+      }
+    } catch (err) {
+      console.error("Failed to sync activities:", err)
+      error("Failed to sync activities")
+    } finally {
+      pending.value = false
+    }
+  }
+
   watch(selectedDate, () => {
     loadCachedData()
   })
@@ -114,6 +139,7 @@ export const useCoreStore = defineStore('core', () => {
     isAiEnabled,
     loadCachedData,
     saveSettings,
+    syncAllActivities,
     init,
   }
 })

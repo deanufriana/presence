@@ -18,11 +18,20 @@ export function formatCalendarActivity (ev: any): string {
   return act
 }
 
+export function formatJiraActivity (ev: any): string {
+  const key = ev.key || ''
+  const summary = ev.summary || ''
+  const projectName = ev.project_name || 'Unknown Project'
+  const type = ev.type || 'Issue'
+  return `[Jira: ${projectName}] ${type} ${key}: ${summary}`
+}
+
 export async function fetchAndGroupActivities (dateStr: string, isMonth: boolean = false) {
   const monthStr = isMonth ? dateStr : dateStr.slice(0, 7)
-  const [gitlabRes, calendarCache]: any = await Promise.all([
+  const [gitlabRes, calendarCache, jiraRes]: any = await Promise.all([
     getGitLabCache(monthStr),
-    getCalendarCache(monthStr)
+    getCalendarCache(monthStr),
+    getJiraCache(monthStr)
   ])
 
   const grouped: Record<string, string[]> = {}
@@ -47,6 +56,18 @@ export async function fetchAndGroupActivities (dateStr: string, isMonth: boolean
         if (!grouped[evDate]) grouped[evDate] = []
         const act = formatCalendarActivity(ev)
         if (act && !grouped[evDate].includes(act)) grouped[evDate].push(act)
+      }
+    })
+  }
+
+  // 3. Process Jira
+  if (jiraRes.success && jiraRes.events) {
+    jiraRes.events.forEach((ev: any) => {
+      const evDate = ev.updated_at.split('T')[0]
+      if (isMonth || evDate === dateStr) {
+        if (!grouped[evDate]) grouped[evDate] = []
+        const desc = formatJiraActivity(ev)
+        if (desc && !grouped[evDate].includes(desc)) grouped[evDate].push(desc)
       }
     })
   }

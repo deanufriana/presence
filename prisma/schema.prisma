@@ -85,3 +85,18 @@ model SummaryLog {
 
   @@index([month])
 }
+
+model JiraActivity {
+  id          String   @id
+  key         String
+  summary     String
+  type        String   // issue, comment, worklog
+  status      String?
+  projectName String?
+  updatedAt   DateTime
+  userEmail   String
+  webUrl      String?
+
+  @@index([userEmail])
+  @@index([updatedAt])
+}

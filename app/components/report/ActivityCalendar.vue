@@ -21,31 +21,36 @@
               GitLab
             </div>
             <div class="flex items-center gap-1">
+              <div class="h-2 w-2 rounded-sm bg-blue-600"></div>
+              Jira
+            </div>
+            <div class="flex items-center gap-1">
               <div class="h-2 w-2 rounded-sm bg-violet-500"></div>
               Calendar
             </div>
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-blue-500"></div>
+              <div class="h-2 w-2 rounded-sm bg-emerald-500"></div>
               Manual
             </div>
           </div>
           <Button
-            variant="orange"
+            variant="outline"
             size="xxs"
-            @click="fetchGitlabFresh()"
-            :disabled="fetchingGitlab"
+            @click="fetchAllActivities()"
+            :disabled="syncingAll"
+            class="gap-1.5 border-border/50 h-7"
           >
             <RefreshCw
               class="h-3 w-3"
-              :class="{ 'animate-spin': fetchingGitlab }"
+              :class="{ 'animate-spin': syncingAll }"
             />
-            Refresh
+            Sync All
           </Button>
         </div>
       </div>
     </CardHeader>
     <CardContent class="p-6">
-      <div v-if="fetchingGitlab" class="grid grid-cols-7 gap-2">
+      <div v-if="syncingAll" class="grid grid-cols-7 gap-2">
         <div
           v-for="i in 31"
           :key="i"
@@ -89,14 +94,14 @@
               <Trash2 class="h-4 w-4" />
             </button>
             <button
-              v-if="day.count > 0"
+              v-if="day.count > 0 || day.jiraCount > 0"
               @click.stop="syncDayActivity(day.date)"
               class="absolute -top-1.5 -left-1.5 h-7 w-7 flex items-center justify-center rounded-full border border-emerald-500/50 bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/35 hover:text-white shadow-lg shadow-emerald-500/20 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
               :class="{
                 'opacity-100 bg-emerald-500/40': syncingRows[day.date],
               }"
               :disabled="syncingRows[day.date]"
-              title="Sync activity from commits"
+              title="Sync activity"
             >
               <RefreshCw
                 class="h-4 w-4"
@@ -114,19 +119,24 @@
             <div class="flex gap-0.5 mt-1">
               <!-- Commit Dots (Orange) -->
               <div
-                v-for="dot in Math.min(day.count, 3)"
+                v-for="dot in Math.min(day.count, 2)"
                 :key="'c-' + dot"
                 class="h-1 w-1 rounded-full bg-orange-500"
+              />
+              <!-- Jira Dot (Blue) -->
+              <div
+                v-if="day.jiraCount > 0"
+                class="h-1 w-1 rounded-full bg-blue-600 shadow-sm shadow-blue-600/50"
               />
               <!-- Calendar Event Dot (Violet) -->
               <div
                 v-if="day.calendarEvents?.length > 0"
                 class="h-1 w-1 rounded-full bg-violet-500 shadow-sm shadow-violet-500/50"
               />
-              <!-- Manual Dot (Blue) -->
+              <!-- Manual Dot (Emerald) -->
               <div
                 v-if="day.hasManual"
-                class="h-1 w-1 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50"
+                class="h-1 w-1 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"
               />
             </div>
 
@@ -134,6 +144,7 @@
             <div
               v-if="
                 day.count > 0 ||
+                day.jiraCount > 0 ||
                 (day.calendarEvents && day.calendarEvents.length > 0)
               "
               class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2 bg-popover border rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50"
@@ -166,6 +177,38 @@
                     class="text-[8px] text-muted-foreground pl-2"
                   >
                     + {{ day.count - 3 }} more
+                  </div>
+                </div>
+
+                <!-- Jira Issues -->
+                <div v-if="day.jiraCount > 0" class="space-y-1">
+                  <div
+                    class="text-[8px] font-bold text-blue-600 uppercase tracking-tighter"
+                  >
+                    Jira Issues
+                  </div>
+                  <div
+                    v-for="(issue, jIdx) in day.jiraEvents.slice(0, 3)"
+                    :key="'jira-' + jIdx"
+                    class="text-[9px] leading-tight flex items-start gap-1"
+                  >
+                    <div
+                      class="h-1 w-1 rounded-full bg-blue-600 mt-1 shrink-0"
+                    />
+                    <div class="min-w-0">
+                      <div class="truncate">
+                        <span
+                          class="font-medium text-blue-600 dark:text-blue-400"
+                          >{{ issue.key }}</span
+                        >: {{ issue.summary }}
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    v-if="day.jiraCount > 3"
+                    class="text-[8px] text-muted-foreground pl-2"
+                  >
+                    + {{ day.jiraCount - 3 }} more
                   </div>
                 </div>
 
@@ -209,6 +252,7 @@ import { storeToRefs } from "pinia";
 import { useCoreStore } from "~/stores/core";
 import { useDailyStore } from "~/stores/daily";
 import { useGitlabStore } from "~/stores/gitlab";
+import { useJiraStore } from "~/stores/jira";
 import { useCalendarStore } from "~/stores/calendar";
 import { CalendarRange, RefreshCw, Trash2 } from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
@@ -226,7 +270,11 @@ const { calendarBlanks, calendarDays } = storeToRefs(calendarStore);
 
 const { syncingRows } = storeToRefs(dailyStore);
 const { openManualEntry, deleteActivity, syncDayActivity } = dailyStore;
-const { fetchGitlabFresh } = gitlabStore;
+const { pending: syncingAll } = storeToRefs(coreStore);
+
+async function fetchAllActivities() {
+  await coreStore.syncAllActivities(true);
+}
 
 const formattedDate = computed(() => {
   try {
@@ -244,10 +292,12 @@ const getDayContainerClasses = (day: any) => {
   // Background and border base
   if (day.count > 0) {
     classes.push("bg-orange-500/5 border-orange-500/20");
+  } else if (day.jiraCount > 0) {
+    classes.push("bg-blue-600/5 border-blue-600/20");
   } else if (day.calendarEvents?.length > 0) {
     classes.push("bg-violet-500/5 border-violet-500/20");
   } else if (day.hasManual) {
-    classes.push("bg-blue-500/5 border-blue-500/20");
+    classes.push("bg-emerald-500/5 border-emerald-500/20");
   } else if (isWeekend(new Date(day.date))) {
     classes.push("bg-red-500/10 border-red-500/20");
   } else {
@@ -257,18 +307,25 @@ const getDayContainerClasses = (day: any) => {
   // Ring indicators
   if (day.count >= 3) {
     classes.push("ring-1 ring-orange-500/30");
+  } else if (day.jiraCount >= 3) {
+    classes.push("ring-1 ring-blue-600/30");
   }
 
-  if (day.calendarEvents?.length > 0 && day.count === 0) {
+  if (
+    day.calendarEvents?.length > 0 &&
+    day.count === 0 &&
+    day.jiraCount === 0
+  ) {
     classes.push("ring-1 ring-violet-500/30");
   }
 
   if (
     day.hasManual &&
     day.count === 0 &&
+    day.jiraCount === 0 &&
     (!day.calendarEvents || day.calendarEvents.length === 0)
   ) {
-    classes.push("ring-1 ring-blue-500/30");
+    classes.push("ring-1 ring-emerald-500/30");
   }
 
   return classes;
@@ -276,10 +333,12 @@ const getDayContainerClasses = (day: any) => {
 
 const getDayTextClasses = (day: any) => {
   if (day.count > 0) return "text-orange-600 dark:text-orange-400";
+  if (day.jiraCount > 0) return "text-blue-600 dark:text-blue-400";
   if (day.calendarEvents?.length > 0)
     return "text-violet-600 dark:text-violet-400";
-  if (day.hasManual) return "text-blue-600 dark:text-blue-400";
-  if (isWeekend(new Date(day.date))) return "text-red-600 dark:text-red-400 font-bold";
+  if (day.hasManual) return "text-emerald-600 dark:text-emerald-400";
+  if (isWeekend(new Date(day.date)))
+    return "text-red-600 dark:text-red-400 font-bold";
   return "text-muted-foreground";
 };
 </script>
