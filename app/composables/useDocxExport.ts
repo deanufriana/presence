@@ -194,27 +194,27 @@ export function useDocxExport () {
                 indent: { left: 280 },
                 tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
                 children: [
-                  new TextRun({ text: 'Nama', size: 24 }),
+                   new TextRun({ text: 'Nama', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
-                  new TextRun({ text: 'Ida Wahyuni Yanuarti', size: 24 }),
+                  new TextRun({ text: settings.div_head_name || 'Ida Wahyuni Yanuarti', size: 24 }),
                 ],
               }),
               new Paragraph({
                 indent: { left: 280 },
                 tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
                 children: [
-                  new TextRun({ text: 'Jabatan', size: 24 }),
+                   new TextRun({ text: 'Jabatan', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
-                  new TextRun({ text: 'Kepala Divisi', size: 24 }),
+                  new TextRun({ text: settings.div_head_position?.split(' ')[0] || 'Kepala Divisi', size: 24 }),
                 ],
               }),
               new Paragraph({
                 indent: { left: 280 },
                 tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
                 children: [
-                  new TextRun({ text: 'Unit Kerja', size: 24 }),
+                   new TextRun({ text: 'Unit Kerja', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
-                  new TextRun({ text: 'Divisi Teknologi Informasi', size: 24 }),
+                  new TextRun({ text: settings.div_head_position?.split(' ').slice(1).join(' ') || 'Divisi Teknologi Informasi', size: 24 }),
                 ],
               }),
 
@@ -397,15 +397,15 @@ export function useDocxExport () {
                       new TableCell({
                         children: [
                           new Paragraph({
-                            alignment: AlignmentType.CENTER,
+                             alignment: AlignmentType.CENTER,
                             children: [
-                              new TextRun({ text: 'Ida Wahyuni Yanuarti', bold: true, size: 24 }),
+                              new TextRun({ text: settings.div_head_name || 'Ida Wahyuni Yanuarti', bold: true, size: 24 }),
                             ]
                           }),
                           new Paragraph({
-                            alignment: AlignmentType.CENTER,
+                             alignment: AlignmentType.CENTER,
                             children: [
-                              new TextRun({ text: 'Kepala Divisi Teknologi Informasi', size: 20 }),
+                              new TextRun({ text: settings.div_head_position || 'Kepala Divisi Teknologi Informasi', size: 20 }),
                             ]
                           }),
                         ]
@@ -602,9 +602,9 @@ export function useDocxExport () {
                 rows: [
                   new TableRow({
                     children: [
-                      createSignatureHeaderCell('Team Leader'),
-                      createSignatureHeaderCell('Departement Head'),
-                      createSignatureHeaderCell('Division Head'),
+                       createSignatureHeaderCell(settings.team_leader_position || 'Team Leader'),
+                      createSignatureHeaderCell(settings.dept_head_position || 'Departement Head'),
+                      createSignatureHeaderCell(settings.div_head_position || 'Division Head'),
                     ],
                   }),
                   new TableRow({
@@ -616,9 +616,9 @@ export function useDocxExport () {
                   }),
                   new TableRow({
                     children: [
-                      createSignatureNameCell('Adhel Ekonofian'),
-                      createSignatureNameCell('Septri Nur Ithmam'),
-                      createSignatureNameCell('Ida Wahyuni Yanuarti'),
+                       createSignatureNameCell(settings.team_leader_name || 'Adhel Ekonofian'),
+                      createSignatureNameCell(settings.dept_head_name || 'Septri Nur Ithmam'),
+                      createSignatureNameCell(settings.div_head_name || 'Ida Wahyuni Yanuarti'),
                     ],
                   }),
                 ],

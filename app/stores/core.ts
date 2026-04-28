@@ -31,6 +31,12 @@ export const useCoreStore = defineStore('core', () => {
     user_nopeg: "",
     user_unit: "",
     user_function: "",
+    team_leader_name: "Adhel Ekonofian",
+    team_leader_position: "Team Leader",
+    dept_head_name: "Septri Nur Ithmam",
+    dept_head_position: "Department Head",
+    div_head_name: "Ida Wahyuni Yanuarti",
+    div_head_position: "Kepala Divisi Teknologi Informasi",
   })
 
   const isAiEnabled = computed(() => !!(settings.value.ai_api_key || settings.value.openai_api_key || settings.value.ai_provider === 'ollama'))

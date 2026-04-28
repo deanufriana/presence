@@ -89,6 +89,73 @@
               </div>
             </div>
 
+            <!-- Signatories Section -->
+            <div class="space-y-3 pt-2 border-t border-border/40">
+              <div class="flex items-center gap-2">
+                <div
+                  class="h-5 w-5 rounded bg-emerald-500/10 flex items-center justify-center"
+                >
+                  <FileText class="h-3 w-3 text-emerald-500" />
+                </div>
+                <span class="text-sm font-medium">Document Signatories</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 pl-7">
+                <!-- Team Leader -->
+                <div class="space-y-1.5">
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">Team Leader</Label>
+                  <Input
+                    v-model="settings.team_leader_name"
+                    placeholder="Name"
+                    class="h-8 text-sm"
+                  />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">TL Position</Label>
+                  <Input
+                    v-model="settings.team_leader_position"
+                    placeholder="Position"
+                    class="h-8 text-sm"
+                  />
+                </div>
+
+                <!-- Dept Head -->
+                <div class="space-y-1.5">
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">Dept Head</Label>
+                  <Input
+                    v-model="settings.dept_head_name"
+                    placeholder="Name"
+                    class="h-8 text-sm"
+                  />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">Dept Head Position</Label>
+                  <Input
+                    v-model="settings.dept_head_position"
+                    placeholder="Position"
+                    class="h-8 text-sm"
+                  />
+                </div>
+
+                <!-- Div Head -->
+                <div class="space-y-1.5">
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">Division Head</Label>
+                  <Input
+                    v-model="settings.div_head_name"
+                    placeholder="Name"
+                    class="h-8 text-sm"
+                  />
+                </div>
+                <div class="space-y-1.5">
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold">Div Head Position</Label>
+                  <Input
+                    v-model="settings.div_head_position"
+                    placeholder="Position"
+                    class="h-8 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
             <!-- GitLab Section -->
             <div class="space-y-3">
               <div class="flex items-center gap-2">
@@ -384,6 +451,7 @@ import {
   Sparkles,
   Check,
   User,
+  FileText,
 } from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
 import {

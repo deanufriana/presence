@@ -34,6 +34,13 @@ export interface SettingsData {
   user_nopeg: string;
   user_unit: string;
   user_function: string;
+  // Document Signatories
+  team_leader_name: string;
+  team_leader_position: string;
+  dept_head_name: string;
+  dept_head_position: string;
+  div_head_name: string;
+  div_head_position: string;
 }
 
 export interface MonthlyReportRow {
