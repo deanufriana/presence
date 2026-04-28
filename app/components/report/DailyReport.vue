@@ -21,7 +21,7 @@
           <Button
             v-if="
               isAiEnabled &&
-              localRows.some((r) => r.aktivitas && r.aktivitas.length > 5)
+              dailyTable.some((r) => r.aktivitas && r.aktivitas.length > 5)
             "
             :variant="summarizingAll ? 'destructive' : 'ai'"
             size="xs"
@@ -36,7 +36,7 @@
             variant="outline"
             size="xs"
             @click="copyReport"
-            :disabled="!localRows.length"
+            :disabled="!dailyTable.length"
           >
             <Check v-if="copied" class="h-3.5 w-3.5 text-emerald-500" />
             <Copy v-else class="h-3.5 w-3.5" />
@@ -91,7 +91,7 @@
         </thead>
         <tbody>
           <tr
-            v-for="(row, idx) in localRows"
+            v-for="(row, idx) in dailyTable"
             :key="idx"
             :class="[
               'border-b border-border/10 last:border-0 transition-colors',
@@ -103,7 +103,10 @@
             <td class="px-4 py-2 font-medium text-muted-foreground">
               <div class="flex flex-col">
                 <span>{{ format(new Date(row.date), "dd/MM/yyyy") }}</span>
-                <span v-if="isHoliday(row.date)" class="text-[9px] text-red-500 font-bold leading-tight mt-0.5">
+                <span
+                  v-if="isHoliday(row.date)"
+                  class="text-[9px] text-red-500 font-bold leading-tight mt-0.5"
+                >
                   {{ getHolidayName(row.date) }}
                 </span>
               </div>
@@ -219,7 +222,7 @@
               </div>
             </td>
           </tr>
-          <tr v-if="!localRows.length && !pending">
+          <tr v-if="!dailyTable.length && !pending">
             <td colspan="5" class="p-16">
               <div
                 class="flex flex-col items-center justify-center text-center text-muted-foreground"
@@ -269,7 +272,7 @@ const calendarStore = useCalendarStore();
 const { success } = useToast();
 
 const { isAiEnabled, pending, copied } = storeToRefs(coreStore);
-const { localRows, summarizingRows, syncingRows, summarizingAll } =
+const { dailyTable, summarizingRows, syncingRows, summarizingAll } =
   storeToRefs(dailyStore);
 
 const {
@@ -307,7 +310,7 @@ const getHolidayName = (date: string) => {
 const handleExport = async () => {
   try {
     await exportToExcel(
-      localRows.value,
+      dailyTable.value,
       monthlyRows.value,
       dateDisplay.value,
       coreStore.settings,

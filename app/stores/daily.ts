@@ -8,8 +8,7 @@ export const useDailyStore = defineStore('daily', () => {
   const core = useCoreStore()
   const { success, error } = useToast()
 
-  const localRows = ref<ReportRow[]>([])
-  const manualActivitiesMap = ref<Record<string, string>>({})
+  const dailyTable = ref<ReportRow[]>([])
   const summarizingRows = ref<Record<string, boolean>>({})
   const summarizingAll = ref(false)
   const shouldStopSummarizing = ref(false)
@@ -23,11 +22,20 @@ export const useDailyStore = defineStore('daily', () => {
   const showConfirmSync = ref(false)
   const syncing = ref(false)
 
+  // Computed map for quick lookup by date
+  const manualActivitiesMap = computed(() => {
+    const map: Record<string, string> = {}
+    dailyTable.value.forEach(row => {
+      if (row.aktivitas) {
+        map[row.date] = row.aktivitas
+      }
+    })
+    return map
+  })
+
   function setCache (reportRes: any) {
     if (reportRes?.success && reportRes.reports) {
-      const map: Record<string, string> = {}
       const rows: ReportRow[] = reportRes.reports.map((r: any) => {
-        if (r.aktivitas) map[r.date] = r.aktivitas
         return {
           date: r.date,
           masuk: r.masuk || "",
@@ -36,13 +44,12 @@ export const useDailyStore = defineStore('daily', () => {
           aktivitas: r.aktivitas || "",
         }
       })
-      manualActivitiesMap.value = map
-      localRows.value = rows
+      dailyTable.value = rows
     }
   }
 
   function applySyncedRows (newRows: ReportRow[]) {
-    const currentRows = [...localRows.value]
+    const currentRows = [...dailyTable.value]
     newRows.forEach((newRow) => {
       const existingRowIndex = currentRows.findIndex((r) => r.date === newRow.date)
       if (existingRowIndex !== -1) {
@@ -58,15 +65,15 @@ export const useDailyStore = defineStore('daily', () => {
       }
     })
     currentRows.sort((a, b) => a.date.localeCompare(b.date))
-    localRows.value = currentRows
+    dailyTable.value = currentRows
   }
 
   const copyReport = async () => {
-    if (!localRows.value.length) return
+    if (!dailyTable.value.length) return
     let tsv = ""
     let html = `<table style="border-collapse: collapse; width: 100%;"><tbody>`
 
-    localRows.value.forEach((row) => {
+    dailyTable.value.forEach((row) => {
       tsv += `${row.date}\t${row.masuk}\t${row.pulang}\t${row.ti}\t${row.aktivitas}\n`
       html += `<tr>
         <td>${row.date}</td>
@@ -95,7 +102,7 @@ export const useDailyStore = defineStore('daily', () => {
   }
 
   function confirmSync () {
-    if (localRows.value.length > 0) {
+    if (dailyTable.value.length > 0) {
       showConfirmSync.value = true
     } else {
       executeSync()
@@ -166,7 +173,7 @@ export const useDailyStore = defineStore('daily', () => {
     shouldStopSummarizing.value = false
 
     // Get list of rows that need summary at the start
-    const rowsToProcess = localRows.value.filter(row =>
+    const rowsToProcess = dailyTable.value.filter(row =>
       row.aktivitas && row.aktivitas.length > 5 && !summarizingRows.value[row.date]
     )
 
@@ -205,11 +212,9 @@ export const useDailyStore = defineStore('daily', () => {
         body: { date }
       })
 
-      delete manualActivitiesMap.value[date]
-
-      const rowIndex = localRows.value.findIndex((r) => r.date === date)
+      const rowIndex = dailyTable.value.findIndex((r) => r.date === date)
       if (rowIndex !== -1) {
-        localRows.value.splice(rowIndex, 1)
+        dailyTable.value.splice(rowIndex, 1)
       }
 
       success(`Activity removed for ${date}`)
@@ -226,16 +231,29 @@ export const useDailyStore = defineStore('daily', () => {
   }
 
   const saveActivity = async (date: string, activity: string) => {
-    await $fetch("/api/report/daily" as any, {
+    const res: any = await $fetch("/api/report/daily" as any, {
       method: "POST",
       body: { date, activity },
     })
-    manualActivitiesMap.value[date] = activity
 
-    // Update local state if not already updated
-    const row = localRows.value.find(r => r.date === date)
-    if (row && row.aktivitas !== activity) {
-      row.aktivitas = activity
+    if (res?.success && res.report) {
+      const updated = res.report
+      const rowIndex = dailyTable.value.findIndex((r) => r.date === date)
+      if (dailyTable.value[rowIndex]) {
+        dailyTable.value[rowIndex].aktivitas = updated.aktivitas
+        dailyTable.value[rowIndex].masuk = updated.masuk
+        dailyTable.value[rowIndex].pulang = updated.pulang
+        dailyTable.value[rowIndex].ti = updated.ti
+      } else {
+        dailyTable.value.push({
+          date: date,
+          masuk: updated.masuk || "",
+          pulang: updated.pulang || "",
+          ti: updated.ti || "",
+          aktivitas: updated.aktivitas || "",
+        })
+        dailyTable.value.sort((a, b) => a.date.localeCompare(b.date))
+      }
     }
   }
 
@@ -252,7 +270,6 @@ export const useDailyStore = defineStore('daily', () => {
       const res: any = await $fetch(`/api/report/daily/sync/${date}` as any)
       if (res.success && res.data) {
         applySyncedRows([res.data])
-        manualActivitiesMap.value[date] = res.data.aktivitas
         success(`Activity synced for ${date}`)
       } else {
         error(res.error || `No activity found for ${date}`)
@@ -275,18 +292,13 @@ export const useDailyStore = defineStore('daily', () => {
         method: "POST",
         body: row,
       })
-      if (row.aktivitas) {
-        manualActivitiesMap.value[row.date] = row.aktivitas
-      } else {
-        delete manualActivitiesMap.value[row.date]
-      }
     } catch (err) {
       console.error("Failed to update row:", err)
     }
   }
 
   return {
-    localRows,
+    dailyTable,
     manualActivitiesMap,
     summarizingRows,
     syncingRows,

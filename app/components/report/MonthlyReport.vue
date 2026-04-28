@@ -23,7 +23,7 @@
             variant="ai"
             size="xs"
             @click="generateAiSummary"
-            :disabled="!localRows.length || summarizing"
+            :disabled="!dailyTable.length || summarizing"
             class="relative overflow-hidden group"
           >
             <div
@@ -74,7 +74,7 @@
             variant="outline"
             size="xs"
             @click="handleBastExport"
-            :disabled="!localRows.length || exportingDocx"
+            :disabled="!dailyTable.length || exportingDocx"
             class="border-orange-500/20 hover:border-orange-500/50 hover:bg-orange-500/5 text-orange-600 dark:text-orange-400"
           >
             <File
@@ -339,7 +339,7 @@ const dailyStore = useDailyStore();
 const { isAiEnabled, selectedDate } = storeToRefs(coreStore);
 const { monthlyRows, monthlyHighlights, summarizing, copiedMonthly } =
   storeToRefs(monthlyStore);
-const { localRows } = storeToRefs(dailyStore);
+const { dailyTable } = storeToRefs(dailyStore);
 
 const {
   generateAiSummary,
