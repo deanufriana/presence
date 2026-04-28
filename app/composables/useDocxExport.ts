@@ -13,8 +13,9 @@ import {
   BorderStyle
 } from 'docx';
 import { saveAs } from 'file-saver';
-import { format, parse } from 'date-fns';
+import { format, parse, getDaysInMonth, isWeekend } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
+import { useCalendarStore } from '~/stores/calendar';
 import type { MonthlyReportRow, SettingsData } from '~/types/report';
 
 export function useDocxExport () {
@@ -25,6 +26,26 @@ export function useDocxExport () {
     bottom: { style: BorderStyle.SINGLE, size: 1 },
     left: { style: BorderStyle.SINGLE, size: 1 },
     right: { style: BorderStyle.SINGLE, size: 1 },
+  };
+
+  const getWorkingDays = (year: number, month: number) => {
+    const calendarStore = useCalendarStore();
+    const workingDays: Date[] = [];
+    const daysCount = getDaysInMonth(new Date(year, month));
+
+    for (let day = 1; day <= daysCount; day++) {
+      const date = new Date(year, month, day);
+      const dateStr = format(date, "yyyy-MM-dd");
+      const isWeekendDay = isWeekend(date);
+      const isHoliday = calendarStore.holidays.some(
+        (h: any) => h.date === dateStr,
+      );
+
+      if (!isWeekendDay && !isHoliday) {
+        workingDays.push(date);
+      }
+    }
+    return workingDays;
   };
 
   async function exportBAST (
@@ -38,8 +59,11 @@ export function useDocxExport () {
     const monthName = format(parsedDate, 'MMMM', { locale: idLocale });
     const yearName = format(parsedDate, 'yyyy');
 
-    // Calculate dates for distribution
-    const daysInMonth = new Date(parsedDate.getFullYear(), parsedDate.getMonth() + 1, 0).getDate();
+    // Calculate working days for distribution
+    const year = parsedDate.getFullYear();
+    const month = parsedDate.getMonth();
+    const workingDays = getWorkingDays(year, month);
+    const workingDaysCount = workingDays.length;
     const rowCount = monthlyRows.length;
 
     exportingDocx.value = true;
@@ -194,7 +218,7 @@ export function useDocxExport () {
                 indent: { left: 280 },
                 tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
                 children: [
-                   new TextRun({ text: 'Nama', size: 24 }),
+                  new TextRun({ text: 'Nama', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
                   new TextRun({ text: settings.div_head_name || 'Ida Wahyuni Yanuarti', size: 24 }),
                 ],
@@ -203,7 +227,7 @@ export function useDocxExport () {
                 indent: { left: 280 },
                 tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
                 children: [
-                   new TextRun({ text: 'Jabatan', size: 24 }),
+                  new TextRun({ text: 'Jabatan', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
                   new TextRun({ text: settings.div_head_position?.split(' ')[0] || 'Kepala Divisi', size: 24 }),
                 ],
@@ -212,7 +236,7 @@ export function useDocxExport () {
                 indent: { left: 280 },
                 tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
                 children: [
-                   new TextRun({ text: 'Unit Kerja', size: 24 }),
+                  new TextRun({ text: 'Unit Kerja', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
                   new TextRun({ text: settings.div_head_position?.split(' ').slice(1).join(' ') || 'Divisi Teknologi Informasi', size: 24 }),
                 ],
@@ -271,11 +295,20 @@ export function useDocxExport () {
                     ],
                   }),
                   ...monthlyRows.map((row, idx) => {
-                    // Distribute rows across the month
-                    const dayForThisRow = rowCount > 1
-                      ? Math.min(daysInMonth, Math.max(1, Math.floor((idx / (rowCount - 1)) * (daysInMonth - 1)) + 1))
-                      : 1;
-                    const rowDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), dayForThisRow);
+                    const workingDayIndex =
+                      rowCount > 1
+                        ? Math.min(
+                          workingDaysCount - 1,
+                          Math.max(
+                            0,
+                            Math.floor(
+                              (idx / (rowCount - 1)) * (workingDaysCount - 1),
+                            ),
+                          ),
+                        )
+                        : 0;
+                    const rowDate =
+                      workingDays[workingDayIndex] || new Date(year, month, 1);
 
                     return new TableRow({
                       children: [
@@ -397,13 +430,13 @@ export function useDocxExport () {
                       new TableCell({
                         children: [
                           new Paragraph({
-                             alignment: AlignmentType.CENTER,
+                            alignment: AlignmentType.CENTER,
                             children: [
                               new TextRun({ text: settings.div_head_name || 'Ida Wahyuni Yanuarti', bold: true, size: 24 }),
                             ]
                           }),
                           new Paragraph({
-                             alignment: AlignmentType.CENTER,
+                            alignment: AlignmentType.CENTER,
                             children: [
                               new TextRun({ text: settings.div_head_position || 'Kepala Divisi Teknologi Informasi', size: 20 }),
                             ]
@@ -602,7 +635,7 @@ export function useDocxExport () {
                 rows: [
                   new TableRow({
                     children: [
-                       createSignatureHeaderCell(settings.team_leader_position || 'Team Leader'),
+                      createSignatureHeaderCell(settings.team_leader_position || 'Team Leader'),
                       createSignatureHeaderCell(settings.dept_head_position || 'Departement Head'),
                       createSignatureHeaderCell(settings.div_head_position || 'Division Head'),
                     ],
@@ -616,7 +649,7 @@ export function useDocxExport () {
                   }),
                   new TableRow({
                     children: [
-                       createSignatureNameCell(settings.team_leader_name || 'Adhel Ekonofian'),
+                      createSignatureNameCell(settings.team_leader_name || 'Adhel Ekonofian'),
                       createSignatureNameCell(settings.dept_head_name || 'Septri Nur Ithmam'),
                       createSignatureNameCell(settings.div_head_name || 'Ida Wahyuni Yanuarti'),
                     ],
