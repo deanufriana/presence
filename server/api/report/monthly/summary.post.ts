@@ -9,7 +9,7 @@ export default defineEventHandler(async (event): Promise<any> => {
   try {
     const dailyReports = await getDailyReports(month)
     const activities = dailyReports
-      .map(r => r.aktivitas)
+      .map(r => `[Date: ${r.date}] ${r.aktivitas}`)
       .filter((act): act is string => !!act && act.length > 5)
 
     if (activities.length === 0) {

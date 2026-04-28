@@ -49,4 +49,5 @@ export interface MonthlyReportRow {
   progres: string;
   done: string;
   status: string;
+  sources?: string[];
 }

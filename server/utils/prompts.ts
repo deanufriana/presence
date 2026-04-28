@@ -18,17 +18,18 @@ Aturan Pengelompokan & Format (WAJIB):
 4. Judul proyek wajib menggunakan format tebal: **Nama Proyek**
 5. Di bawah tiap proyek, gunakan bullet "-" dengan MAKSIMAL 3 bullet per proyek. Pilih 3 pencapaian yang paling berdampak/penting.
 6. Gunakan tepat 1 kalimat per bullet.
+21. Setiap bullet WAJIB diawali dengan daftar tanggal sumber dari aktivitas aslinya dalam kurung siku, contoh: \`[2024-04-01, 2024-04-05] Deskripsi pekerjaan...\`
 
 Aturan Konten & Sintesis:
 7. Fokus pada nilai bisnis dan dampak teknis dari setiap pencapaian (misal: meningkatkan efisiensi, menjamin keamanan data).
 8. JANGAN menghapus detail spesifik mengenai lokasi atau bagian aplikasi yang dikerjakan (misal: "pada modul autentikasi", "di sistem reporting"). Detail "di mana" implementasi dilakukan sangat penting.
-9. Gabungkan aktivitas/commit yang serupa menjadi 1 bullet umum yang komprehensif tanpa menghilangkan konteks teknis utamanya.
+9. Gabungkan aktivitas/commit yang serupa atau yang terjadi pada tanggal yang sama menjadi 1 bullet umum yang komprehensif tanpa menghilangkan konteks teknis utamanya.
 10. Ringkas log aktivitas meeting (misal: "Meeting from... with discuss about...") menjadi satu ringkasan koordinasi/diskusi teknis yang relevan dengan proyek.
 11. DILARANG halusinasi; ekstrak data murni dari daftar aktivitas yang diberikan.
 12. JANGAN menyertakan nama branch (misal: feature/api, develop) ke dalam ringkasan.
 
 Aturan Label Status (WAJIB):
-12. Setiap bullet WAJIB diakhiri dengan salah satu dari 3 label status berikut (tulis persis seperti ini):
+13. Setiap bullet WAJIB diakhiri dengan salah satu dari 3 label status berikut (tulis persis seperti ini):
     - [Status: Project] -> Untuk pekerjaan fitur baru/pengembangan proyek utama.
     - [Status: Project Enhance] -> Untuk improvement, refactoring kode, optimasi, atau perbaikan.
     - [Status: Continuing (Daily)] -> Untuk monitoring, support, operasional, aktivitas berulang harian, atau meeting rutin/koordinasi.
@@ -36,12 +37,12 @@ Aturan Label Status (WAJIB):
 
 <example>
 **NotiFi**
-- Mengembangkan sistem manajemen template notifikasi pada modul scheduler untuk pengiriman pesan terjadwal. [Status: Project]
-- Melakukan optimasi pada query database di repository Core untuk mempercepat proses upload data. [Status: Project Enhance]
-- Rapat koordinasi mingguan terkait sinkronisasi data antar layanan di lingkungan staging. [Status: Continuing (Daily)]
+- [2024-04-01, 2024-04-02] Mengembangkan sistem manajemen template notifikasi pada modul scheduler untuk pengiriman pesan terjadwal. [Status: Project]
+- [2024-04-05] Melakukan optimasi pada query database di repository Core untuk mempercepat proses upload data. [Status: Project Enhance]
+- [2024-04-08, 2024-04-15] Rapat koordinasi mingguan terkait sinkronisasi data antar layanan di lingkungan staging. [Status: Continuing (Daily)]
 
 **Project Lainnya**
-- Memperbaiki bug minor pada antarmuka dashboard pengguna di bagian widget statistik. [Status: Project Enhance]
+- [2024-04-10] Memperbaiki bug minor pada antarmuka dashboard pengguna di bagian widget statistik. [Status: Project Enhance]
 </example>
 
 <activities>

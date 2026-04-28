@@ -86,7 +86,8 @@ export async function getMonthlyReport (month: string) {
     month,
     rows: rows.map(r => ({
       ...r,
-      bulan: r.month // Map month to bulan for frontend compatibility
+      bulan: r.month, // Map month to bulan for frontend compatibility
+      sources: r.sources ? JSON.parse(r.sources) : []
     })) || [],
     summary: summaryLog?.summary || ''
   }
@@ -161,18 +162,22 @@ export function parseMonthlyMarkdown (markdown: string) {
       continue
     }
 
-    // Detect bullet item: - Description [Status: XXX]
-    const bulletMatch = trimmed.match(/^-\s+(.+?)(?:\.\s*)?\[Status:\s*(.+?)\]\s*\.?$/)
-    if (bulletMatch && currentProject && bulletMatch[1] && bulletMatch[2]) {
-      const description = bulletMatch[1].trim()
-      const status = bulletMatch[2].trim()
+    // Detect bullet item: - [Sources] Description [Status: XXX]
+    const bulletMatch = trimmed.match(/^-\s+\[(.+?)\]\s+(.+?)(?:\.\s*)?\[Status:\s*(.+?)\]\s*\.?$/)
+    if (bulletMatch && currentProject && bulletMatch[1] && bulletMatch[2] && bulletMatch[3]) {
+      const sourceStr = bulletMatch[1].trim()
+      const description = bulletMatch[2].trim()
+      const status = bulletMatch[3].trim()
+
+      const sources = sourceStr.split(',').map(s => s.trim())
 
       rows.push({
         project: `[${currentProject}] ${description}`,
         progres: '100%',
         done: 'Done',
-        status
-      })
+        status,
+        sources
+      } as any)
     }
   }
 
@@ -207,7 +212,8 @@ export async function upsertMonthlyReport (data: {
           project: row.project,
           progres: row.progres,
           done: row.done,
-          status: row.status
+          status: row.status,
+          sources: row.sources ? JSON.stringify(row.sources) : null
         }))
       })
     }
