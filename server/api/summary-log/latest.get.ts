@@ -1,7 +1,7 @@
 export default defineEventHandler(async (): Promise<any> => {
   try {
     const latest = await prisma.summaryLog.findFirst({
-      orderBy: { month: 'desc' }
+      orderBy: { period: 'desc' }
     })
 
     return { success: true, summary: latest }

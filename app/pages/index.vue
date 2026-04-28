@@ -80,7 +80,7 @@
 
     <!-- Tabs -->
     <Tabs default-value="daily" class="w-full">
-      <TabsList class="grid w-full grid-cols-3">
+      <TabsList class="grid w-full grid-cols-4">
         <TabsTrigger value="daily" class="gap-1.5">
           <FileText class="h-3.5 w-3.5" />
           Daily Report
@@ -88,6 +88,10 @@
         <TabsTrigger value="monthly" class="gap-1.5">
           <CalendarDays class="h-3.5 w-3.5" />
           Monthly Report
+        </TabsTrigger>
+        <TabsTrigger value="yearly" class="gap-1.5">
+          <Calendar class="h-3.5 w-3.5" />
+          Yearly Report
         </TabsTrigger>
         <TabsTrigger value="activity" class="gap-1.5">
           <CalendarRange class="h-3.5 w-3.5" />
@@ -101,6 +105,10 @@
 
       <TabsContent value="monthly">
         <MonthlyReport />
+      </TabsContent>
+
+      <TabsContent value="yearly">
+        <YearlyReport />
       </TabsContent>
 
       <TabsContent value="activity">
@@ -134,6 +142,7 @@
 import {
   CalendarDays,
   CalendarRange,
+  Calendar,
   Settings,
   FileText,
   Upload,
@@ -145,6 +154,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 import { format, parse } from "date-fns";
 import DailyReport from "~/components/report/DailyReport.vue";
 import MonthlyReport from "~/components/report/MonthlyReport.vue";
+import YearlyReport from "~/components/report/YearlyReport.vue";
 import ActivityCalendar from "~/components/report/ActivityCalendar.vue";
 import MonthPicker from "~/components/report/MonthPicker.vue";
 import SettingsModal from "~/components/report/SettingsModal.vue";

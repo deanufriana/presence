@@ -1,5 +1,6 @@
+import type { YearlyReportRow } from '~/types/report'
 import { prisma } from './prisma'
-import { format } from 'date-fns'
+import { format, parse } from 'date-fns'
 
 export function formatGitLabActivity (ev: any): string {
   const desc = ev.title || ''
@@ -94,20 +95,20 @@ export async function getMonthlyReport (month: string) {
   if (!month) throw new Error('Month required')
 
   const rows = await prisma.monthlyReport.findMany({
-    where: { month },
+    where: { month: month },
     orderBy: { createdAt: 'asc' }
   })
 
   const summaryLog = await prisma.summaryLog.findFirst({
-    where: { month },
+    where: { period: month },
     orderBy: { createdAt: 'desc' }
   })
 
   return {
-    month,
+    month: month,
     rows: rows.map(r => ({
       ...r,
-      bulan: r.month, // Map month to bulan for frontend compatibility
+      month: r.month,
       sources: r.sources ? JSON.parse(r.sources) : []
     })) || [],
     summary: summaryLog?.summary || ''
@@ -205,6 +206,45 @@ export function parseMonthlyMarkdown (markdown: string) {
   return rows
 }
 
+export function parseYearlyMarkdown (markdown: string) {
+  const lines = markdown.split('\n')
+  const rows: YearlyReportRow[] = []
+  let currentProject = ''
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+
+    // Detect project heading: **Project Name** or ### **Project Name**
+    const projectMatch = trimmed.match(/^(?:#{1,6}\s+)?\*\*(.+?)\*\*[:\s]*$/)
+    if (projectMatch && projectMatch[1]) {
+      currentProject = projectMatch[1].trim()
+      continue
+    }
+
+    // Detect bullet item: - [dd/mm/yyyy] [Months] Description [Status: XXX]
+    // Allowing flexible spacing between blocks
+    const bulletMatch = trimmed.match(/^[-*]\s*\[(\d{2}\/\d{2}\/\d{4})\]\s*\[(.+?)\]\s*(.+?)(?:\.\s*)?\[Status:\s*(.+?)\]\s*\.?$/i)
+    if (bulletMatch && currentProject && bulletMatch[1] && bulletMatch[2] && bulletMatch[3] && bulletMatch[4]) {
+      const tanggal = bulletMatch[1].trim()
+      const monthStr = bulletMatch[2].trim()
+      const description = bulletMatch[3].trim()
+      const statusLabel = bulletMatch[4].trim()
+
+      rows.push({
+        tanggal,
+        month: monthStr,
+        task: `[${currentProject}] ${description}`,
+        deliverable: 'Deliver',
+        status: 'Done',
+        keterangan: statusLabel
+      })
+    }
+  }
+
+  return rows
+}
+
+
 export async function upsertMonthlyReport (data: {
   month: string,
   summary?: string,
@@ -215,7 +255,7 @@ export async function upsertMonthlyReport (data: {
   // 1. Save summary to SummaryLog (Create new entry for history)
   if (summary !== undefined) {
     await prisma.summaryLog.create({
-      data: { month, summary: summary || '' }
+      data: { period: month, summary: summary || '' }
     })
   }
 
@@ -229,7 +269,7 @@ export async function upsertMonthlyReport (data: {
     if (rows.length > 0) {
       await prisma.monthlyReport.createMany({
         data: rows.map((row: any) => ({
-          month,
+          month: month,
           project: row.project,
           progres: row.progres,
           done: row.done,
@@ -241,4 +281,117 @@ export async function upsertMonthlyReport (data: {
   }
 
   return await getMonthlyReport(month)
+}
+
+export async function getYearlyReport (year: string) {
+  if (!year) throw new Error('Year required')
+
+  // Try to fetch from YearlyReport table first
+  const yearlyRows = await prisma.yearlyReport.findMany({
+    where: { year }
+  })
+
+  let rows = yearlyRows.map(r => ({
+    tanggal: r.tanggal || '',
+    month: r.month || '',
+    task: r.task || '',
+    deliverable: r.deliverable || 'Deliver',
+    status: r.status || 'Done',
+    keterangan: r.keterangan || ''
+  }))
+
+  // Sort rows chronologically by tanggal (dd/MM/yyyy)
+  rows.sort((a, b) => {
+    try {
+      const dateA = parse(a.tanggal, 'dd/MM/yyyy', new Date())
+      const dateB = parse(b.tanggal, 'dd/MM/yyyy', new Date())
+      return dateA.getTime() - dateB.getTime()
+    } catch {
+      return 0
+    }
+  })
+
+  return {
+    year,
+    rows
+  }
+}
+
+export async function upsertYearlyReport (data: {
+  year: string,
+  summary?: string,
+  rows?: YearlyReportRow[]
+}) {
+  const { year, summary, rows } = data
+
+  if (summary !== undefined) {
+    await prisma.summaryLog.upsert({
+      where: { id: (await prisma.summaryLog.findFirst({ where: { period: year } }))?.id || -1 },
+      update: { summary: summary || '' },
+      create: { period: year, summary: summary || '' }
+    })
+  }
+
+  if (Array.isArray(rows)) {
+    // Sort rows chronologically before insertion
+    rows.sort((a, b) => {
+      try {
+        const dateA = parse(a.tanggal, 'dd/MM/yyyy', new Date())
+        const dateB = parse(b.tanggal, 'dd/MM/yyyy', new Date())
+        return dateA.getTime() - dateB.getTime()
+      } catch {
+        return 0
+      }
+    })
+
+    // Sync YearlyReport table
+    await prisma.yearlyReport.deleteMany({
+      where: { year }
+    })
+
+    if (rows.length > 0) {
+      await prisma.yearlyReport.createMany({
+        data: rows.map(row => ({
+          year,
+          tanggal: row.tanggal,
+          month: row.month,
+          task: row.task,
+          deliverable: row.deliverable,
+          status: row.status,
+          keterangan: row.keterangan
+        }))
+      })
+    }
+  }
+
+  return await getYearlyReport(year)
+}
+
+export async function getAllMonthlySummaries (year: string) {
+  if (!year) throw new Error('Year required')
+
+  // Get all unique months for this year that have summaries
+  const summaries = await prisma.summaryLog.findMany({
+    where: {
+      period: {
+        startsWith: `${year}-`
+      },
+      summary: {
+        not: ''
+      }
+    },
+    orderBy: { createdAt: 'desc' }
+  })
+
+  const latestSummaries: Record<string, string> = {}
+  for (const s of summaries) {
+    if (!latestSummaries[s.period]) {
+      latestSummaries[s.period] = s.summary || ''
+    }
+  }
+
+  return Object.entries(latestSummaries).map(([p, summary]) => ({
+    period: p,
+    summary
+  })).sort((a, b) => a.period.localeCompare(b.period))
 }

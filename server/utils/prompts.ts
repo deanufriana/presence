@@ -89,3 +89,53 @@ Aturan Konten & Sintesis:
 ${activities.join('\n')}
 </activities>
 `
+
+export const getYearlyPrompt = (monthlySummaries: string[]) => `
+Kamu adalah Senior Technical Report Writer yang ahli dalam merangkum laporan tahunan IT.
+
+Tugas:
+Sintesis daftar ringkasan bulanan menjadi laporan tahunan yang dikelompokkan per proyek untuk Berita Acara Serah Terima (BAST).
+
+<instructions>
+Bahasa & Gaya:
+- Gunakan Bahasa Indonesia formal & profesional.
+- Jangan menerjemahkan istilah teknis (tetap gunakan istilah aslinya, misal: refactoring, deployment, optimization, dll).
+- Fokus pada pencapaian strategis, bukan detail harian.
+- Fokus pada dampak bisnis dan pencapaian teknis utama tanpa kalimat pembuka, penutup, atau basa-basi.
+
+Aturan Pengelompokan & Format (WAJIB):
+1. Gunakan format Markdown.
+2. Kelompokkan berdasarkan proyek/aplikasi. Identifikasi nama proyek dari ringkasan bulanan yang diberikan. Jika nama proyek tidak teridentifikasi, masukkan ke **Project Lainnya**.
+3. Urutkan proyek dari volume aktivitas tertinggi ke terendah.
+4. Judul proyek wajib menggunakan format tebal: **Nama Proyek**
+5. Di bawah tiap proyek, gunakan bullet "-" dengan MAKSIMAL 5 bullet per proyek. Gabungkan aktivitas serupa dari berbagai bulan menjadi satu bullet yang komprehensif.
+6. Gunakan tepat 1 kalimat per bullet.
+7. Setiap bullet WAJIB diawali dengan tanggal representatif dalam format dd/mm/yyyy (ambil dari tanggal sumber di ringkasan bulanan), diikuti daftar bulan sumber dalam kurung siku, contoh: \`- [25/01/2024] [Januari, Februari] Deskripsi pekerjaan...\`
+
+Aturan Label Status (WAJIB):
+8. Setiap bullet WAJIB diakhiri dengan salah satu dari 3 label status berikut (tulis persis seperti ini):
+    - [Status: Project] -> Untuk pekerjaan fitur baru/pengembangan proyek utama.
+    - [Status: Project Enhance] -> Untuk improvement, refactoring, optimasi, atau perbaikan.
+    - [Status: Continuing (Daily)] -> Untuk monitoring, support, operasional, atau meeting rutin.
+
+Aturan Konten & Sintesis:
+9. DILARANG halusinasi; ekstrak data murni dari ringkasan bulanan yang diberikan.
+10. Gabungkan aktivitas yang sama dari berbagai bulan menjadi satu ringkasan yang mencakup seluruh periode.
+11. Fokus pada dampak bisnis dan pencapaian teknis utama.
+</instructions>
+
+<example>
+**NotiFi**
+- [25/01/2024] [Januari, Februari, Maret] Mengembangkan dan mengimplementasikan arsitektur microservices pada core notification engine termasuk scheduler dan template management. [Status: Project]
+- [10/04/2024] [April, Mei] Melakukan optimasi query database dan refactoring repository layer untuk meningkatkan performa. [Status: Project Enhance]
+- [01/01/2024] [Januari - Desember] Monitoring dan support operasional harian termasuk koordinasi rutin antar tim. [Status: Continuing (Daily)]
+
+**Project Lainnya**
+- [15/03/2024] [Maret, Juni] Memperbaiki bug pada antarmuka dashboard dan widget statistik pengguna. [Status: Project Enhance]
+</example>
+
+<monthly_summaries>
+${monthlySummaries.join('\n\n---\n\n')}
+</monthly_summaries>
+`
+

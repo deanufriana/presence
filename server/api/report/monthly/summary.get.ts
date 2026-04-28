@@ -12,12 +12,12 @@ export default defineEventHandler(async (event) => {
 
   try {
     const latest = await prisma.summaryLog.findFirst({
-      where: { month },
+      where: { period: month },
       orderBy: { createdAt: 'desc' }
     })
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       summary: latest?.summary || '',
       id: latest?.id,
       createdAt: latest?.createdAt

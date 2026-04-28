@@ -51,7 +51,7 @@ export const useMonthlyStore = defineStore('monthly', () => {
 
   function addMonthlyRow (monthName?: string) {
     monthlyRows.value.push({
-      bulan: monthName || "",
+      month: monthName || "",
       project: "",
       progres: "100%",
       done: "Done",
@@ -68,9 +68,9 @@ export const useMonthlyStore = defineStore('monthly', () => {
     let tsv = ""
     let html = `<table border="1" style="border-collapse: collapse; width: 100%; font-family: sans-serif; font-size: 11pt;"><tbody>`
     monthlyRows.value.forEach((row) => {
-      tsv += `${row.bulan}\t${row.project}\t${row.progres}\t${row.done}\t${row.status}\n`
+      tsv += `${row.month}\t${row.project}\t${row.progres}\t${row.done}\t${row.status}\n`
       html += `<tr>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.bulan}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${row.month}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${row.project}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${row.progres}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${row.done}</td>

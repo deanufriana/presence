@@ -64,7 +64,7 @@ model DailyReport {
 
 model MonthlyReport {
   id        Int      @id @default(autoincrement())
-  month     String
+  month    String
   project   String?
   progres   String?
   done      String?
@@ -78,12 +78,12 @@ model MonthlyReport {
 
 model SummaryLog {
   id        Int      @id @default(autoincrement())
-  month     String
+  period    String
   summary   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([month])
+  @@index([period])
 }
 
 model JiraActivity {
@@ -99,4 +99,19 @@ model JiraActivity {
 
   @@index([userEmail])
   @@index([updatedAt])
+}
+
+model YearlyReport {
+  id          Int      @id @default(autoincrement())
+  year        String
+  tanggal     String?
+  month      String?
+  task        String?
+  deliverable String?
+  status      String?
+  keterangan  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([year])
 }

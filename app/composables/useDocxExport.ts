@@ -314,7 +314,7 @@ export function useDocxExport () {
                       children: [
                         createBASTDataCell((idx + 1).toString(), AlignmentType.CENTER),
                         createBASTDataCell(format(rowDate, 'dd/MM/yyyy'), AlignmentType.CENTER),
-                        createBASTDataCell(format(rowDate, 'MMMM', { locale: idLocale }), AlignmentType.CENTER),
+                        createBASTDataCell(row.month || format(rowDate, 'MMMM', { locale: idLocale }), AlignmentType.CENTER),
                         createBASTDataCell(row.project || '-', AlignmentType.LEFT),
                         createBASTDataCell('Deliver', AlignmentType.CENTER),
                         createBASTDataCell('Done', AlignmentType.CENTER),
@@ -614,7 +614,7 @@ export function useDocxExport () {
                   }),
                   ...monthlyRows.map(row => new TableRow({
                     children: [
-                      createDataCell(monthName, AlignmentType.LEFT),
+                      createDataCell(row.month || monthName, AlignmentType.LEFT),
                       createDataCell(row.project, AlignmentType.LEFT),
                       createDataCell(row.progres, AlignmentType.LEFT),
                       createDataCell(row.done, AlignmentType.LEFT),
