@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import { watchDebounced } from '@vueuse/core'
 import { useCoreStore } from '~/stores/core'
 import { useToast } from '~/composables/use-toast'
 import type { MonthlyReportRow } from '~/types/report'
+import { watchDebounced } from '@vueuse/core'
 
 export const useMonthlyStore = defineStore('monthly', () => {
   const core = useCoreStore()
@@ -13,13 +13,17 @@ export const useMonthlyStore = defineStore('monthly', () => {
   const summarizing = ref(false)
   const copiedMonthly = ref(false)
 
-  function setCache (monthlyRes: any) {
-    if (monthlyRes?.success && monthlyRes.report) {
-      monthlyRows.value = monthlyRes.report.rows || []
-      monthlyHighlights.value = monthlyRes.report.summary || ""
-    } else {
-      monthlyRows.value = []
-      monthlyHighlights.value = ""
+  async function fetchMonthlyReport () {
+    try {
+      const res: any = await $fetch("/api/report/monthly" as any, {
+        query: { month: core.selectedDate },
+      })
+      if (res?.success && res.report) {
+        monthlyRows.value = res.report.rows || []
+        monthlyHighlights.value = res.report.summary || ""
+      }
+    } catch (err) {
+      console.error("Failed to fetch monthly report:", err)
     }
   }
 
@@ -107,7 +111,7 @@ export const useMonthlyStore = defineStore('monthly', () => {
     monthlyHighlights,
     summarizing,
     copiedMonthly,
-    setCache,
+    fetchMonthlyReport,
     generateAiSummary,
     addMonthlyRow,
     removeMonthlyRow,

@@ -24,15 +24,14 @@
               Manual Activity
             </CardTitle>
             <CardDescription>
-              Adding task for {{ selectedDay?.date }}
+              Adding task for {{ selectedDayForEntry?.date }}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div class="space-y-3">
               <Label class="text-xs">Activity Description</Label>
               <textarea
-                :value="activityText"
-                @input="$emit('update:activityText', ($event.target as HTMLTextAreaElement).value)"
+                v-model="manualActivityText"
                 placeholder="What did you work on today? (e.g. Documentation, Meeting, etc.)"
                 class="w-full min-h-[200px] rounded-lg border border-border bg-muted/20 p-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
                 autofocus
@@ -48,7 +47,7 @@
             >
             <Button
               size="sm"
-              @click="$emit('save')"
+              @click="saveManualActivity"
               class="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Save Activity
@@ -75,9 +74,11 @@ import { Label } from "~/components/ui/label";
 
 defineProps<{
   modelValue: boolean;
-  selectedDay: { date: string; dayNum: number } | null;
-  activityText: string;
 }>();
+
+const dailyStore = useDailyStore();
+const { saveManualActivity } = dailyStore;
+const { selectedDayForEntry, manualActivityText } = storeToRefs(dailyStore);
 
 defineEmits<{
   "update:modelValue": [value: boolean];

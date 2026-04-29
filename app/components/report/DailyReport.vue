@@ -254,8 +254,6 @@ import {
   Download,
 } from "lucide-vue-next";
 import { useExcelExport } from "~/composables/useExcelExport";
-import { useMonthlyStore } from "~/stores/monthly";
-import { parse } from "date-fns";
 import { Button } from "~/components/ui/button";
 import { useCalendarStore } from "~/stores/calendar";
 import {
@@ -271,7 +269,7 @@ const dailyStore = useDailyStore();
 const calendarStore = useCalendarStore();
 const { success } = useToast();
 
-const { isAiEnabled, pending, copied } = storeToRefs(coreStore);
+const { isAiEnabled, pending, copied, selectedDate } = storeToRefs(coreStore);
 const { dailyTable, summarizingRows, syncingRows, summarizingAll } =
   storeToRefs(dailyStore);
 
@@ -283,35 +281,17 @@ const {
   deleteActivity,
   syncDayActivity,
   updateRow,
+  fetchDailyReport,
 } = dailyStore;
 
-const { monthlyRows } = storeToRefs(useMonthlyStore());
-const { selectedDate } = storeToRefs(coreStore);
+const { dateDisplay } = storeToRefs(coreStore);
 const { exportToExcel, exporting } = useExcelExport();
-
-const dateDisplay = computed(() => {
-  try {
-    const d = parse(selectedDate.value, "yyyy-MM", new Date());
-    return format(d, "MMMM yyyy");
-  } catch {
-    return selectedDate.value;
-  }
-});
-
-const isHoliday = (date: string) => {
-  return calendarStore.holidays.some((h: any) => h.date === date);
-};
-
-const getHolidayName = (date: string) => {
-  const holiday = calendarStore.holidays.find((h: any) => h.date === date);
-  return holiday ? holiday.name : "";
-};
+const { getHolidayName, isHoliday } = calendarStore;
 
 const handleExport = async () => {
   try {
     await exportToExcel(
       dailyTable.value,
-      monthlyRows.value,
       dateDisplay.value,
       coreStore.settings,
     );
@@ -331,4 +311,12 @@ const copyRow = (text: string, date: string) => {
     copiedRows.value[date] = false;
   }, 2000);
 };
+
+watch(
+  () => selectedDate.value,
+  () => {
+    fetchDailyReport();
+  },
+  { immediate: true },
+);
 </script>

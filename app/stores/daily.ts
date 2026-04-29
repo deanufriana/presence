@@ -33,18 +33,25 @@ export const useDailyStore = defineStore('daily', () => {
     return map
   })
 
-  function setCache (reportRes: any) {
-    if (reportRes?.success && reportRes.reports) {
-      const rows: ReportRow[] = reportRes.reports.map((r: any) => {
-        return {
-          date: r.date,
-          masuk: r.masuk || "",
-          pulang: r.pulang || "",
-          ti: r.ti || "",
-          aktivitas: r.aktivitas || "",
-        }
+  async function fetchDailyReport () {
+    try {
+      const res: any = await $fetch("/api/report/daily" as any, {
+        query: { date: core.selectedDate },
       })
-      dailyTable.value = rows
+      if (res?.success && res.reports) {
+        const rows: ReportRow[] = res.reports.map((r: any) => {
+          return {
+            date: r.date,
+            masuk: r.masuk || "",
+            pulang: r.pulang || "",
+            ti: r.ti || "",
+            aktivitas: r.aktivitas || "",
+          }
+        })
+        dailyTable.value = rows
+      }
+    } catch (err) {
+      console.error("Failed to fetch daily report:", err)
     }
   }
 
@@ -308,7 +315,7 @@ export const useDailyStore = defineStore('daily', () => {
     showConfirmSync,
     syncing,
     summarizingAll,
-    setCache,
+    fetchDailyReport,
     copyReport,
     confirmSync,
     executeSync,

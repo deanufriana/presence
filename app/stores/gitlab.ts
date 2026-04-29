@@ -10,7 +10,6 @@ export const useGitlabStore = defineStore('gitlab', () => {
   const fetchingGitlab = ref(false)
   const fetchingProjects = ref(false)
   const allProjects = ref<{ id: number; name: string; path: string }[]>([])
-  const selectedProjectIds = ref<number[]>([])
 
   const filteredGitLab = computed(() => {
     if (!gitlabData.value?.events) return []
@@ -55,6 +54,12 @@ export const useGitlabStore = defineStore('gitlab', () => {
     gitlabData.value = cachedGitlab
   }
 
+  const fetchGitlabCache = async () => {
+    const res: any = await $fetch("/api/gitlab/cache" as any, { query: { date: core.selectedDate } })
+    if (res.success) {
+      useGitlabStore().setCache(res.gitlab)
+    }
+  }
 
   async function fetchProjects () {
     if (!core.settings.gitlab_token) {
@@ -73,27 +78,14 @@ export const useGitlabStore = defineStore('gitlab', () => {
     }
   }
 
-  function toggleProject (id: number | string) {
-    const numId = typeof id === 'string' ? parseInt(id, 10) : id
-    if (isNaN(numId)) return
-
-    const index = selectedProjectIds.value.indexOf(numId)
-    if (index === -1) {
-      selectedProjectIds.value.push(numId)
-    } else {
-      selectedProjectIds.value.splice(index, 1)
-    }
-  }
-
   return {
     gitlabData,
     fetchingGitlab,
     fetchingProjects,
     allProjects,
-    selectedProjectIds,
     filteredGitLab,
+    fetchGitlabCache,
     setCache,
     fetchProjects,
-    toggleProject,
   }
 })

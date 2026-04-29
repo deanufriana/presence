@@ -8,7 +8,8 @@
         <div>
           <h1 class="text-2xl font-bold tracking-tight">Dashboard</h1>
           <p class="text-sm text-muted-foreground mt-1">
-            Generate your daily activity report from GitLab activity.
+            Generate your daily activity report from GitLab, Jira, and Calendar
+            activity.
           </p>
         </div>
 
@@ -49,7 +50,7 @@
           <Button
             variant="gradient"
             size="sm"
-            @click="confirmSync()"
+            @click="confirmSync"
             :disabled="syncing"
           >
             <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': syncing }" />
@@ -64,10 +65,11 @@
       <div class="flex items-center gap-1.5">
         <div
           class="h-2 w-2 rounded-full"
-          :class="gitlabData?.success ? 'bg-emerald-500' : 'bg-amber-500'"
+          :class="settings.gitlab_token ? 'bg-emerald-500' : 'bg-amber-500'"
         />
         <span
-          >GitLab {{ gitlabData?.success ? "Connected" : "Disconnected" }}</span
+          >GitLab
+          {{ settings.gitlab_token ? "Connected" : "Disconnected" }}</span
         >
       </div>
       <div class="ml-auto text-muted-foreground/60">
@@ -117,24 +119,15 @@
     </div>
 
     <!-- Modals -->
-    <SettingsModal
-      v-model="showSettings"
-      :settings="settings"
-      :saving="saving"
-      :fetching-projects="fetchingProjects"
-      :all-projects="allProjects"
-      :selected-project-ids="selectedProjectIds"
+    <SettingsModal v-if="showSettings" v-model="showSettings" />
+
+    <SyncConfirmModal
+      v-if="showConfirmSync"
+      v-model="showConfirmSync"
+      @confirm="executeSync"
     />
 
-    <SyncConfirmModal v-model="showConfirmSync" @confirm="executeSync" />
-
-    <ManualActivityModal
-      v-model="showManualEntry"
-      :selected-day="selectedDayForEntry"
-      :activity-text="manualActivityText"
-      @update:activity-text="manualActivityText = $event"
-      @save="saveManualActivity"
-    />
+    <ManualActivityModal v-if="showManualEntry" v-model="showManualEntry" />
   </div>
 </template>
 
@@ -142,72 +135,54 @@
 import {
   CalendarDays,
   CalendarRange,
-  Calendar,
   Settings,
   FileText,
   Upload,
   RefreshCw,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-vue-next";
 import { useScrollLock } from "@vueuse/core";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
-import { format, parse } from "date-fns";
 import DailyReport from "~/components/report/DailyReport.vue";
-import MonthlyReport from "~/components/report/MonthlyReport.vue";
-import YearlyReport from "~/components/report/YearlyReport.vue";
-import ActivityCalendar from "~/components/report/ActivityCalendar.vue";
-import MonthPicker from "~/components/report/MonthPicker.vue";
-import SettingsModal from "~/components/report/SettingsModal.vue";
-import SyncConfirmModal from "~/components/report/SyncConfirmModal.vue";
-import ManualActivityModal from "~/components/report/ManualActivityModal.vue";
 import YearlyActivityGrid from "~/components/report/YearlyActivityGrid.vue";
+
+const YearlyReport = defineAsyncComponent(
+  () => import("~/components/report/YearlyReport.vue"),
+);
+const ActivityCalendar = defineAsyncComponent(
+  () => import("~/components/report/ActivityCalendar.vue"),
+);
+const MonthlyReport = defineAsyncComponent(
+  () => import("~/components/report/MonthlyReport.vue"),
+);
+const ManualActivityModal = defineAsyncComponent(
+  () => import("~/components/report/ManualActivityModal.vue"),
+);
+const SyncConfirmModal = defineAsyncComponent(
+  () => import("~/components/report/SyncConfirmModal.vue"),
+);
+const SettingsModal = defineAsyncComponent(
+  () => import("~/components/report/SettingsModal.vue"),
+);
 
 import { useCoreStore } from "~/stores/core";
 import { useDailyStore } from "~/stores/daily";
-import { useGitlabStore } from "~/stores/gitlab";
 import { useCalendarStore } from "~/stores/calendar";
 import { storeToRefs } from "pinia";
 
 const coreStore = useCoreStore();
-const gitlabStore = useGitlabStore();
 
-const { selectedDate, showSettings, saving, pending, settings, viewMode } =
+const { fetchSettings } = coreStore;
+const { dateDisplay, showSettings, viewMode, settings } =
   storeToRefs(coreStore);
 
-const { fetchingProjects, allProjects, selectedProjectIds, gitlabData } =
-  storeToRefs(gitlabStore);
-
 const dailyStore = useDailyStore();
-
-const {
-  showConfirmSync,
-  showManualEntry,
-  selectedDayForEntry,
-  manualActivityText,
-  syncing,
-} = storeToRefs(dailyStore);
-
-const { executeSync, saveManualActivity, confirmSync } = dailyStore;
+const { showConfirmSync, showManualEntry, syncing } = storeToRefs(dailyStore);
+const { executeSync, confirmSync } = dailyStore;
 
 const calendarStore = useCalendarStore();
 const { importingCalendar } = storeToRefs(calendarStore);
 const { importCalendar } = calendarStore;
-
-onMounted(() => {
-  coreStore.init();
-});
-
-// ─── Date Display ────────────────────────────────
-const dateDisplay = computed(() => {
-  try {
-    const d = parse(selectedDate.value, "yyyy-MM", new Date());
-    return format(d, "MMMM yyyy");
-  } catch {
-    return selectedDate.value;
-  }
-});
 
 // ─── Calendar Import ──────────────────────────────
 const calendarInput = ref<HTMLInputElement | null>(null);
@@ -226,6 +201,10 @@ const handleCalendarUpload = async (event: Event) => {
     }
   }
 };
+
+onMounted(() => {
+  fetchSettings();
+});
 
 // ─── Scroll Lock ──────────────────────────────────
 const isLocked = useScrollLock(process.client ? document.body : null);

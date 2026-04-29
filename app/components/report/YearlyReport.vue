@@ -23,7 +23,7 @@
             variant="ai"
             size="xs"
             @click="generateAiSummary"
-            :disabled="!monthlyRows.length || summarizing"
+            :disabled="summarizing"
             class="relative overflow-hidden group"
           >
             <div
@@ -258,16 +258,13 @@ import {
 import { storeToRefs } from "pinia";
 import { useCoreStore } from "~/stores/core";
 import { useYearlyStore } from "~/stores/yearly";
-import { useMonthlyStore } from "~/stores/monthly";
 
 const coreStore = useCoreStore();
 const yearlyStore = useYearlyStore();
-const monthlyStore = useMonthlyStore();
 
 const { isAiEnabled, selectedDate } = storeToRefs(coreStore);
 const { yearlyRows, yearlyHighlights, summarizing, copiedYearly } =
   storeToRefs(yearlyStore);
-const { monthlyRows } = storeToRefs(monthlyStore);
 
 const {
   generateAiSummary,
@@ -298,11 +295,11 @@ const handleBastExport = async () => {
   }
 };
 
-onMounted(() => {
-  fetchYearlyData();
-});
-
-watch(selectedDate, () => {
-  fetchYearlyData();
-});
+watch(
+  selectedDate,
+  () => {
+    fetchYearlyData();
+  },
+  { immediate: true },
+);
 </script>

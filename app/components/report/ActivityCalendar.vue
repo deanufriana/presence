@@ -10,7 +10,7 @@
           >
             <CalendarRange class="h-4 w-4 text-orange-500" />
           </div>
-          Activity Calendar ({{ formattedDate }})
+          Activity Calendar ({{ dateDisplay }})
         </CardTitle>
         <div class="flex items-center gap-4">
           <div
@@ -40,7 +40,7 @@
           <Button
             variant="outline"
             size="xxs"
-            @click="fetchAllActivities()"
+            @click="syncAllActivities()"
             :disabled="syncingAll"
             class="gap-1.5 border-border/50 h-7"
           >
@@ -149,7 +149,6 @@
               />
             </div>
 
-
             <!-- Hover Tooltip -->
             <div
               v-if="
@@ -161,15 +160,25 @@
               class="absolute bottom-full mb-2 w-56 p-2 bg-popover border rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50"
               :class="getTooltipPositionClasses(idx)"
             >
-              <div class="text-[10px] font-bold mb-1 pb-1 border-b flex justify-between items-center">
+              <div
+                class="text-[10px] font-bold mb-1 pb-1 border-b flex justify-between items-center"
+              >
                 <span>{{ day.date }}</span>
-                <span v-if="day.isHoliday" class="text-[8px] px-1 bg-red-500/20 text-red-600 dark:text-red-400 rounded">
-                  {{ day.holiday?.type === 'leave' ? 'Cuti Bersama' : 'Holiday' }}
+                <span
+                  v-if="day.isHoliday"
+                  class="text-[8px] px-1 bg-red-500/20 text-red-600 dark:text-red-400 rounded"
+                >
+                  {{
+                    day.holiday?.type === "leave" ? "Cuti Bersama" : "Holiday"
+                  }}
                 </span>
               </div>
               <div class="space-y-2">
                 <!-- Holiday Name -->
-                <div v-if="day.isHoliday" class="text-[9px] font-bold text-red-600 dark:text-red-400 leading-tight">
+                <div
+                  v-if="day.isHoliday"
+                  class="text-[9px] font-bold text-red-600 dark:text-red-400 leading-tight"
+                >
                   {{ day.holiday?.name }}
                 </div>
                 <!-- Commits -->
@@ -273,32 +282,19 @@ import { useDailyStore } from "~/stores/daily";
 import { useCalendarStore } from "~/stores/calendar";
 import { CalendarRange, RefreshCw, Trash2 } from "lucide-vue-next";
 import { Button } from "~/components/ui/button";
-import { format, parse, isWeekend } from "date-fns";
-import { id as idLocale } from "date-fns/locale";
+import { isWeekend } from "date-fns";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 
 const coreStore = useCoreStore();
 const dailyStore = useDailyStore();
 const calendarStore = useCalendarStore();
 
-const { calendarBlanks, calendarDays } = storeToRefs(calendarStore);
-
-const { syncingRows } = storeToRefs(dailyStore);
+const { fetchAllActivities, syncAllActivities } = coreStore;
 const { openManualEntry, deleteActivity, syncDayActivity } = dailyStore;
-const { pending: syncingAll } = storeToRefs(coreStore);
 
-async function fetchAllActivities() {
-  await coreStore.syncAllActivities(true);
-}
-
-const formattedDate = computed(() => {
-  try {
-    const d = parse(coreStore.selectedDate, "yyyy-MM", new Date());
-    return format(d, "MMMM yyyy", { locale: idLocale });
-  } catch {
-    return "";
-  }
-});
+const { calendarBlanks, calendarDays } = storeToRefs(calendarStore);
+const { syncingRows } = storeToRefs(dailyStore);
+const { pending: syncingAll, dateDisplay } = storeToRefs(coreStore);
 
 // ─── Class Helpers ────────────────────────────────
 const getDayContainerClasses = (day: any) => {
@@ -366,4 +362,8 @@ const getTooltipPositionClasses = (idx: number) => {
   if (column > 4) return "right-0 left-auto translate-x-0";
   return "left-1/2 -translate-x-1/2";
 };
+
+onMounted(() => {
+  fetchAllActivities();
+});
 </script>

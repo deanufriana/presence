@@ -246,9 +246,9 @@
                         selectedProjectIds.includes(p.id),
                     }"
                     tabindex="0"
-                    @click="gitlabStore.toggleProject(p.id)"
-                    @keydown.enter.prevent="gitlabStore.toggleProject(p.id)"
-                    @keydown.space.prevent="gitlabStore.toggleProject(p.id)"
+                    @click="toggleProject(p.id)"
+                    @keydown.enter.prevent="toggleProject(p.id)"
+                    @keydown.space.prevent="toggleProject(p.id)"
                   >
                     <Checkbox
                       :checked="selectedProjectIds.includes(p.id)"
@@ -533,15 +533,9 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useCoreStore } from "~/stores/core";
 import { useGitlabStore } from "~/stores/gitlab";
-import type { SettingsData } from "~/types/report";
 
 const props = defineProps<{
   modelValue: boolean;
-  settings: SettingsData;
-  saving: boolean;
-  fetchingProjects: boolean;
-  allProjects: { id: number; name: string; path: string }[];
-  selectedProjectIds: number[];
 }>();
 
 defineEmits<{
@@ -551,9 +545,11 @@ defineEmits<{
 const coreStore = useCoreStore();
 const gitlabStore = useGitlabStore();
 
-const { saveSettings } = coreStore;
-const { fetchProjects, toggleProject } = gitlabStore;
+const { saveSettings, toggleProject } = coreStore;
+const { fetchProjects } = gitlabStore;
 
+const { saving, settings, selectedProjectIds } = storeToRefs(coreStore);
+const { fetchingProjects, allProjects } = storeToRefs(gitlabStore);
 const ollamaModels = ref<any[]>([]);
 const fetchingModels = ref(false);
 
@@ -566,9 +562,9 @@ async function fetchOllamaModels() {
       // If current model is not in the list and list is not empty, select the first one
       if (
         ollamaModels.value.length > 0 &&
-        !ollamaModels.value.find((m) => m.name === props.settings.ai_model)
+        !ollamaModels.value.find((m) => m.name === settings.value?.ai_model)
       ) {
-        props.settings.ai_model = ollamaModels.value[0].name;
+        settings.value.ai_model = ollamaModels.value[0].name;
       }
     }
   } catch (err) {
@@ -579,7 +575,7 @@ async function fetchOllamaModels() {
 }
 
 watch(
-  () => props.settings.ai_provider,
+  () => settings.value?.ai_provider,
   (newVal) => {
     if (newVal === "ollama" && ollamaModels.value.length === 0) {
       fetchOllamaModels();
@@ -588,7 +584,8 @@ watch(
 );
 
 onMounted(() => {
-  if (props.settings.ai_provider === "ollama") {
+  fetchProjects();
+  if (settings.value?.ai_provider === "ollama") {
     fetchOllamaModels();
   }
 });

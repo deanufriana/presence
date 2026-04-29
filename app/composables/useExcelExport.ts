@@ -1,21 +1,20 @@
-import ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
-import type { ReportRow, MonthlyReportRow, SettingsData } from '~/types/report';
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import type { ReportRow, SettingsData } from "~/types/report";
 
-export function useExcelExport() {
+export function useExcelExport () {
   const exporting = ref(false);
 
   // Helper for borders
   const thinBorder: Partial<ExcelJS.Borders> = {
-    top: { style: 'thin' },
-    left: { style: 'thin' },
-    bottom: { style: 'thin' },
-    right: { style: 'thin' },
+    top: { style: "thin" },
+    left: { style: "thin" },
+    bottom: { style: "thin" },
+    right: { style: "thin" },
   };
 
-  async function exportToExcel(
+  async function exportToExcel (
     dailyRows: ReportRow[],
-    monthlyRows: MonthlyReportRow[],
     monthName: string,
     settings: SettingsData
   ) {
@@ -52,7 +51,7 @@ export function useExcelExport() {
         const labelCell = dailySheet.getCell(`B${row}`);
         labelCell.value = label;
         labelCell.font = { name: 'Calibri', size: 11, bold: true };
-        
+
         const valueCell = dailySheet.getCell(`C${row}`);
         valueCell.value = `: ${value}`;
         valueCell.font = { name: 'Calibri', size: 11, bold: true };
@@ -101,9 +100,9 @@ export function useExcelExport() {
       // --- DATA SECTION ---
       dailyRows.forEach((row, index) => {
         const excelRow = dailySheet.getRow(10 + index);
-        
+
         excelRow.getCell(2).value = index + 1; // No
-        
+
         // Tanggal (Date Formatting)
         const dateCell = excelRow.getCell(3);
         dateCell.value = new Date(row.date);
@@ -119,10 +118,10 @@ export function useExcelExport() {
         for (let col = 2; col <= 8; col++) {
           const cell = excelRow.getCell(col);
           cell.border = thinBorder;
-          cell.alignment = { 
-            vertical: 'middle', 
-            horizontal: col === 7 ? 'left' : 'center', 
-            wrapText: true 
+          cell.alignment = {
+            vertical: 'middle',
+            horizontal: col === 7 ? 'left' : 'center',
+            wrapText: true
           };
         }
         excelRow.height = 40; // Fixed height for signature feel
@@ -130,7 +129,7 @@ export function useExcelExport() {
 
       // --- SIGNATURE SECTION ---
       const signatureStartRow = 10 + dailyRows.length + 2;
-      
+
       // BRI LIFE
       const briLifeCell = dailySheet.getCell(`H${signatureStartRow}`);
       briLifeCell.value = 'BRI LIFE';
@@ -148,20 +147,6 @@ export function useExcelExport() {
       roleCell.value = 'TEAM LEADER';
       roleCell.font = { name: 'Calibri', size: 11, bold: true };
       roleCell.alignment = { horizontal: 'center' };
-
-
-      // --- 2. MONTHLY REPORT SHEET ---
-      // (Keeping it simple for now as the user focused on the daily format)
-      const monthlySheet = workbook.addWorksheet('Monthly Summary');
-      monthlySheet.columns = [
-        { header: 'Month', key: 'bulan', width: 15 },
-        { header: 'Project', key: 'project', width: 30 },
-        { header: 'Progress', key: 'progres', width: 12 },
-        { header: 'Done', key: 'done', width: 12 },
-        { header: 'Status', key: 'status', width: 15 },
-      ];
-      monthlySheet.getRow(1).font = { bold: true };
-      monthlyRows.forEach(row => monthlySheet.addRow(row));
 
 
       // --- GENERATE & SAVE ---

@@ -16,10 +16,6 @@ export const useCalendarStore = defineStore('calendar', () => {
   const importingCalendar = ref(false)
   const fetchingHolidays = ref(false)
 
-  function setCache (cachedCalendar: any) {
-    calendarData.value = cachedCalendar
-  }
-
   const calendarBlanks = computed(() => {
     const d = parse(core.selectedDate, "yyyy-MM", new Date())
     return getDay(startOfMonth(d))
@@ -98,6 +94,17 @@ export const useCalendarStore = defineStore('calendar', () => {
     }
   }
 
+  const fetchCalendarEvents = async () => {
+    try {
+      const data: any = await $fetch('/api/calendar/cache' as any, {
+        query: { date: core.selectedDate }
+      })
+      calendarData.value = data
+    } catch (err) {
+      console.error('Failed to fetch calendar events:', err)
+    }
+  }
+
   const fetchHolidays = async () => {
     if (!core.selectedDate) return
     fetchingHolidays.value = true
@@ -117,6 +124,16 @@ export const useCalendarStore = defineStore('calendar', () => {
     }
   }
 
+  const isHoliday = (date: string) => {
+    return holidays.value.some((h: any) => h.date === date);
+  };
+
+  const getHolidayName = (date: string) => {
+    const holiday = holidays.value.find((h: any) => h.date === date);
+    return holiday ? holiday.name : "";
+  };
+
+
   // Watch for date changes to refetch holidays
   watch(() => core.selectedDate, () => {
     fetchHolidays()
@@ -129,7 +146,9 @@ export const useCalendarStore = defineStore('calendar', () => {
     fetchingHolidays,
     calendarBlanks,
     calendarDays,
-    setCache,
+    getHolidayName,
+    fetchCalendarEvents,
+    isHoliday,
     importCalendar,
     fetchHolidays
   }

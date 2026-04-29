@@ -3,9 +3,6 @@ import { format, addMonths, subMonths, addYears, subYears, parse } from "date-fn
 import { useToast } from "~/composables/use-toast"
 import type { SettingsData } from '~/types/report'
 import { useGitlabStore } from '~/stores/gitlab'
-import { useCalendarStore } from '~/stores/calendar'
-import { useDailyStore } from '~/stores/daily'
-import { useMonthlyStore } from '~/stores/monthly'
 import { useJiraStore } from '~/stores/jira'
 
 export const useCoreStore = defineStore('core', () => {
@@ -18,6 +15,7 @@ export const useCoreStore = defineStore('core', () => {
   const pending = ref(false)
   const copied = ref(false)
   const viewMode = ref<"monthly" | "yearly">("monthly")
+  const selectedProjectIds = ref<number[]>([])
 
   const settings = ref<SettingsData>({
     gitlab_token: "",
@@ -46,27 +44,21 @@ export const useCoreStore = defineStore('core', () => {
 
   const isAiEnabled = computed(() => !!(settings.value.ai_api_key || settings.value.openai_api_key || settings.value.ai_provider === 'ollama'))
 
-  async function loadCachedData () {
-    initialLoading.value = true
+  const dateDisplay = computed(() => {
     try {
-      const [cachedGitlab, cachedCalendar, reportRes, monthlyRes, cachedJira]: any =
-        await Promise.all([
-          $fetch("/api/gitlab/cache" as any, { query: { date: selectedDate.value } }),
-          $fetch("/api/calendar/cache" as any, { query: { date: selectedDate.value } }),
-          $fetch("/api/report/daily" as any, { query: { date: selectedDate.value } }),
-          $fetch("/api/report/monthly" as any, { query: { month: selectedDate.value } }),
-          $fetch("/api/jira/cache" as any, { query: { date: selectedDate.value } }),
-        ])
+      const d = parse(selectedDate.value, "yyyy-MM", new Date());
+      return format(d, "MMMM yyyy");
+    } catch {
+      return selectedDate.value;
+    }
+  });
 
-      useCalendarStore().setCache(cachedCalendar)
-      useDailyStore().setCache(reportRes)
-      useMonthlyStore().setCache(monthlyRes)
-      useGitlabStore().setCache(cachedGitlab)
-      useJiraStore().setCache(cachedJira)
-    } catch (error) {
-      console.error("Failed to load cached data:", error)
-    } finally {
-      initialLoading.value = false
+  function toggleProject (id: number) {
+    const index = selectedProjectIds.value.indexOf(id)
+    if (index === -1) {
+      selectedProjectIds.value.push(id)
+    } else {
+      selectedProjectIds.value.splice(index, 1)
     }
   }
 
@@ -75,7 +67,7 @@ export const useCoreStore = defineStore('core', () => {
     try {
       const payload = {
         ...settings.value,
-        gitlab_selected_projects: useGitlabStore().selectedProjectIds.join(","),
+        gitlab_selected_projects: selectedProjectIds.value.join(","),
       }
       await $fetch("/api/settings" as any, {
         method: "POST",
@@ -92,37 +84,34 @@ export const useCoreStore = defineStore('core', () => {
     }
   }
 
-  async function init () {
-    if (isInitialized.value) return
-    isInitialized.value = true
+  async function fetchSettings () {
     const data: any = await $fetch("/api/settings" as any)
     if (data) {
       settings.value = { ...settings.value, ...data }
       if (settings.value.gitlab_selected_projects) {
-        useGitlabStore().selectedProjectIds = settings.value.gitlab_selected_projects.split(",").map(Number)
+        selectedProjectIds.value = settings.value.gitlab_selected_projects.split(",").map(Number)
       }
     }
-    await loadCachedData()
   }
 
-  function nextMonth() {
+  function nextMonth () {
     const current = parse(selectedDate.value, "yyyy-MM", new Date())
     selectedDate.value = format(addMonths(current, 1), "yyyy-MM")
   }
 
-  function prevMonth() {
+  function prevMonth () {
     const current = parse(selectedDate.value, "yyyy-MM", new Date())
     // Basic validation to prevent going too far back if needed, 
     // but the picker will handle the strict "not before current month" rule.
     selectedDate.value = format(subMonths(current, 1), "yyyy-MM")
   }
 
-  function nextYear() {
+  function nextYear () {
     const current = parse(selectedDate.value, "yyyy-MM", new Date())
     selectedDate.value = format(addYears(current, 1), "yyyy-MM")
   }
 
-  function prevYear() {
+  function prevYear () {
     const current = parse(selectedDate.value, "yyyy-MM", new Date())
     selectedDate.value = format(subYears(current, 1), "yyyy-MM")
   }
@@ -146,9 +135,21 @@ export const useCoreStore = defineStore('core', () => {
     }
   }
 
-  watch(selectedDate, () => {
-    loadCachedData()
-  })
+  async function fetchAllActivities () {
+    pending.value = true
+    try {
+      await Promise.all([
+        useCalendarStore().fetchCalendarEvents(),
+        useGitlabStore().fetchGitlabCache(),
+        useJiraStore().fetchJiraCache(),
+      ])
+    } catch (err) {
+      console.error("Failed to sync activities:", err)
+      error("Failed to sync activities")
+    } finally {
+      pending.value = false
+    }
+  }
 
   return {
     selectedDate,
@@ -160,10 +161,13 @@ export const useCoreStore = defineStore('core', () => {
     copied,
     settings,
     isAiEnabled,
-    loadCachedData,
+    dateDisplay,
+    selectedProjectIds,
     saveSettings,
     syncAllActivities,
-    init,
+    fetchAllActivities,
+    fetchSettings,
+    toggleProject,
     nextMonth,
     prevMonth,
     nextYear,

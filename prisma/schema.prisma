@@ -78,7 +78,7 @@ model MonthlyReport {
 
 model SummaryLog {
   id        Int      @id @default(autoincrement())
-  period    String
+  period    String   @unique
   summary   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,7 +90,7 @@ model JiraActivity {
   id          String   @id
   key         String
   summary     String
-  type        String   // issue, comment, worklog
+  type        String
   status      String?
   projectName String?
   updatedAt   DateTime

@@ -39,7 +39,7 @@
           <Button
             variant="outline"
             size="xs"
-            @click="addMonthlyRow(formattedMonth)"
+            @click="addMonthlyRow(dateDisplay)"
           >
             <Plus class="h-3.5 w-3.5" />
             Add Row
@@ -322,7 +322,7 @@ const coreStore = useCoreStore();
 const monthlyStore = useMonthlyStore();
 const dailyStore = useDailyStore();
 
-const { isAiEnabled, selectedDate } = storeToRefs(coreStore);
+const { isAiEnabled, selectedDate, dateDisplay } = storeToRefs(coreStore);
 const { monthlyRows, monthlyHighlights, summarizing, copiedMonthly } =
   storeToRefs(monthlyStore);
 const { dailyTable } = storeToRefs(dailyStore);
@@ -332,8 +332,9 @@ const {
   addMonthlyRow,
   removeMonthlyRow,
   copyMonthlyReport,
+  fetchMonthlyReport,
 } = monthlyStore;
-const { exportToDocx, exportBAST, exportingDocx } = useDocxExport();
+const { exportToDocx, exportingDocx } = useDocxExport();
 const { success, error } = useToast();
 
 const handleDocxExport = async () => {
@@ -359,22 +360,9 @@ const copyRow = (text: string, id: string) => {
   }, 2000);
 };
 
-const formattedMonth = computed(() => {
-  try {
-    const d = parse(selectedDate.value, "yyyy-MM", new Date());
-    return format(d, "MMMM", { locale: idLocale });
-  } catch {
-    return "";
-  }
-});
-
 const formatMonthOnly = (dateStr: string) => {
   if (!dateStr) return "";
   try {
-    // If it's already a month name (e.g. from manual add), return as is
-    if (isNaN(Date.parse(dateStr)) && !/^\d{4}-\d{2}$/.test(dateStr))
-      return dateStr;
-
     const d = dateStr.includes("-")
       ? parse(dateStr, "yyyy-MM", new Date())
       : new Date(dateStr);
@@ -383,4 +371,12 @@ const formatMonthOnly = (dateStr: string) => {
     return dateStr;
   }
 };
+
+watch(
+  () => selectedDate.value,
+  () => {
+    fetchMonthlyReport();
+  },
+  { immediate: true },
+);
 </script>
