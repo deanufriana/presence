@@ -71,7 +71,7 @@
             size="xxs"
             :disabled="fetchingActivities"
             class="h-7 gap-1.5 px-2 text-[10px] border-indigo-500/20 hover:border-indigo-500/40 hover:bg-indigo-500/5 text-indigo-600 dark:text-indigo-400"
-            @click="yearlyStore.fetchYearlyActivities()"
+            @click="fetchYearlyActivities"
           >
             <RefreshCw class="h-3 w-3" :class="{ 'animate-spin': fetchingActivities }" />
             <span class="hidden xs:inline">Sync</span>
@@ -176,6 +176,7 @@ import { id as idLocale } from 'date-fns/locale'
 const yearlyStore = useYearlyStore()
 const coreStore = useCoreStore()
 
+const { fetchYearlyActivities } = yearlyStore
 const { yearlyActivities, fetchingActivities, currentYear } = storeToRefs(yearlyStore)
 const { selectedDate, viewMode } = storeToRefs(coreStore)
 
@@ -230,13 +231,11 @@ const getMonthTextClasses = (month: YearlyActivityMonth) => {
   return 'text-muted-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
 }
 
-onMounted(() => {
-  if (yearlyActivities.value.length === 0) {
-    yearlyStore.fetchYearlyActivities()
-  }
-})
-
-watch(currentYear, () => {
-  yearlyStore.fetchYearlyActivities()
-})
+watch(
+  currentYear,
+  () => {
+    fetchYearlyActivities()
+  },
+  { immediate: true },
+)
 </script>

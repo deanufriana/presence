@@ -20,7 +20,7 @@
             class="relative overflow-hidden group"
             @click="generateAiSummary"
           >
-            <div v-if="summarizing" class="absolute inset-0 bg-violet-500/10 animate-pulse"/>
+            <div v-if="summarizing" class="absolute inset-0 bg-violet-500/10 animate-pulse" />
             <Sparkles v-if="!summarizing" class="h-3.5 w-3.5" />
             <RefreshCw v-else class="h-3.5 w-3.5 animate-spin" />
             <span :class="{ 'animate-pulse': summarizing }">
@@ -187,7 +187,7 @@ const coreStore = useCoreStore()
 const yearlyStore = useYearlyStore()
 
 const { isAiEnabled, selectedDate } = storeToRefs(coreStore)
-const { yearlyRows, yearlyHighlights, summarizing, copiedYearly, isLoading } =
+const { yearlyRows, yearlyHighlights, summarizing, copiedYearly, isLoading, currentYear } =
   storeToRefs(yearlyStore)
 
 const columns = [
@@ -226,7 +226,7 @@ const handleBastExport = async () => {
 }
 
 watch(
-  selectedDate,
+  currentYear,
   () => {
     fetchYearlyData()
   },
