@@ -35,17 +35,6 @@
           <Button
             variant="outline"
             size="xs"
-            :disabled="!monthlyRows.length"
-            @click="copyMonthlyReport"
-          >
-            <Check v-if="copiedMonthly" class="h-3.5 w-3.5 text-emerald-500" />
-            <Copy v-else class="h-3.5 w-3.5" />
-            {{ copiedMonthly ? 'Copied!' : 'Copy' }}
-          </Button>
-
-          <Button
-            variant="outline"
-            size="xs"
             :disabled="!monthlyRows.length || exportingDocx"
             class="border-blue-500/20 hover:border-blue-500/50 hover:bg-blue-500/5 text-blue-600 dark:text-blue-400"
             @click="handleDocxExport"
@@ -121,7 +110,7 @@
 
             <div
               v-if="row.sources && row.sources.length"
-              class="absolute right-2 bottom-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-20"
+              class="absolute right-2 bottom-2 flex items-center gap-1 transition-all duration-200 z-20"
             >
               <TooltipProvider :delay-duration="100">
                 <Tooltip>
@@ -150,7 +139,7 @@
             </div>
 
             <div
-              class="absolute right-2 top-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
+              class="absolute right-2 top-2 flex items-center gap-1 transition-all duration-200 z-10"
             >
               <button
                 v-if="row.project"
@@ -258,8 +247,7 @@ const monthlyStore = useMonthlyStore()
 const dailyStore = useDailyStore()
 
 const { isAiEnabled, selectedDate, dateDisplay } = storeToRefs(coreStore)
-const { monthlyRows, monthlyHighlights, summarizing, copiedMonthly, isLoading } =
-  storeToRefs(monthlyStore)
+const { monthlyRows, monthlyHighlights, summarizing, isLoading } = storeToRefs(monthlyStore)
 const { dailyTable } = storeToRefs(dailyStore)
 
 const columns = [
@@ -271,13 +259,7 @@ const columns = [
   { key: 'actions', label: '', width: '50px' },
 ]
 
-const {
-  generateAiSummary,
-  addMonthlyRow,
-  removeMonthlyRow,
-  copyMonthlyReport,
-  fetchMonthlyReport,
-} = monthlyStore
+const { generateAiSummary, addMonthlyRow, removeMonthlyRow, fetchMonthlyReport } = monthlyStore
 const { exportToDocx, exportBAST, exportingDocx } = useDocxExport()
 const { success, error } = useToast()
 

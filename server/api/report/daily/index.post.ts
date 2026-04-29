@@ -33,20 +33,20 @@ export default defineEventHandler(async (event) => {
     }
 
     // Support single update
-    const { date, activity, masuk, pulang, ti } = body
+    const { date, aktivitas, masuk, pulang, ti } = body
     if (!date) return { success: false, error: 'Date required' }
 
     const updated = await prisma.dailyReport.upsert({
       where: { date },
       update: {
-        aktivitas: activity !== undefined ? activity : undefined,
+        aktivitas: aktivitas,
         masuk: masuk ?? undefined,
         pulang: pulang ?? undefined,
         ti: ti ?? undefined,
       },
       create: {
         date,
-        aktivitas: activity || '',
+        aktivitas: aktivitas || '',
         masuk: masuk || '',
         pulang: pulang || '',
         ti: ti || '',

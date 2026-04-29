@@ -23,12 +23,6 @@
             {{ summarizingAll ? 'Stop Summarizing' : 'Summarize All' }}
           </Button>
 
-          <Button variant="outline" size="xs" :disabled="!dailyTable.length" @click="copyReport">
-            <Check v-if="copied" class="h-3.5 w-3.5 text-emerald-500" />
-            <Copy v-else class="h-3.5 w-3.5" />
-            {{ copied ? 'Copied!' : 'Copy' }}
-          </Button>
-
           <Button variant="excel" size="xs" :disabled="exporting" @click="handleExport">
             <Download class="h-3.5 w-3.5" :class="{ 'animate-bounce': exporting }" />
             {{ exporting ? 'Exporting...' : 'Export Excel' }}
@@ -107,7 +101,10 @@
                     @click.stop
                     @dragstart="handleDragStart($event, item, row.date)"
                   >
-                    <div class="h-1.5 w-1.5 rounded-full bg-violet-400 mt-1.5 shrink-0" />
+                    <div
+                      v-if="!/^[-*•]/.test(item)"
+                      class="h-1.5 w-1.5 rounded-full bg-violet-400 mt-1.5 shrink-0"
+                    />
                     <span class="flex-1">{{ item }}</span>
                     <button
                       class="opacity-0 group-hover/item:opacity-100 p-0.5 rounded-sm text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all"
@@ -232,12 +229,11 @@ const dailyStore = useDailyStore()
 const calendarStore = useCalendarStore()
 const { success } = useToast()
 
-const { isAiEnabled, copied, selectedDate } = storeToRefs(coreStore)
+const { isAiEnabled, selectedDate } = storeToRefs(coreStore)
 const { dailyTable, summarizingRows, syncingRows, summarizingAll, isLoading } =
   storeToRefs(dailyStore)
 
 const {
-  copyReport,
   summarizeRow,
   summarizeAll,
   openManualEntry,
@@ -299,7 +295,7 @@ const parseActivities = (text: string) => {
   if (!text) return []
   return text
     .split('\n')
-    .map((s) => s.trim().replace(/^[-*•]\s*/, ''))
+    .map((s) => s.trim())
     .filter(Boolean)
 }
 
@@ -317,23 +313,21 @@ const handleDrop = async (event: DragEvent, targetDate: string) => {
 
   if (!item || !sourceDate || sourceDate === targetDate) return
 
-  // 1. Remove from source
   const sourceRow = dailyTable.value.find((r) => r.date === sourceDate)
-  if (sourceRow) {
-    const items = parseActivities(sourceRow.aktivitas)
-    const newItems = items.filter((i) => i !== item)
-    sourceRow.aktivitas = newItems.join('\n')
-    await updateRow(sourceRow)
-  }
-
-  // 2. Add to target
   const targetRow = dailyTable.value.find((r) => r.date === targetDate)
-  if (targetRow) {
-    const items = parseActivities(targetRow.aktivitas)
-    items.push(item)
-    targetRow.aktivitas = items.join('\n')
-    await updateRow(targetRow)
-  }
+
+  if (!sourceRow || !targetRow) return
+
+  // 1. Update source
+  const sourceItems = parseActivities(sourceRow.aktivitas)
+  sourceRow.aktivitas = sourceItems.filter((i) => i !== item).join('\n')
+
+  // 2. Update target
+  const targetItems = parseActivities(targetRow.aktivitas)
+  targetItems.push(item)
+  targetRow.aktivitas = targetItems.join('\n')
+
+  await updateRow([sourceRow, targetRow])
 
   success(`Moved activity to ${targetDate}`)
 }

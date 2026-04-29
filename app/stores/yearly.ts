@@ -12,7 +12,6 @@ export const useYearlyStore = defineStore('yearly', () => {
   const yearlyHighlights = ref('')
   const yearlyActivities = ref<YearlyActivityMonth[]>([])
   const summarizing = ref(false)
-  const copiedYearly = ref(false)
   const fetchingActivities = ref(false)
   const isLoading = ref(false)
 
@@ -104,22 +103,6 @@ export const useYearlyStore = defineStore('yearly', () => {
     yearlyRows.value.splice(idx, 1)
   }
 
-  const copyYearlyReport = async () => {
-    if (!yearlyRows.value.length) return
-    let tsv = 'No\tTanggal\tPeriod\tTask\tDeliverable\tStatus\tKeterangan\n'
-    yearlyRows.value.forEach((row, idx) => {
-      tsv += `${idx + 1}\t${row.tanggal}\t${row.month}\t${row.task}\t${row.deliverable}\t${row.status}\t${row.keterangan}\n`
-    })
-    try {
-      await navigator.clipboard.writeText(tsv)
-      copiedYearly.value = true
-      success('Yearly report copied to clipboard!')
-    } catch {
-      error('Failed to copy report.')
-    }
-    setTimeout(() => (copiedYearly.value = false), 2000)
-  }
-
   watchDebounced(
     yearlyRows,
     async (newRows) => {
@@ -139,7 +122,6 @@ export const useYearlyStore = defineStore('yearly', () => {
     yearlyHighlights,
     yearlyActivities,
     summarizing,
-    copiedYearly,
     fetchingActivities,
     currentYear,
     fetchYearlyData,
@@ -147,6 +129,5 @@ export const useYearlyStore = defineStore('yearly', () => {
     generateAiSummary,
     addYearlyRow,
     removeYearlyRow,
-    copyYearlyReport,
   }
 })

@@ -11,7 +11,6 @@ export const useMonthlyStore = defineStore('monthly', () => {
   const monthlyRows = ref<MonthlyReportRow[]>([])
   const monthlyHighlights = ref('')
   const summarizing = ref(false)
-  const copiedMonthly = ref(false)
   const isLoading = ref(false)
 
   async function fetchMonthlyReport() {
@@ -80,36 +79,6 @@ export const useMonthlyStore = defineStore('monthly', () => {
     monthlyRows.value.splice(idx, 1)
   }
 
-  const copyMonthlyReport = async () => {
-    if (!monthlyRows.value.length) return
-    let tsv = ''
-    let html = `<table border="1" style="border-collapse: collapse; width: 100%; font-family: sans-serif; font-size: 11pt;"><tbody>`
-    monthlyRows.value.forEach((row) => {
-      tsv += `${row.month}\t${row.project}\t${row.progres}\t${row.done}\t${row.status}\n`
-      html += `<tr>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.month}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.project}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.progres}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.done}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${row.status}</td>
-      </tr>`
-    })
-    html += `</tbody></table>`
-    try {
-      const blobHtml = new Blob([html], { type: 'text/html' })
-      const blobText = new Blob([tsv], { type: 'text/plain' })
-      const data = [new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })]
-      await navigator.clipboard.write(data)
-      copiedMonthly.value = true
-      success('Monthly report copied as table!')
-    } catch {
-      navigator.clipboard.writeText(tsv)
-      copiedMonthly.value = true
-      error('Advanced copy failed, copied as plain text.')
-    }
-    setTimeout(() => (copiedMonthly.value = false), 2000)
-  }
-
   watchDebounced(
     monthlyRows,
     async (newRows) => {
@@ -128,11 +97,9 @@ export const useMonthlyStore = defineStore('monthly', () => {
     monthlyRows,
     monthlyHighlights,
     summarizing,
-    copiedMonthly,
     fetchMonthlyReport,
     generateAiSummary,
     addMonthlyRow,
     removeMonthlyRow,
-    copyMonthlyReport,
   }
 })

@@ -36,17 +36,6 @@
           <Button
             variant="outline"
             size="xs"
-            :disabled="!yearlyRows.length"
-            @click="copyYearlyReport"
-          >
-            <Check v-if="copiedYearly" class="h-3.5 w-3.5 text-emerald-500" />
-            <Copy v-else class="h-3.5 w-3.5" />
-            {{ copiedYearly ? 'Copied!' : 'Copy' }}
-          </Button>
-
-          <Button
-            variant="outline"
-            size="xs"
             :disabled="!yearlyRows.length || exportingDocx"
             class="border-orange-500/20 hover:border-orange-500/50 hover:bg-orange-500/5 text-orange-600 dark:text-orange-400"
             @click="handleBastExport"
@@ -153,7 +142,7 @@
         <template #cell-actions="{ index }">
           <div class="flex items-center justify-center">
             <button
-              class="h-6 w-6 mx-auto flex items-center justify-center rounded-md text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+              class="h-6 w-6 mx-auto flex items-center justify-center rounded-md text-red-400 hover:bg-red-500/10 transition-all"
               @click="removeYearlyRow(index)"
             >
               <Trash2 class="h-3 w-3" />
@@ -166,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { Calendar, Copy, Check, Sparkles, RefreshCw, Plus, X, Trash2, File } from 'lucide-vue-next'
+import { Calendar, Sparkles, RefreshCw, Plus, X, Trash2, File } from 'lucide-vue-next'
 import { useDocxExport } from '~/composables/useDocxExport'
 import { useToast } from '~/composables/use-toast'
 import { Button } from '~/components/ui/button'
@@ -187,7 +176,7 @@ const coreStore = useCoreStore()
 const yearlyStore = useYearlyStore()
 
 const { isAiEnabled, selectedDate } = storeToRefs(coreStore)
-const { yearlyRows, yearlyHighlights, summarizing, copiedYearly, isLoading, currentYear } =
+const { yearlyRows, yearlyHighlights, summarizing, isLoading, currentYear } =
   storeToRefs(yearlyStore)
 
 const columns = [
@@ -201,8 +190,7 @@ const columns = [
   { key: 'actions', label: '', width: '50px' },
 ]
 
-const { generateAiSummary, addYearlyRow, removeYearlyRow, copyYearlyReport, fetchYearlyData } =
-  yearlyStore
+const { generateAiSummary, addYearlyRow, removeYearlyRow, fetchYearlyData } = yearlyStore
 
 const { exportBAST, exportingDocx } = useDocxExport()
 const { success, error } = useToast()

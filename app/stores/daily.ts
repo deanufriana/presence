@@ -82,39 +82,6 @@ export const useDailyStore = defineStore('daily', () => {
     dailyTable.value = currentRows
   }
 
-  const copyReport = async () => {
-    if (!dailyTable.value.length) return
-    let tsv = ''
-    let html = `<table style="border-collapse: collapse; width: 100%;"><tbody>`
-
-    dailyTable.value.forEach((row) => {
-      tsv += `${row.date}\t${row.masuk}\t${row.pulang}\t${row.ti}\t${row.aktivitas}\n`
-      html += `<tr>
-        <td>${row.date}</td>
-        <td>${row.masuk}</td>
-        <td>${row.pulang}</td>
-        <td>${row.ti}</td>
-        <td>${row.aktivitas}</td>
-      </tr>`
-    })
-
-    html += `</tbody></table>`
-
-    try {
-      const blobHtml = new Blob([html], { type: 'text/html' })
-      const blobText = new Blob([tsv], { type: 'text/plain' })
-      const data = [new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })]
-      await navigator.clipboard.write(data)
-      core.copied = true
-      success('Daily report copied as table!')
-    } catch {
-      navigator.clipboard.writeText(tsv)
-      core.copied = true
-      error('Advanced copy failed, copied as plain text.')
-    }
-    setTimeout(() => (core.copied = false), 2000)
-  }
-
   function confirmSync() {
     if (dailyTable.value.length > 0) {
       showConfirmSync.value = true
@@ -276,10 +243,10 @@ export const useDailyStore = defineStore('daily', () => {
     }
   }
 
-  const saveActivity = async (date: string, activity: string) => {
+  const saveActivity = async (date: string, aktivitas: string) => {
     const res = await $fetch<{ success: boolean; report: ReportRow }>('/api/report/daily', {
       method: 'POST',
-      body: { date, activity },
+      body: { date, aktivitas },
     })
 
     if (res?.success && res.report) {
@@ -339,14 +306,15 @@ export const useDailyStore = defineStore('daily', () => {
     }
   }
 
-  const updateRow = async (row: ReportRow) => {
+  const updateRow = async (data: ReportRow | ReportRow[]) => {
     try {
       await $fetch('/api/report/daily', {
         method: 'POST',
-        body: row,
+        body: data,
       })
     } catch {
-      console.error('Failed to update row')
+      console.error('Failed to update row(s)')
+      error('Failed to save changes')
     }
   }
 
@@ -365,7 +333,6 @@ export const useDailyStore = defineStore('daily', () => {
     syncing,
     summarizingAll,
     fetchDailyReport,
-    copyReport,
     confirmSync,
     executeSync,
     summarizeRow,
