@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event): Promise<any> => {
+export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { month } = body
 
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event): Promise<any> => {
   try {
     const dailyReports = await getDailyReports(month)
     const activities = dailyReports
-      .map(r => `[Date: ${r.date}] ${r.aktivitas}`)
+      .map((r) => `[Date: ${r.date}] ${r.aktivitas}`)
       .filter((act): act is string => !!act && act.length > 5)
 
     if (activities.length === 0) {
@@ -26,16 +26,17 @@ export default defineEventHandler(async (event): Promise<any> => {
     const report = await upsertMonthlyReport({
       month,
       summary: rawContent.trim(),
-      rows
+      rows,
     })
 
     return {
       success: true,
       summary: report.summary,
-      rows: report.rows
+      rows: report.rows,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     console.error('AI Monthly Summary Error:', error)
-    return { success: false, error: error.message || 'Failed to generate AI summary' }
+    return { success: false, error: msg || 'Failed to generate AI summary' }
   }
 })

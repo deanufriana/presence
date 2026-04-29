@@ -46,13 +46,13 @@ export async function fetchJira<T = unknown>(
   const url = `${config.url.replace(/\/$/, '')}/rest/api/3/${path.replace(/^\//, '')}`
   const auth = Buffer.from(`${config.email}:${config.token}`).toString('base64')
 
-  return await $fetch<T>(url, {
+  return (await $fetch<T>(url, {
     headers: {
       Authorization: `Basic ${auth}`,
       Accept: 'application/json',
     },
     query,
-  })
+  })) as T
 }
 
 export async function syncJiraActivities(dateStr: string, force: boolean = false) {

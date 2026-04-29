@@ -1,21 +1,24 @@
 import { defineStore } from 'pinia'
+import type { JiraCache } from '~/types/report'
 
 export const useJiraStore = defineStore('jira', () => {
-  const jiraData = ref<any>(null)
+  const jiraData = ref<JiraCache | null>(null)
 
-  function setCache (cachedJira: any) {
+  function setCache(cachedJira: JiraCache) {
     jiraData.value = cachedJira
   }
 
-  async function fetchJiraCache () {
+  async function fetchJiraCache() {
     const coreStore = useCoreStore()
     try {
-      const res: any = await $fetch("/api/jira/cache" as any, { query: { date: coreStore.selectedDate } })
+      const res = await $fetch<JiraCache>('/api/jira/cache', {
+        query: { date: coreStore.selectedDate },
+      })
       if (res.success) {
-        setCache(res.jira)
+        setCache(res)
       }
     } catch (error) {
-      console.error("Failed to fetch jira cache:", error)
+      console.error('Failed to fetch jira cache:', error)
     }
   }
 

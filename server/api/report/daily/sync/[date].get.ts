@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event): Promise<any> => {
+export default defineEventHandler(async (event) => {
   const dateStr = event.context.params?.date as string
   if (!dateStr) {
     throw createError({ statusCode: 400, message: 'Date is required' })
@@ -10,17 +10,18 @@ export default defineEventHandler(async (event): Promise<any> => {
 
     const report = await upsertDailyReport({
       date: dateStr,
-      activities
+      activities,
     })
 
     return {
       success: true,
-      data: report
+      data: report,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     return {
       success: false,
-      error: error.message
+      error: msg,
     }
   }
 })

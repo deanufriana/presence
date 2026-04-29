@@ -59,10 +59,10 @@ export async function fetchGitLab<T = unknown>(
   }
 
   const url = `${config.url}/api/v4/${path.replace(/^\//, '')}`
-  return await $fetch<T>(url, {
+  return (await $fetch<T>(url, {
     headers: { 'PRIVATE-TOKEN': config.token },
     query,
-  })
+  })) as T
 }
 
 export async function getGitLabUser(config: GitLabConfig): Promise<RawGitLabUser> {

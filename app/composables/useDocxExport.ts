@@ -10,63 +10,62 @@ import {
   AlignmentType,
   UnderlineType,
   VerticalAlign,
-  BorderStyle
-} from 'docx';
-import { saveAs } from 'file-saver';
-import { format, parse, getDaysInMonth, isWeekend } from 'date-fns';
-import { id as idLocale } from 'date-fns/locale';
-import { useCalendarStore } from '~/stores/calendar';
-import type { MonthlyReportRow, SettingsData } from '~/types/report';
+  BorderStyle,
+} from 'docx'
+import { saveAs } from 'file-saver'
+import { format, parse, getDaysInMonth, isWeekend } from 'date-fns'
+import { id as idLocale } from 'date-fns/locale'
+import { useCalendarStore } from '~/stores/calendar'
+import type { MonthlyReportRow, SettingsData } from '~/types/report'
+import type { Holiday } from '~/types/holiday'
 
-export function useDocxExport () {
-  const exportingDocx = ref(false);
+export function useDocxExport() {
+  const exportingDocx = ref(false)
 
   const tableBorders = {
     top: { style: BorderStyle.SINGLE, size: 1 },
     bottom: { style: BorderStyle.SINGLE, size: 1 },
     left: { style: BorderStyle.SINGLE, size: 1 },
     right: { style: BorderStyle.SINGLE, size: 1 },
-  };
+  }
 
   const getWorkingDays = (year: number, month: number) => {
-    const calendarStore = useCalendarStore();
-    const workingDays: Date[] = [];
-    const daysCount = getDaysInMonth(new Date(year, month));
+    const calendarStore = useCalendarStore()
+    const workingDays: Date[] = []
+    const daysCount = getDaysInMonth(new Date(year, month))
 
     for (let day = 1; day <= daysCount; day++) {
-      const date = new Date(year, month, day);
-      const dateStr = format(date, "yyyy-MM-dd");
-      const isWeekendDay = isWeekend(date);
-      const isHoliday = calendarStore.holidays.some(
-        (h: any) => h.date === dateStr,
-      );
+      const date = new Date(year, month, day)
+      const dateStr = format(date, 'yyyy-MM-dd')
+      const isWeekendDay = isWeekend(date)
+      const isHoliday = calendarStore.holidays.some((h: Holiday) => h.date === dateStr)
 
       if (!isWeekendDay && !isHoliday) {
-        workingDays.push(date);
+        workingDays.push(date)
       }
     }
-    return workingDays;
-  };
+    return workingDays
+  }
 
-  async function exportBAST (
+  async function exportBAST(
     monthlyRows: MonthlyReportRow[],
     selectedDateStr: string,
-    settings: SettingsData
+    settings: SettingsData,
   ) {
-    const parsedDate = parse(selectedDateStr, 'yyyy-MM', new Date());
-    const dayName = format(new Date(), 'eeee', { locale: idLocale });
-    const dayNum = format(new Date(), 'dd');
-    const monthName = format(parsedDate, 'MMMM', { locale: idLocale });
-    const yearName = format(parsedDate, 'yyyy');
+    const parsedDate = parse(selectedDateStr, 'yyyy-MM', new Date())
+    const dayName = format(new Date(), 'eeee', { locale: idLocale })
+    const dayNum = format(new Date(), 'dd')
+    const monthName = format(parsedDate, 'MMMM', { locale: idLocale })
+    const yearName = format(parsedDate, 'yyyy')
 
     // Calculate working days for distribution
-    const year = parsedDate.getFullYear();
-    const month = parsedDate.getMonth();
-    const workingDays = getWorkingDays(year, month);
-    const workingDaysCount = workingDays.length;
-    const rowCount = monthlyRows.length;
+    const year = parsedDate.getFullYear()
+    const month = parsedDate.getMonth()
+    const workingDays = getWorkingDays(year, month)
+    const workingDaysCount = workingDays.length
+    const rowCount = monthlyRows.length
 
-    exportingDocx.value = true;
+    exportingDocx.value = true
     try {
       const doc = new Document({
         styles: {
@@ -120,9 +119,7 @@ export function useDocxExport () {
               }),
 
               new Paragraph({
-                children: [
-                  new TextRun({ text: 'Nomor : ........', size: 24 }),
-                ],
+                children: [new TextRun({ text: 'Nomor : ........', size: 24 })],
                 spacing: { after: 200 },
               }),
 
@@ -131,7 +128,7 @@ export function useDocxExport () {
                 children: [
                   new TextRun({
                     text: `Pada hari ini, ${dayName} tanggal ${dayNum} bulan ${monthName} tahun ${yearName}, telah dilakukan serah terima hasil pekerjaan project untuk periode:`,
-                    size: 24
+                    size: 24,
                   }),
                 ],
                 spacing: { after: 100 },
@@ -154,14 +151,22 @@ export function useDocxExport () {
               new Paragraph({
                 indent: { left: 280 },
                 children: [
-                  new TextRun({ text: '(Pekerja Project)', italics: true, size: 18, color: '888888' }),
+                  new TextRun({
+                    text: '(Pekerja Project)',
+                    italics: true,
+                    size: 18,
+                    color: '888888',
+                  }),
                 ],
                 spacing: { after: 100 },
               }),
 
               new Paragraph({
                 indent: { left: 280 },
-                tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
+                tabStops: [
+                  { type: 'left', position: 1700 },
+                  { type: 'left', position: 1700 },
+                ],
                 children: [
                   new TextRun({ text: 'Nama', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
@@ -170,7 +175,10 @@ export function useDocxExport () {
               }),
               new Paragraph({
                 indent: { left: 280 },
-                tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
+                tabStops: [
+                  { type: 'left', position: 1700 },
+                  { type: 'left', position: 1700 },
+                ],
                 children: [
                   new TextRun({ text: 'No Pekerja', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
@@ -179,7 +187,10 @@ export function useDocxExport () {
               }),
               new Paragraph({
                 indent: { left: 280 },
-                tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
+                tabStops: [
+                  { type: 'left', position: 1700 },
+                  { type: 'left', position: 1700 },
+                ],
                 children: [
                   new TextRun({ text: 'Posisi', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
@@ -188,11 +199,17 @@ export function useDocxExport () {
               }),
               new Paragraph({
                 indent: { left: 280 },
-                tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
+                tabStops: [
+                  { type: 'left', position: 1700 },
+                  { type: 'left', position: 1700 },
+                ],
                 children: [
                   new TextRun({ text: 'Team/Fungsi', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
-                  new TextRun({ text: settings.user_function || settings.user_unit || '-', size: 24 }),
+                  new TextRun({
+                    text: settings.user_function || settings.user_unit || '-',
+                    size: 24,
+                  }),
                 ],
               }),
 
@@ -208,15 +225,16 @@ export function useDocxExport () {
               // --- 2. PIHAK YANG MENERIMA ---
               new Paragraph({
                 indent: { left: 280, hanging: 280 },
-                children: [
-                  new TextRun({ text: '2. PIHAK YANG MENERIMA', bold: true, size: 24 }),
-                ],
+                children: [new TextRun({ text: '2. PIHAK YANG MENERIMA', bold: true, size: 24 })],
                 spacing: { after: 100 },
               }),
 
               new Paragraph({
                 indent: { left: 280 },
-                tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
+                tabStops: [
+                  { type: 'left', position: 1700 },
+                  { type: 'left', position: 1700 },
+                ],
                 children: [
                   new TextRun({ text: 'Nama', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
@@ -225,20 +243,34 @@ export function useDocxExport () {
               }),
               new Paragraph({
                 indent: { left: 280 },
-                tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
+                tabStops: [
+                  { type: 'left', position: 1700 },
+                  { type: 'left', position: 1700 },
+                ],
                 children: [
                   new TextRun({ text: 'Jabatan', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
-                  new TextRun({ text: settings.div_head_position?.split(' ')[0] || 'Kepala Divisi', size: 24 }),
+                  new TextRun({
+                    text: settings.div_head_position?.split(' ')[0] || 'Kepala Divisi',
+                    size: 24,
+                  }),
                 ],
               }),
               new Paragraph({
                 indent: { left: 280 },
-                tabStops: [{ type: 'left', position: 1700 }, { type: 'left', position: 1700 }],
+                tabStops: [
+                  { type: 'left', position: 1700 },
+                  { type: 'left', position: 1700 },
+                ],
                 children: [
                   new TextRun({ text: 'Unit Kerja', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
-                  new TextRun({ text: settings.div_head_position?.split(' ').slice(1).join(' ') || 'Divisi Teknologi Informasi', size: 24 }),
+                  new TextRun({
+                    text:
+                      settings.div_head_position?.split(' ').slice(1).join(' ') ||
+                      'Divisi Teknologi Informasi',
+                    size: 24,
+                  }),
                 ],
               }),
 
@@ -254,9 +286,7 @@ export function useDocxExport () {
               // --- 3. DASAR PENUGASAN ---
               new Paragraph({
                 indent: { left: 280, hanging: 280 },
-                children: [
-                  new TextRun({ text: '3. DASAR PENUGASAN', bold: true, size: 24 }),
-                ],
+                children: [new TextRun({ text: '3. DASAR PENUGASAN', bold: true, size: 24 })],
                 spacing: { after: 100 },
               }),
               new Paragraph({
@@ -265,7 +295,7 @@ export function useDocxExport () {
                 children: [
                   new TextRun({
                     text: 'Pekerja project melaksanakan pekerjaan berdasarkan kontrak kerja yang dikelola oleh Divisi HC and ditugaskan pada Divisi Teknologi Informasi.',
-                    size: 24
+                    size: 24,
                   }),
                 ],
                 spacing: { after: 400 },
@@ -298,29 +328,29 @@ export function useDocxExport () {
                     const workingDayIndex =
                       rowCount > 1
                         ? Math.min(
-                          workingDaysCount - 1,
-                          Math.max(
-                            0,
-                            Math.floor(
-                              (idx / (rowCount - 1)) * (workingDaysCount - 1),
+                            workingDaysCount - 1,
+                            Math.max(
+                              0,
+                              Math.floor((idx / (rowCount - 1)) * (workingDaysCount - 1)),
                             ),
-                          ),
-                        )
-                        : 0;
-                    const rowDate =
-                      workingDays[workingDayIndex] || new Date(year, month, 1);
+                          )
+                        : 0
+                    const rowDate = workingDays[workingDayIndex] || new Date(year, month, 1)
 
                     return new TableRow({
                       children: [
                         createBASTDataCell((idx + 1).toString(), AlignmentType.CENTER),
                         createBASTDataCell(format(rowDate, 'dd/MM/yyyy'), AlignmentType.CENTER),
-                        createBASTDataCell(row.month || format(rowDate, 'MMMM', { locale: idLocale }), AlignmentType.CENTER),
+                        createBASTDataCell(
+                          row.month || format(rowDate, 'MMMM', { locale: idLocale }),
+                          AlignmentType.CENTER,
+                        ),
                         createBASTDataCell(row.project || '-', AlignmentType.LEFT),
                         createBASTDataCell('Deliver', AlignmentType.CENTER),
                         createBASTDataCell('Done', AlignmentType.CENTER),
                         createBASTDataCell(row.status || '-', AlignmentType.LEFT),
                       ],
-                    });
+                    })
                   }),
                 ],
               }),
@@ -330,9 +360,7 @@ export function useDocxExport () {
               // --- 5. PERNYATAAN ---
               new Paragraph({
                 indent: { left: 280, hanging: 280 },
-                children: [
-                  new TextRun({ text: '5. PERNYATAAN', bold: true, size: 24 }),
-                ],
+                children: [new TextRun({ text: '5. PERNYATAAN', bold: true, size: 24 })],
                 spacing: { after: 100 },
               }),
               new Paragraph({
@@ -341,7 +369,7 @@ export function useDocxExport () {
                 children: [
                   new TextRun({
                     text: 'PIHAK PERTAMA menyatakan bahwa seluruh pekerjaan di atas telah dilaksanakan sesuai dengan tugas dan tanggung jawab yang diberikan.',
-                    size: 24
+                    size: 24,
                   }),
                 ],
               }),
@@ -351,7 +379,7 @@ export function useDocxExport () {
                 children: [
                   new TextRun({
                     text: 'PIHAK KEDUA menyatakan bahwa hasil pekerjaan telah diterima dan diverifikasi sesuai kebutuhan project.',
-                    size: 24
+                    size: 24,
                   }),
                 ],
                 spacing: { before: 200, after: 400 },
@@ -360,9 +388,7 @@ export function useDocxExport () {
               // --- 6. PENUTUP ---
               new Paragraph({
                 indent: { left: 280, hanging: 280 },
-                children: [
-                  new TextRun({ text: '6. PENUTUP', bold: true, size: 24 }),
-                ],
+                children: [new TextRun({ text: '6. PENUTUP', bold: true, size: 24 })],
                 spacing: { after: 100 },
               }),
               new Paragraph({
@@ -371,7 +397,7 @@ export function useDocxExport () {
                 children: [
                   new TextRun({
                     text: 'Demikian Berita Acara Serah Terima ini dibuat sebagai bukti pelaksanaan dan penyelesaian pekerjaan project pada periode tersebut.',
-                    size: 24
+                    size: 24,
                   }),
                 ],
                 spacing: { after: 600 },
@@ -380,9 +406,7 @@ export function useDocxExport () {
               // --- 7. TANDA TANGAN ---
               new Paragraph({
                 indent: { left: 280, hanging: 280 },
-                children: [
-                  new TextRun({ text: '7. TANDA TANGAN', bold: true, size: 24 }),
-                ],
+                children: [new TextRun({ text: '7. TANDA TANGAN', bold: true, size: 24 })],
                 spacing: { after: 400 },
               }),
 
@@ -399,14 +423,42 @@ export function useDocxExport () {
                 rows: [
                   new TableRow({
                     children: [
-                      new TableCell({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'PIHAK PERTAMA', bold: true, size: 24 })] })] }),
-                      new TableCell({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'PIHAK KEDUA', bold: true, size: 24 })] })] }),
+                      new TableCell({
+                        children: [
+                          new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            children: [
+                              new TextRun({ text: 'PIHAK PERTAMA', bold: true, size: 24 }),
+                            ],
+                          }),
+                        ],
+                      }),
+                      new TableCell({
+                        children: [
+                          new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            children: [new TextRun({ text: 'PIHAK KEDUA', bold: true, size: 24 })],
+                          }),
+                        ],
+                      }),
                     ],
                   }),
                   new TableRow({
                     children: [
-                      new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: '\n\n\n\n', size: 24 })] })] }),
-                      new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: '\n\n\n\n', size: 24 })] })] }),
+                      new TableCell({
+                        children: [
+                          new Paragraph({
+                            children: [new TextRun({ text: '\n\n\n\n', size: 24 })],
+                          }),
+                        ],
+                      }),
+                      new TableCell({
+                        children: [
+                          new Paragraph({
+                            children: [new TextRun({ text: '\n\n\n\n', size: 24 })],
+                          }),
+                        ],
+                      }),
                     ],
                   }),
                   new TableRow({
@@ -416,77 +468,72 @@ export function useDocxExport () {
                           new Paragraph({
                             alignment: AlignmentType.CENTER,
                             children: [
-                              new TextRun({ text: `(${settings.user_name || 'Nama'})`, bold: true, size: 24 }),
-                            ]
+                              new TextRun({
+                                text: `(${settings.user_name || 'Nama'})`,
+                                bold: true,
+                                size: 24,
+                              }),
+                            ],
                           }),
                           new Paragraph({
                             alignment: AlignmentType.CENTER,
                             children: [
-                              new TextRun({ text: `(${settings.user_position || 'Jabatan'})`, size: 20 }),
-                            ]
+                              new TextRun({
+                                text: `(${settings.user_position || 'Jabatan'})`,
+                                size: 20,
+                              }),
+                            ],
                           }),
-                        ]
+                        ],
                       }),
                       new TableCell({
                         children: [
                           new Paragraph({
                             alignment: AlignmentType.CENTER,
                             children: [
-                              new TextRun({ text: settings.div_head_name || 'Ida Wahyuni Yanuarti', bold: true, size: 24 }),
-                            ]
+                              new TextRun({
+                                text: settings.div_head_name || 'Ida Wahyuni Yanuarti',
+                                bold: true,
+                                size: 24,
+                              }),
+                            ],
                           }),
                           new Paragraph({
                             alignment: AlignmentType.CENTER,
                             children: [
-                              new TextRun({ text: settings.div_head_position || 'Kepala Divisi Teknologi Informasi', size: 20 }),
-                            ]
+                              new TextRun({
+                                text:
+                                  settings.div_head_position || 'Kepala Divisi Teknologi Informasi',
+                                size: 20,
+                              }),
+                            ],
                           }),
-                        ]
+                        ],
                       }),
                     ],
                   }),
                 ],
               }),
-
             ],
           },
         ],
-      });
+      })
 
-      const blob = await Packer.toBlob(doc);
-      saveAs(blob, `BAST PEKERJA IT PROJECT - ${settings.user_name}.docx`);
+      const blob = await Packer.toBlob(doc)
+      saveAs(blob, `BAST PEKERJA IT PROJECT - ${settings.user_name}.docx`)
 
-      return true;
+      return true
     } catch (error) {
-      console.error('BAST export failed:', error);
-      throw error;
+      console.error('BAST export failed:', error)
+      throw error
     } finally {
-      exportingDocx.value = false;
+      exportingDocx.value = false
     }
   }
 
   // --- HELPERS ---
 
-  function createBASTProfileRow (label: string, value: string) {
-    return new TableRow({
-      children: [
-        new TableCell({
-          width: { size: 20, type: WidthType.PERCENTAGE },
-          children: [new Paragraph({ children: [new TextRun({ text: label, size: 24 })] })],
-        }),
-        new TableCell({
-          width: { size: 3, type: WidthType.PERCENTAGE },
-          children: [new Paragraph({ children: [new TextRun({ text: ':', size: 24 })] })],
-        }),
-        new TableCell({
-          width: { size: 77, type: WidthType.PERCENTAGE },
-          children: [new Paragraph({ children: [new TextRun({ text: value, size: 24 })] })],
-        }),
-      ],
-    });
-  }
-
-  function createBASTHeaderCell (text: string, width: number) {
+  function createBASTHeaderCell(text: string, width: number) {
     return new TableCell({
       width: { size: width, type: WidthType.PERCENTAGE },
       children: [
@@ -498,10 +545,10 @@ export function useDocxExport () {
       verticalAlign: VerticalAlign.CENTER,
       borders: tableBorders,
       shading: { fill: 'F2F2F2' },
-    });
+    })
   }
 
-  function createBASTDataCell (text: string, alignment: any) {
+  function createBASTDataCell(text: string, alignment: AlignSetting) {
     return new TableCell({
       children: [
         new Paragraph({
@@ -512,18 +559,18 @@ export function useDocxExport () {
       verticalAlign: VerticalAlign.CENTER,
       borders: tableBorders,
       margins: { left: 50, right: 50, top: 50, bottom: 50 },
-    });
+    })
   }
 
-  async function exportToDocx (
+  async function exportToDocx(
     monthlyRows: MonthlyReportRow[],
     selectedDateStr: string,
-    settings: SettingsData
+    settings: SettingsData,
   ) {
-    const parsedDate = parse(selectedDateStr, 'yyyy-MM', new Date());
-    const monthName = format(parsedDate, 'MMMM', { locale: idLocale });
-    const yearName = format(parsedDate, 'yyyy');
-    exportingDocx.value = true;
+    const parsedDate = parse(selectedDateStr, 'yyyy-MM', new Date())
+    const monthName = format(parsedDate, 'MMMM', { locale: idLocale })
+    const yearName = format(parsedDate, 'yyyy')
+    exportingDocx.value = true
     try {
       const doc = new Document({
         styles: {
@@ -609,18 +656,25 @@ export function useDocxExport () {
                       createHeaderCell('Project Yang Dikerjakan', 50),
                       createHeaderCell('Progres', 10),
                       createHeaderCell('Done', 10),
-                      createHeaderCell('Status Pekerjaan', 15, 'Continuing (Daily) / Project Enhance'),
+                      createHeaderCell(
+                        'Status Pekerjaan',
+                        15,
+                        'Continuing (Daily) / Project Enhance',
+                      ),
                     ],
                   }),
-                  ...monthlyRows.map(row => new TableRow({
-                    children: [
-                      createDataCell(row.month || monthName, AlignmentType.LEFT),
-                      createDataCell(row.project, AlignmentType.LEFT),
-                      createDataCell(row.progres, AlignmentType.LEFT),
-                      createDataCell(row.done, AlignmentType.LEFT),
-                      createDataCell(row.status, AlignmentType.LEFT),
-                    ],
-                  })),
+                  ...monthlyRows.map(
+                    (row) =>
+                      new TableRow({
+                        children: [
+                          createDataCell(row.month || monthName, AlignmentType.LEFT),
+                          createDataCell(row.project, AlignmentType.LEFT),
+                          createDataCell(row.progres, AlignmentType.LEFT),
+                          createDataCell(row.done, AlignmentType.LEFT),
+                          createDataCell(row.status, AlignmentType.LEFT),
+                        ],
+                      }),
+                  ),
                 ],
               }),
 
@@ -659,23 +713,23 @@ export function useDocxExport () {
             ],
           },
         ],
-      });
+      })
 
-      const blob = await Packer.toBlob(doc);
-      saveAs(blob, `Form Task Job - ${settings.user_name}.docx`);
+      const blob = await Packer.toBlob(doc)
+      saveAs(blob, `Form Task Job - ${settings.user_name}.docx`)
 
-      return true;
+      return true
     } catch (error) {
-      console.error('Docx export failed:', error);
-      throw error;
+      console.error('Docx export failed:', error)
+      throw error
     } finally {
-      exportingDocx.value = false;
+      exportingDocx.value = false
     }
   }
 
   // --- HELPERS ---
 
-  function createProfileRow (label: string, value: string) {
+  function createProfileRow(label: string, value: string) {
     return new TableRow({
       children: [
         new TableCell({
@@ -687,7 +741,12 @@ export function useDocxExport () {
         }),
         new TableCell({
           width: { size: 5, type: WidthType.PERCENTAGE },
-          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: ':', size: 24 })] })],
+          children: [
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: ':', size: 24 })],
+            }),
+          ],
           verticalAlign: VerticalAlign.CENTER,
           borders: tableBorders,
         }),
@@ -699,24 +758,24 @@ export function useDocxExport () {
           margins: { left: 100, right: 100 },
         }),
       ],
-    });
+    })
   }
 
-  function createHeaderCell (text: string, width: number, subtext?: string) {
+  function createHeaderCell(text: string, width: number, subtext?: string) {
     const children = [
       new Paragraph({
         alignment: AlignmentType.CENTER,
         children: [new TextRun({ text, bold: true, size: 24 })],
-      })
-    ];
+      }),
+    ]
 
     if (subtext) {
       children.push(
         new Paragraph({
           alignment: AlignmentType.LEFT,
           children: [new TextRun({ text: subtext, size: 18, bold: true })],
-        })
-      );
+        }),
+      )
     }
 
     return new TableCell({
@@ -724,10 +783,10 @@ export function useDocxExport () {
       children,
       verticalAlign: VerticalAlign.CENTER,
       borders: tableBorders,
-    });
+    })
   }
 
-  function createDataCell (text: string, alignment: AlignSetting) {
+  function createDataCell(text: string, alignment: AlignSetting) {
     return new TableCell({
       children: [
         new Paragraph({
@@ -738,10 +797,10 @@ export function useDocxExport () {
       verticalAlign: VerticalAlign.CENTER,
       borders: tableBorders,
       margins: { left: 100, right: 100, top: 100, bottom: 100 },
-    });
+    })
   }
 
-  function createSignatureHeaderCell (text: string) {
+  function createSignatureHeaderCell(text: string) {
     return new TableCell({
       children: [
         new Paragraph({
@@ -751,10 +810,10 @@ export function useDocxExport () {
       ],
       verticalAlign: VerticalAlign.CENTER,
       borders: tableBorders,
-    });
+    })
   }
 
-  function createSignaturePlaceholderCell () {
+  function createSignaturePlaceholderCell() {
     return new TableCell({
       children: [
         new Paragraph({
@@ -764,10 +823,10 @@ export function useDocxExport () {
       ],
       verticalAlign: VerticalAlign.CENTER,
       borders: tableBorders,
-    });
+    })
   }
 
-  function createSignatureNameCell (text: string) {
+  function createSignatureNameCell(text: string) {
     return new TableCell({
       children: [
         new Paragraph({
@@ -784,12 +843,12 @@ export function useDocxExport () {
       ],
       verticalAlign: VerticalAlign.CENTER,
       borders: tableBorders,
-    });
+    })
   }
 
   return {
     exportToDocx,
     exportBAST,
     exportingDocx,
-  };
+  }
 }

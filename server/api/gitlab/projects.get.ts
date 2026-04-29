@@ -1,4 +1,6 @@
-export default defineEventHandler(async (event): Promise<any> => {
+import { getGitLabConfig, getGitLabProjects, type RawGitLabProject } from '../../utils/gitlab'
+
+export default defineEventHandler(async (_) => {
   const config = await getGitLabConfig()
 
   if (!config.token) {
@@ -6,17 +8,18 @@ export default defineEventHandler(async (event): Promise<any> => {
   }
 
   try {
-    const response: any = await getGitLabProjects(config)
+    const response = await getGitLabProjects(config)
 
     return {
       success: true,
-      projects: (response || []).map((p: any) => ({
+      projects: (response || []).map((p: RawGitLabProject) => ({
         id: p.id,
         name: p.name,
-        path: p.path_with_namespace
-      }))
+        path: p.path_with_namespace,
+      })),
     }
-  } catch (error: any) {
-    return { success: false, error: error.message, projects: [] }
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
+    return { success: false, error: msg, projects: [] }
   }
 })

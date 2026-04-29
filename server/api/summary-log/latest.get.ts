@@ -1,12 +1,13 @@
-export default defineEventHandler(async (): Promise<any> => {
+export default defineEventHandler(async () => {
   try {
     const latest = await prisma.summaryLog.findFirst({
-      orderBy: { period: 'desc' }
+      orderBy: { period: 'desc' },
     })
 
     return { success: true, summary: latest }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     console.error('API Error (summary-log.latest):', error)
-    return { success: false, error: error.message || 'Internal server error' }
+    return { success: false, error: msg || 'Internal server error' }
   }
 })

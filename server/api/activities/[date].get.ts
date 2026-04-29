@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 
-export default defineEventHandler(async (event): Promise<any> => {
+export default defineEventHandler(async (event) => {
   const dateStr = getRouterParam(event, 'date') || format(new Date(), 'yyyy-MM')
   const query = getQuery(event)
   const force = query.force === 'true'
@@ -8,18 +8,19 @@ export default defineEventHandler(async (event): Promise<any> => {
   try {
     const [gitlab, jira] = await Promise.all([
       syncGitLabEvents(dateStr, force),
-      syncJiraActivities(dateStr, force)
+      syncJiraActivities(dateStr, force),
     ])
 
     return {
       success: true,
       gitlab,
-      jira
+      jira,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     return {
       success: false,
-      error: error.message
+      error: msg,
     }
   }
 })

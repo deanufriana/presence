@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event): Promise<any> => {
+export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
     const { month, rows, summary } = body
@@ -8,12 +8,13 @@ export default defineEventHandler(async (event): Promise<any> => {
     const updated = await upsertMonthlyReport({
       month,
       summary,
-      rows
+      rows,
     })
 
     return { success: true, report: updated }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     console.error('API Error (monthly-report.post):', error)
-    return { success: false, error: error.message || 'Internal server error' }
+    return { success: false, error: msg || 'Internal server error' }
   }
 })

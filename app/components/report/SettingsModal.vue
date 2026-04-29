@@ -32,15 +32,11 @@
             </CardDescription>
           </CardHeader>
 
-          <CardContent
-            class="space-y-6 flex-1 overflow-y-auto p-4 sm:p-6 sm:max-h-[75vh]"
-          >
+          <CardContent class="space-y-6 flex-1 overflow-y-auto p-4 sm:p-6 sm:max-h-[75vh]">
             <!-- Profile Section -->
             <div class="space-y-3">
               <div class="flex items-center gap-2">
-                <div
-                  class="h-5 w-5 rounded bg-blue-500/10 flex items-center justify-center"
-                >
+                <div class="h-5 w-5 rounded bg-blue-500/10 flex items-center justify-center">
                   <User class="h-3 w-3 text-blue-500" />
                 </div>
                 <span class="text-sm font-medium">Profile Info</span>
@@ -92,9 +88,7 @@
             <!-- Signatories Section -->
             <div class="space-y-3 pt-2 border-t border-border/40">
               <div class="flex items-center gap-2">
-                <div
-                  class="h-5 w-5 rounded bg-emerald-500/10 flex items-center justify-center"
-                >
+                <div class="h-5 w-5 rounded bg-emerald-500/10 flex items-center justify-center">
                   <FileText class="h-3 w-3 text-emerald-500" />
                 </div>
                 <span class="text-sm font-medium">Document Signatories</span>
@@ -102,8 +96,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 pl-7">
                 <!-- Team Leader -->
                 <div class="space-y-1.5">
-                  <Label
-                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold"
                     >Team Leader</Label
                   >
                   <Input
@@ -113,8 +106,7 @@
                   />
                 </div>
                 <div class="space-y-1.5">
-                  <Label
-                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold"
                     >TL Position</Label
                   >
                   <Input
@@ -126,19 +118,13 @@
 
                 <!-- Dept Head -->
                 <div class="space-y-1.5">
-                  <Label
-                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold"
                     >Dept Head</Label
                   >
-                  <Input
-                    v-model="settings.dept_head_name"
-                    placeholder="Name"
-                    class="h-8 text-sm"
-                  />
+                  <Input v-model="settings.dept_head_name" placeholder="Name" class="h-8 text-sm" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label
-                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold"
                     >Dept Head Position</Label
                   >
                   <Input
@@ -150,19 +136,13 @@
 
                 <!-- Div Head -->
                 <div class="space-y-1.5">
-                  <Label
-                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold"
                     >Division Head</Label
                   >
-                  <Input
-                    v-model="settings.div_head_name"
-                    placeholder="Name"
-                    class="h-8 text-sm"
-                  />
+                  <Input v-model="settings.div_head_name" placeholder="Name" class="h-8 text-sm" />
                 </div>
                 <div class="space-y-1.5">
-                  <Label
-                    class="text-[10px] uppercase text-muted-foreground font-semibold"
+                  <Label class="text-[10px] uppercase text-muted-foreground font-semibold"
                     >Div Head Position</Label
                   >
                   <Input
@@ -177,9 +157,7 @@
             <!-- GitLab Section -->
             <div class="space-y-3">
               <div class="flex items-center gap-2">
-                <div
-                  class="h-5 w-5 rounded bg-orange-500/10 flex items-center justify-center"
-                >
+                <div class="h-5 w-5 rounded bg-orange-500/10 flex items-center justify-center">
                   <GitMerge class="h-3 w-3 text-orange-500" />
                 </div>
                 <span class="text-sm font-medium">GitLab</span>
@@ -210,21 +188,16 @@
                   <Button
                     size="sm"
                     variant="ghost"
-                    @click="fetchProjects"
                     :disabled="fetchingProjects || !settings.gitlab_token"
                     class="h-6 text-[10px] gap-1"
+                    @click="fetchProjects"
                   >
-                    <RefreshCw
-                      class="h-3 w-3"
-                      :class="{ 'animate-spin': fetchingProjects }"
-                    />
+                    <RefreshCw class="h-3 w-3" :class="{ 'animate-spin': fetchingProjects }" />
                     Fetch List
                   </Button>
                 </div>
 
-                <div
-                  class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1"
-                >
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
                   <div
                     v-if="!allProjects.length && !fetchingProjects"
                     class="col-span-full text-[10px] text-muted-foreground text-center py-4 border rounded-md bg-muted/20"
@@ -242,8 +215,7 @@
                     :key="p.id"
                     class="p-2 flex items-center gap-2 cursor-pointer transition-all hover:border-primary/50 hover:bg-accent/50 group relative focus-visible:ring-1 focus-visible:ring-primary outline-none"
                     :class="{
-                      'border-primary/50 bg-primary/5 shadow-sm':
-                        selectedProjectIds.includes(p.id),
+                      'border-primary/50 bg-primary/5 shadow-sm': selectedProjectIds.includes(p.id),
                     }"
                     tabindex="0"
                     @click="toggleProject(p.id)"
@@ -255,14 +227,12 @@
                       class="h-4 w-4 pointer-events-none"
                     />
                     <div class="flex flex-col min-w-0">
-                      <span
-                        class="text-[10px] font-semibold truncate leading-tight"
-                        >{{ p.name }}</span
-                      >
-                      <span
-                        class="text-[9px] text-muted-foreground truncate leading-tight"
-                        >{{ p.path }}</span
-                      >
+                      <span class="text-[10px] font-semibold truncate leading-tight">{{
+                        p.name
+                      }}</span>
+                      <span class="text-[9px] text-muted-foreground truncate leading-tight">{{
+                        p.path
+                      }}</span>
                     </div>
                   </Card>
                 </div>
@@ -272,9 +242,7 @@
             <!-- Jira Section -->
             <div class="space-y-3 pt-2 border-t border-border/40">
               <div class="flex items-center gap-2">
-                <div
-                  class="h-5 w-5 rounded bg-blue-600/10 flex items-center justify-center"
-                >
+                <div class="h-5 w-5 rounded bg-blue-600/10 flex items-center justify-center">
                   <Trello class="h-3 w-3 text-blue-600" />
                 </div>
                 <span class="text-sm font-medium">Jira (Atlassian)</span>
@@ -312,9 +280,7 @@
             <div class="space-y-3 pt-2 border-t border-border/40">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <div
-                    class="h-5 w-5 rounded bg-violet-500/10 flex items-center justify-center"
-                  >
+                  <div class="h-5 w-5 rounded bg-violet-500/10 flex items-center justify-center">
                     <Sparkles class="h-3 w-3 text-violet-500" />
                   </div>
                   <span class="text-sm font-medium">AI Configuration</span>
@@ -322,32 +288,23 @@
 
                 <Tabs
                   :model-value="settings.ai_provider"
+                  class="w-auto"
                   @update:model-value="
                     (v) => {
-                      settings.ai_provider = v as
-                        | 'gemini'
-                        | 'openai'
-                        | 'ollama';
+                      settings.ai_provider = v as 'gemini' | 'openai' | 'ollama'
                       settings.ai_model =
                         v === 'gemini'
                           ? 'gemini-2.0-flash-lite'
                           : v === 'openai'
                             ? 'gpt-4o-mini'
-                            : 'gemma:latest';
+                            : 'gemma:latest'
                     }
                   "
-                  class="w-auto"
                 >
                   <TabsList class="h-8">
-                    <TabsTrigger value="gemini" class="text-[10px] px-3 h-7">
-                      Gemini
-                    </TabsTrigger>
-                    <TabsTrigger value="openai" class="text-[10px] px-3 h-7">
-                      OpenAI
-                    </TabsTrigger>
-                    <TabsTrigger value="ollama" class="text-[10px] px-3 h-7">
-                      Ollama
-                    </TabsTrigger>
+                    <TabsTrigger value="gemini" class="text-[10px] px-3 h-7"> Gemini </TabsTrigger>
+                    <TabsTrigger value="openai" class="text-[10px] px-3 h-7"> OpenAI </TabsTrigger>
+                    <TabsTrigger value="ollama" class="text-[10px] px-3 h-7"> Ollama </TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
@@ -371,39 +328,19 @@
                         <SelectItem value="gemini-2.0-flash-lite">
                           Gemini 2.0 Flash Lite
                         </SelectItem>
-                        <SelectItem value="gemini-1.5-flash">
-                          Gemini 1.5 Flash
-                        </SelectItem>
-                        <SelectItem value="gemini-1.5-pro">
-                          Gemini 1.5 Pro
-                        </SelectItem>
+                        <SelectItem value="gemini-1.5-flash"> Gemini 1.5 Flash </SelectItem>
+                        <SelectItem value="gemini-1.5-pro"> Gemini 1.5 Pro </SelectItem>
                       </SelectGroup>
-                      <SelectGroup
-                        v-else-if="settings.ai_provider === 'openai'"
-                      >
-                        <SelectItem value="gpt-4o-mini">
-                          GPT-4o Mini
-                        </SelectItem>
+                      <SelectGroup v-else-if="settings.ai_provider === 'openai'">
+                        <SelectItem value="gpt-4o-mini"> GPT-4o Mini </SelectItem>
                         <SelectItem value="gpt-4o"> GPT-4o </SelectItem>
-                        <SelectItem value="gpt-3.5-turbo">
-                          GPT-3.5 Turbo
-                        </SelectItem>
+                        <SelectItem value="gpt-3.5-turbo"> GPT-3.5 Turbo </SelectItem>
                       </SelectGroup>
-                      <SelectGroup
-                        v-else-if="settings.ai_provider === 'ollama'"
-                      >
-                        <SelectItem
-                          v-for="m in ollamaModels"
-                          :key="m.name"
-                          :value="m.name"
-                        >
+                      <SelectGroup v-else-if="settings.ai_provider === 'ollama'">
+                        <SelectItem v-for="m in ollamaModels" :key="m.name" :value="m.name">
                           {{ m.name }}
                         </SelectItem>
-                        <SelectItem
-                          v-if="!ollamaModels.length"
-                          value="gemma:latest"
-                          disabled
-                        >
+                        <SelectItem v-if="!ollamaModels.length" value="gemma:latest" disabled>
                           No models found
                         </SelectItem>
                       </SelectGroup>
@@ -411,10 +348,7 @@
                   </Select>
                 </div>
 
-                <div
-                  v-if="settings.ai_provider === 'gemini'"
-                  class="space-y-1.5"
-                >
+                <div v-if="settings.ai_provider === 'gemini'" class="space-y-1.5">
                   <Label class="text-xs">Gemini API Key</Label>
                   <Input
                     v-model="settings.ai_api_key"
@@ -427,10 +361,7 @@
                   </p>
                 </div>
 
-                <div
-                  v-else-if="settings.ai_provider === 'openai'"
-                  class="space-y-1.5"
-                >
+                <div v-else-if="settings.ai_provider === 'openai'" class="space-y-1.5">
                   <Label class="text-xs">OpenAI API Key</Label>
                   <Input
                     v-model="settings.openai_api_key"
@@ -443,10 +374,7 @@
                   </p>
                 </div>
 
-                <div
-                  v-else-if="settings.ai_provider === 'ollama'"
-                  class="space-y-3"
-                >
+                <div v-else-if="settings.ai_provider === 'ollama'" class="space-y-3">
                   <div class="space-y-1.5">
                     <Label class="text-xs">Ollama Base URL</Label>
                     <div class="flex gap-2">
@@ -458,9 +386,9 @@
                       <Button
                         size="sm"
                         variant="outline"
-                        @click="fetchOllamaModels"
                         :disabled="fetchingModels"
                         class="h-9 px-3"
+                        @click="fetchOllamaModels"
                       >
                         <RefreshCw
                           class="h-3.5 w-3.5"
@@ -478,20 +406,17 @@
           </CardContent>
 
           <CardFooter class="flex justify-end gap-2 pt-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              @click="$emit('update:modelValue', false)"
+            <Button variant="ghost" size="sm" @click="$emit('update:modelValue', false)"
               >Cancel</Button
             >
             <Button
               size="sm"
-              @click="saveSettings"
               :disabled="saving"
               class="gap-1.5 min-w-[100px]"
+              @click="saveSettings"
             >
               <RefreshCw v-if="saving" class="h-3.5 w-3.5 animate-spin" />
-              {{ saving ? "Saving..." : "Save Changes" }}
+              {{ saving ? 'Saving...' : 'Save Changes' }}
             </Button>
           </CardFooter>
         </Card>
@@ -501,16 +426,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Settings,
-  RefreshCw,
-  GitMerge,
-  Sparkles,
-  User,
-  FileText,
-  Trello,
-} from "lucide-vue-next";
-import { Button } from "~/components/ui/button";
+import { Settings, RefreshCw, GitMerge, Sparkles, User, FileText, Trello } from 'lucide-vue-next'
+import { Button } from '~/components/ui/button'
 import {
   Card,
   CardHeader,
@@ -518,10 +435,10 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Checkbox } from "~/components/ui/checkbox";
+} from '~/components/ui/card'
+import { Input } from '~/components/ui/input'
+import { Label } from '~/components/ui/label'
+import { Checkbox } from '~/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -529,64 +446,66 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { useCoreStore } from "~/stores/core";
-import { useGitlabStore } from "~/stores/gitlab";
+} from '~/components/ui/select'
+import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs'
+import { useCoreStore } from '~/stores/core'
+import { useGitlabStore } from '~/stores/gitlab'
+import type { OllamaModel, OllamaModelsResponse } from '~/types/ollama'
 
-const props = defineProps<{
-  modelValue: boolean;
-}>();
+defineProps<{
+  modelValue: boolean
+}>()
 
 defineEmits<{
-  "update:modelValue": [value: boolean];
-}>();
+  'update:modelValue': [value: boolean]
+}>()
 
-const coreStore = useCoreStore();
-const gitlabStore = useGitlabStore();
+const coreStore = useCoreStore()
+const gitlabStore = useGitlabStore()
 
-const { saveSettings, toggleProject } = coreStore;
-const { fetchProjects } = gitlabStore;
+const { saveSettings, toggleProject } = coreStore
+const { fetchProjects } = gitlabStore
 
-const { saving, settings, selectedProjectIds } = storeToRefs(coreStore);
-const { fetchingProjects, allProjects } = storeToRefs(gitlabStore);
-const ollamaModels = ref<any[]>([]);
-const fetchingModels = ref(false);
+const { saving, settings, selectedProjectIds } = storeToRefs(coreStore)
+const { fetchingProjects, allProjects } = storeToRefs(gitlabStore)
+const ollamaModels = ref<OllamaModel[]>([])
+const fetchingModels = ref(false)
 
 async function fetchOllamaModels() {
-  fetchingModels.value = true;
+  fetchingModels.value = true
   try {
-    const res: any = await $fetch("/api/ollama/models");
+    const res = await $fetch<OllamaModelsResponse>('/api/ollama/models')
     if (res.success) {
-      ollamaModels.value = res.models;
+      ollamaModels.value = res.models
       // If current model is not in the list and list is not empty, select the first one
       if (
         ollamaModels.value.length > 0 &&
+        settings.value &&
         !ollamaModels.value.find((m) => m.name === settings.value?.ai_model)
       ) {
-        settings.value.ai_model = ollamaModels.value[0].name;
+        settings.value.ai_model = ollamaModels.value[0]!.name
       }
     }
   } catch (err) {
-    console.error("Failed to fetch Ollama models:", err);
+    console.error('Failed to fetch Ollama models:', err)
   } finally {
-    fetchingModels.value = false;
+    fetchingModels.value = false
   }
 }
 
 watch(
   () => settings.value?.ai_provider,
   (newVal) => {
-    if (newVal === "ollama" && ollamaModels.value.length === 0) {
-      fetchOllamaModels();
+    if (newVal === 'ollama' && ollamaModels.value.length === 0) {
+      fetchOllamaModels()
     }
   },
-);
+)
 
 onMounted(() => {
-  fetchProjects();
-  if (settings.value?.ai_provider === "ollama") {
-    fetchOllamaModels();
+  fetchProjects()
+  if (settings.value?.ai_provider === 'ollama') {
+    fetchOllamaModels()
   }
-});
+})
 </script>

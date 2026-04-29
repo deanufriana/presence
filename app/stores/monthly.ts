@@ -29,7 +29,7 @@ export const useMonthlyStore = defineStore('monthly', () => {
       }
     } catch (err: unknown) {
       const e = err as { data?: { error?: string } }
-      error(e.data?.error || 'Failed to fetch monthly report', err)
+      error(e.data?.error || 'Failed to fetch monthly report')
     } finally {
       isLoading.value = false
     }

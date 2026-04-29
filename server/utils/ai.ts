@@ -1,17 +1,25 @@
 import { prisma } from './prisma'
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI } from '@google/genai'
 import ollama from 'ollama'
 export interface AiOptions {
-  model?: string;
-  max_tokens?: number;
-  think?: boolean;
+  model?: string
+  max_tokens?: number
+  think?: boolean
+}
+
+export interface OpenAiResponse {
+  choices: Array<{
+    message: {
+      content: string
+    }
+  }>
 }
 
 export const generateSummary = async (prompt: string, options: AiOptions): Promise<string> => {
   try {
     const [providerSetting, modelSetting] = await Promise.all([
       prisma.setting.findUnique({ where: { key: 'ai_provider' } }),
-      prisma.setting.findUnique({ where: { key: 'ai_model' } })
+      prisma.setting.findUnique({ where: { key: 'ai_model' } }),
     ])
 
     const provider = providerSetting?.value || 'gemini'
@@ -26,33 +34,37 @@ export const generateSummary = async (prompt: string, options: AiOptions): Promi
     }
 
     return await callGemini(prompt, { ...options, model })
-  } catch (error: any) {
-    console.error('AI Summary failed:', error.message)
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error('AI Summary failed:', msg)
     throw error
   }
 }
 
-async function callOpenAi (prompt: string, options: AiOptions): Promise<string> {
+async function callOpenAi(prompt: string, options: AiOptions): Promise<string> {
   const aiKeySetting = await prisma.setting.findUnique({ where: { key: 'openai_api_key' } })
   if (!aiKeySetting?.value) throw new Error('OpenAI API Key not configured in settings')
 
   const isJson = prompt.toLowerCase().includes('json')
-  const response: any = await (globalThis as any).$fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await $fetch<OpenAiResponse>('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${aiKeySetting.value}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${aiKeySetting.value}`,
+      'Content-Type': 'application/json',
     },
     body: {
       model: options.model || 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'Anda adalah asisten profesional yang membantu merangkum aktivitas kerja.' },
-        { role: 'user', content: prompt }
+        {
+          role: 'system',
+          content: 'Anda adalah asisten profesional yang membantu merangkum aktivitas kerja.',
+        },
+        { role: 'user', content: prompt },
       ],
       temperature: 0.3,
       max_tokens: options.max_tokens,
-      response_format: isJson ? { type: "json_object" } : undefined
-    }
+      response_format: isJson ? { type: 'json_object' } : undefined,
+    },
   })
 
   const content = response?.choices?.[0]?.message?.content?.trim()
@@ -61,16 +73,16 @@ async function callOpenAi (prompt: string, options: AiOptions): Promise<string> 
   return content.replace(/^["']|["']$/g, '')
 }
 
-async function callGemini (prompt: string, options: AiOptions): Promise<string> {
+async function callGemini(prompt: string, options: AiOptions): Promise<string> {
   const aiKeySetting = await prisma.setting.findUnique({ where: { key: 'ai_api_key' } })
   if (!aiKeySetting?.value) throw new Error('AI API Key not configured in settings')
 
-  const ai = new GoogleGenAI({ apiKey: aiKeySetting.value });
+  const ai = new GoogleGenAI({ apiKey: aiKeySetting.value })
 
   const response = await ai.models.generateContent({
     model: options.model || 'gemini-2.5-flash-lite',
     contents: prompt,
-  });
+  })
 
   const content = response.text?.trim()
   if (!content) throw new Error('Gemini did not return a valid summary')
@@ -78,19 +90,22 @@ async function callGemini (prompt: string, options: AiOptions): Promise<string> 
   return content.replace(/^["']|["']$/g, '')
 }
 
-async function callOllama (prompt: string, options: AiOptions): Promise<string> {
+async function callOllama(prompt: string, options: AiOptions): Promise<string> {
   try {
     const response = await ollama.chat({
       model: options.model || 'gemma:latest',
       messages: [
-        { role: 'system', content: 'Anda adalah asisten profesional yang membantu merangkum aktivitas kerja.' },
-        { role: 'user', content: prompt }
+        {
+          role: 'system',
+          content: 'Anda adalah asisten profesional yang membantu merangkum aktivitas kerja.',
+        },
+        { role: 'user', content: prompt },
       ],
       think: options.think,
       options: {
         temperature: 0.5,
         num_predict: options.max_tokens,
-      }
+      },
     })
 
     const content = response.message.content
@@ -100,8 +115,8 @@ async function callOllama (prompt: string, options: AiOptions): Promise<string> 
     }
 
     return content.replace(/^["']|["']$/g, '')
-  } catch (error: any) {
-    console.error('Ollama call failed:', error)
+  } catch (error: unknown) {
+    console.error('Ollama error:', error)
     throw error
   }
 }

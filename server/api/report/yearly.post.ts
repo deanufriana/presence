@@ -10,9 +10,10 @@ export default defineEventHandler(async (event) => {
     const report = await upsertYearlyReport({ year, rows, summary })
     return {
       success: true,
-      ...report
+      ...report,
     }
-  } catch (error: any) {
-    return { success: false, error: error.message }
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
+    return { success: false, error: msg }
   }
 })

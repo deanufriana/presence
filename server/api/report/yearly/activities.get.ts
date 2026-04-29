@@ -17,30 +17,32 @@ export default defineEventHandler(async (event) => {
     const [gitlabDates, jiraDates, calendarEvents, dailyReports] = await Promise.all([
       prisma.gitLabCommit.findMany({
         where: { createdAt: { gte: startDate, lte: endDate } },
-        select: { createdAt: true }
+        select: { createdAt: true },
       }),
       prisma.jiraActivity.findMany({
         where: { updatedAt: { gte: startDate, lte: endDate } },
-        select: { updatedAt: true }
+        select: { updatedAt: true },
       }),
       prisma.calendarEvent.findMany({
         where: { date: { startsWith: year } },
-        select: { date: true }
+        select: { date: true },
       }),
       prisma.dailyReport.findMany({
         where: { date: { startsWith: year } },
-        select: { date: true }
-      })
+        select: { date: true },
+      }),
     ])
 
     const months = Array.from({ length: 12 }, (_, i) => {
       const monthNum = (i + 1).toString().padStart(2, '0')
       const monthStr = `${year}-${monthNum}`
 
-      const hasGitlab = gitlabDates.some(c => format(new Date(c.createdAt), 'yyyy-MM') === monthStr)
-      const hasJira = jiraDates.some(c => format(new Date(c.updatedAt), 'yyyy-MM') === monthStr)
-      const hasCalendar = calendarEvents.some(e => e.date.startsWith(monthStr))
-      const hasDaily = dailyReports.some(r => r.date.startsWith(monthStr))
+      const hasGitlab = gitlabDates.some(
+        (c) => format(new Date(c.createdAt), 'yyyy-MM') === monthStr,
+      )
+      const hasJira = jiraDates.some((c) => format(new Date(c.updatedAt), 'yyyy-MM') === monthStr)
+      const hasCalendar = calendarEvents.some((e) => e.date.startsWith(monthStr))
+      const hasDaily = dailyReports.some((r) => r.date.startsWith(monthStr))
 
       return {
         month: monthStr,
@@ -48,16 +50,17 @@ export default defineEventHandler(async (event) => {
         hasJira,
         hasCalendar,
         hasDaily,
-        hasActivity: hasGitlab || hasJira || hasCalendar || hasDaily
+        hasActivity: hasGitlab || hasJira || hasCalendar || hasDaily,
       }
     })
 
     return {
       success: true,
-      months
+      months,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     console.error('Yearly activities error:', error)
-    return { success: false, error: error.message }
+    return { success: false, error: msg }
   }
 })

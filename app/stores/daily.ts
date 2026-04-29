@@ -54,7 +54,7 @@ export const useDailyStore = defineStore('daily', () => {
       }
     } catch (err: unknown) {
       const e = err as { data?: { error?: string } }
-      error(e.data?.error || 'Failed to fetch daily report', err)
+      error(e.data?.error || 'Failed to fetch daily report')
     } finally {
       isLoading.value = false
     }

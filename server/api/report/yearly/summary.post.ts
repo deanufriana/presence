@@ -10,10 +10,13 @@ export default defineEventHandler(async (event) => {
     const summaries = await getAllMonthlySummaries(year)
 
     // Aggregate monthly summaries into a format for the prompt
-    const monthlySummaries = summaries.map(s => `[Month: ${s.period}]\n${s.summary}`)
+    const monthlySummaries = summaries.map((s) => `[Month: ${s.period}]\n${s.summary}`)
 
     if (monthlySummaries.length === 0) {
-      return { success: false, error: 'No monthly summaries found for this year. Please generate monthly reports first.' }
+      return {
+        success: false,
+        error: 'No monthly summaries found for this year. Please generate monthly reports first.',
+      }
     }
 
     const prompt = getYearlyPrompt(monthlySummaries)
@@ -23,15 +26,16 @@ export default defineEventHandler(async (event) => {
     const report = await upsertYearlyReport({
       year,
       summary: rawContent.trim(),
-      rows
+      rows,
     })
 
     return {
       success: true,
-      ...report
+      ...report,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     console.error('AI Yearly Summary Error:', error)
-    return { success: false, error: error.message || 'Failed to generate AI summary' }
+    return { success: false, error: msg || 'Failed to generate AI summary' }
   }
 })

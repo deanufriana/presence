@@ -1,16 +1,21 @@
-import type { YearlyReportRow } from '~/types/report'
+import type { YearlyReportRow, MonthlyReportRow } from '~/types/report'
+import type { GitLabEvent } from '~/types/gitlab'
+import type { JiraEvent } from '~/types/jira'
+import type { CalendarEvent } from '~/types/calendar'
+import { getGitLabCache } from './gitlab'
+import { getJiraCache } from './jira'
 import { prisma } from './prisma'
 import { format, parse } from 'date-fns'
 
-export function formatGitLabActivity (ev: any): string {
+export function formatGitLabActivity(ev: GitLabEvent): string {
   const desc = ev.title || ''
   const projectName = ev.project_name || 'Unknown Project'
   const branchName = ev.branch_name ? ` (branch: ${ev.branch_name})` : ''
   return `[Project: ${projectName}] ${desc}${branchName}`
 }
 
-export function formatCalendarActivity (ev: any): string {
-  let act = ev.summary
+export function formatCalendarActivity(ev: CalendarEvent): string {
+  let act = ev.summary || ''
   if (ev.startTime && ev.endTime) {
     act = `Meeting from ${ev.startTime} to ${ev.endTime} with discuss about ${ev.summary}`
   } else if (ev.startTime) {
@@ -19,7 +24,7 @@ export function formatCalendarActivity (ev: any): string {
   return act
 }
 
-export function formatJiraActivity (ev: any): string {
+export function formatJiraActivity(ev: JiraEvent): string {
   const key = ev.key || ''
   const summary = ev.summary || ''
   const projectName = ev.project_name || 'Unknown Project'
@@ -27,48 +32,48 @@ export function formatJiraActivity (ev: any): string {
   return `[Jira: ${projectName}] ${type} ${key}: ${summary}`
 }
 
-export async function fetchAndGroupActivities (dateStr: string, isMonth: boolean = false) {
+export async function fetchAndGroupActivities(dateStr: string, isMonth: boolean = false) {
   const monthStr = isMonth ? dateStr : dateStr.slice(0, 7)
-  const [gitlabRes, calendarCache, jiraRes]: any = await Promise.all([
+  const [gitlabRes, calendarCache, jiraRes] = await Promise.all([
     getGitLabCache(monthStr),
-    getCalendarCache(monthStr),
-    getJiraCache(monthStr)
+    getCalendarCache(monthStr) as Promise<{ events: CalendarEvent[] }>,
+    getJiraCache(monthStr),
   ])
 
   const grouped: Record<string, string[]> = {}
 
   // 1. Process GitLab
   if (gitlabRes.success && gitlabRes.events) {
-    gitlabRes.events.forEach((ev: any) => {
+    gitlabRes.events.forEach((ev) => {
       const evDate = format(new Date(ev.created_at), 'yyyy-MM-dd')
       if (isMonth || evDate === dateStr) {
-        if (!grouped[evDate]) grouped[evDate] = []
+        const dayGroup = (grouped[evDate] = grouped[evDate] || [])
         const desc = formatGitLabActivity(ev)
-        if (desc && !grouped[evDate].includes(desc)) grouped[evDate].push(desc)
+        if (desc && !dayGroup.includes(desc)) dayGroup.push(desc)
       }
     })
   }
 
   // 2. Process Calendar
   if (calendarCache && calendarCache.events) {
-    calendarCache.events.forEach((ev: any) => {
+    calendarCache.events.forEach((ev) => {
       const evDate = ev.date
-      if (isMonth || evDate === dateStr) {
-        if (!grouped[evDate]) grouped[evDate] = []
+      if (evDate && (isMonth || evDate === dateStr)) {
+        const dayGroup = (grouped[evDate] = grouped[evDate] || [])
         const act = formatCalendarActivity(ev)
-        if (act && !grouped[evDate].includes(act)) grouped[evDate].push(act)
+        if (act && !dayGroup.includes(act)) dayGroup.push(act)
       }
     })
   }
 
   // 3. Process Jira
   if (jiraRes.success && jiraRes.events) {
-    jiraRes.events.forEach((ev: any) => {
+    jiraRes.events.forEach((ev) => {
       const evDate = ev.updated_at.split('T')[0]
-      if (isMonth || evDate === dateStr) {
-        if (!grouped[evDate]) grouped[evDate] = []
+      if (evDate && (isMonth || evDate === dateStr)) {
+        const dayGroup = (grouped[evDate] = grouped[evDate] || [])
         const desc = formatJiraActivity(ev)
-        if (desc && !grouped[evDate].includes(desc)) grouped[evDate].push(desc)
+        if (desc && !dayGroup.includes(desc)) dayGroup.push(desc)
       }
     })
   }
@@ -76,72 +81,72 @@ export async function fetchAndGroupActivities (dateStr: string, isMonth: boolean
   return grouped
 }
 
-export async function getDailyReports (datePrefix: string) {
+export async function getDailyReports(datePrefix: string) {
   if (!datePrefix) throw new Error('Date prefix required')
 
   const reports = await prisma.dailyReport.findMany({
     where: {
       date: {
-        startsWith: datePrefix
-      }
+        startsWith: datePrefix,
+      },
     },
-    orderBy: { date: 'asc' }
+    orderBy: { date: 'asc' },
   })
 
   return reports
 }
 
-export async function getMonthlyReport (month: string) {
+export async function getMonthlyReport(month: string) {
   if (!month) throw new Error('Month required')
 
   const rows = await prisma.monthlyReport.findMany({
     where: { month: month },
-    orderBy: { createdAt: 'asc' }
+    orderBy: { createdAt: 'asc' },
   })
 
   const summaryLog = await prisma.summaryLog.findFirst({
     where: { period: month },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
   })
 
   return {
     month: month,
-    rows: rows.map(r => ({
-      ...r,
-      month: r.month,
-      sources: r.sources ? JSON.parse(r.sources) : []
-    })) || [],
-    summary: summaryLog?.summary || ''
+    rows:
+      rows.map((r) => ({
+        ...r,
+        month: r.month,
+        sources: r.sources ? JSON.parse(r.sources) : [],
+      })) || [],
+    summary: summaryLog?.summary || '',
   }
 }
 
-export async function getCalendarCache (month: string) {
+export async function getCalendarCache(month: string) {
   if (!month) throw new Error('Month required')
 
   const events = await prisma.calendarEvent.findMany({
     where: {
       date: {
-        startsWith: month
-      }
+        startsWith: month,
+      },
     },
-    orderBy: { date: 'asc' }
+    orderBy: { date: 'asc' },
   })
 
   return {
-    events: events || []
+    events: events || [],
   }
 }
 
-export async function upsertDailyReport (data: {
-  date: string,
-  activities: string[]
-}) {
+export async function upsertDailyReport(data: { date: string; activities: string[] }) {
   const result = {
     date: data.date,
     masuk: getRandomTime('07:30', '08:00'),
     pulang: getRandomTime('17:00', '17:30'),
     ti: 'TI',
-    aktivitas: data.activities.map(a => a.trim().startsWith('-') ? a.trim() : `- ${a.trim()}`).join('\n')
+    aktivitas: data.activities
+      .map((a) => (a.trim().startsWith('-') ? a.trim() : `- ${a.trim()}`))
+      .join('\n'),
   }
 
   return await prisma.dailyReport.upsert({
@@ -150,15 +155,15 @@ export async function upsertDailyReport (data: {
       masuk: result.masuk,
       pulang: result.pulang,
       ti: result.ti,
-      aktivitas: result.aktivitas
+      aktivitas: result.aktivitas,
     },
     create: {
       date: result.date,
       masuk: result.masuk,
       pulang: result.pulang,
       ti: result.ti,
-      aktivitas: result.aktivitas
-    }
+      aktivitas: result.aktivitas,
+    },
   })
 }
 
@@ -169,9 +174,9 @@ export async function upsertDailyReport (data: {
  *   - Activity description. [Status: Project]
  *   - Another activity. [Status: Project Enhance]
  */
-export function parseMonthlyMarkdown (markdown: string) {
+export function parseMonthlyMarkdown(markdown: string) {
   const lines = markdown.split('\n')
-  const rows: { project: string, progres: string, done: string, status: string }[] = []
+  const rows: MonthlyReportRow[] = []
   let currentProject = ''
 
   for (const line of lines) {
@@ -191,22 +196,23 @@ export function parseMonthlyMarkdown (markdown: string) {
       const description = bulletMatch[2].trim()
       const status = bulletMatch[3].trim()
 
-      const sources = sourceStr.split(',').map(s => s.trim())
+      const sources = sourceStr.split(',').map((s) => s.trim())
 
       rows.push({
+        month: '', // Will be set by consumer or ignored if not used
         project: `[${currentProject}] ${description}`,
         progres: '100%',
         done: 'Done',
         status,
-        sources
-      } as any)
+        sources,
+      })
     }
   }
 
   return rows
 }
 
-export function parseYearlyMarkdown (markdown: string) {
+export function parseYearlyMarkdown(markdown: string) {
   const lines = markdown.split('\n')
   const rows: YearlyReportRow[] = []
   let currentProject = ''
@@ -223,8 +229,17 @@ export function parseYearlyMarkdown (markdown: string) {
 
     // Detect bullet item: - [dd/mm/yyyy] [Months] Description [Status: XXX]
     // Allowing flexible spacing between blocks
-    const bulletMatch = trimmed.match(/^[-*]\s*\[(\d{2}\/\d{2}\/\d{4})\]\s*\[(.+?)\]\s*(.+?)(?:\.\s*)?\[Status:\s*(.+?)\]\s*\.?$/i)
-    if (bulletMatch && currentProject && bulletMatch[1] && bulletMatch[2] && bulletMatch[3] && bulletMatch[4]) {
+    const bulletMatch = trimmed.match(
+      /^[-*]\s*\[(\d{2}\/\d{2}\/\d{4})\]\s*\[(.+?)\]\s*(.+?)(?:\.\s*)?\[Status:\s*(.+?)\]\s*\.?$/i,
+    )
+    if (
+      bulletMatch &&
+      currentProject &&
+      bulletMatch[1] &&
+      bulletMatch[2] &&
+      bulletMatch[3] &&
+      bulletMatch[4]
+    ) {
       const tanggal = bulletMatch[1].trim()
       const monthStr = bulletMatch[2].trim()
       const description = bulletMatch[3].trim()
@@ -236,7 +251,7 @@ export function parseYearlyMarkdown (markdown: string) {
         task: `[${currentProject}] ${description}`,
         deliverable: 'Deliver',
         status: 'Done',
-        keterangan: statusLabel
+        keterangan: statusLabel,
       })
     }
   }
@@ -244,18 +259,17 @@ export function parseYearlyMarkdown (markdown: string) {
   return rows
 }
 
-
-export async function upsertMonthlyReport (data: {
-  month: string,
-  summary?: string,
-  rows?: any[]
+export async function upsertMonthlyReport(data: {
+  month: string
+  summary?: string
+  rows?: MonthlyReportRow[]
 }) {
   const { month, summary, rows } = data
 
   // 1. Save summary to SummaryLog (Create new entry for history)
   if (summary !== undefined) {
     await prisma.summaryLog.create({
-      data: { period: month, summary: summary || '' }
+      data: { period: month, summary: summary || '' },
     })
   }
 
@@ -263,19 +277,19 @@ export async function upsertMonthlyReport (data: {
   if (Array.isArray(rows)) {
     // Delete existing rows for this month to sync
     await prisma.monthlyReport.deleteMany({
-      where: { month }
+      where: { month },
     })
 
     if (rows.length > 0) {
       await prisma.monthlyReport.createMany({
-        data: rows.map((row: any) => ({
+        data: rows.map((row) => ({
           month: month,
           project: row.project,
           progres: row.progres,
           done: row.done,
           status: row.status,
-          sources: row.sources ? JSON.stringify(row.sources) : null
-        }))
+          sources: row.sources ? JSON.stringify(row.sources) : null,
+        })),
       })
     }
   }
@@ -283,21 +297,21 @@ export async function upsertMonthlyReport (data: {
   return await getMonthlyReport(month)
 }
 
-export async function getYearlyReport (year: string) {
+export async function getYearlyReport(year: string) {
   if (!year) throw new Error('Year required')
 
   // Try to fetch from YearlyReport table first
   const yearlyRows = await prisma.yearlyReport.findMany({
-    where: { year }
+    where: { year },
   })
 
-  let rows = yearlyRows.map(r => ({
+  const rows = yearlyRows.map((r) => ({
     tanggal: r.tanggal || '',
     month: r.month || '',
     task: r.task || '',
     deliverable: r.deliverable || 'Deliver',
     status: r.status || 'Done',
-    keterangan: r.keterangan || ''
+    keterangan: r.keterangan || '',
   }))
 
   // Sort rows chronologically by tanggal (dd/MM/yyyy)
@@ -313,13 +327,13 @@ export async function getYearlyReport (year: string) {
 
   return {
     year,
-    rows
+    rows,
   }
 }
 
-export async function upsertYearlyReport (data: {
-  year: string,
-  summary?: string,
+export async function upsertYearlyReport(data: {
+  year: string
+  summary?: string
   rows?: YearlyReportRow[]
 }) {
   const { year, summary, rows } = data
@@ -328,7 +342,7 @@ export async function upsertYearlyReport (data: {
     await prisma.summaryLog.upsert({
       where: { id: (await prisma.summaryLog.findFirst({ where: { period: year } }))?.id || -1 },
       update: { summary: summary || '' },
-      create: { period: year, summary: summary || '' }
+      create: { period: year, summary: summary || '' },
     })
   }
 
@@ -346,20 +360,20 @@ export async function upsertYearlyReport (data: {
 
     // Sync YearlyReport table
     await prisma.yearlyReport.deleteMany({
-      where: { year }
+      where: { year },
     })
 
     if (rows.length > 0) {
       await prisma.yearlyReport.createMany({
-        data: rows.map(row => ({
+        data: rows.map((row) => ({
           year,
           tanggal: row.tanggal,
           month: row.month,
           task: row.task,
           deliverable: row.deliverable,
           status: row.status,
-          keterangan: row.keterangan
-        }))
+          keterangan: row.keterangan,
+        })),
       })
     }
   }
@@ -367,20 +381,20 @@ export async function upsertYearlyReport (data: {
   return await getYearlyReport(year)
 }
 
-export async function getAllMonthlySummaries (year: string) {
+export async function getAllMonthlySummaries(year: string) {
   if (!year) throw new Error('Year required')
 
   // Get all unique months for this year that have summaries
   const summaries = await prisma.summaryLog.findMany({
     where: {
       period: {
-        startsWith: `${year}-`
+        startsWith: `${year}-`,
       },
       summary: {
-        not: ''
-      }
+        not: '',
+      },
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
   })
 
   const latestSummaries: Record<string, string> = {}
@@ -390,8 +404,10 @@ export async function getAllMonthlySummaries (year: string) {
     }
   }
 
-  return Object.entries(latestSummaries).map(([p, summary]) => ({
-    period: p,
-    summary
-  })).sort((a, b) => a.period.localeCompare(b.period))
+  return Object.entries(latestSummaries)
+    .map(([p, summary]) => ({
+      period: p,
+      summary,
+    }))
+    .sort((a, b) => a.period.localeCompare(b.period))
 }

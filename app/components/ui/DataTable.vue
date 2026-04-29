@@ -27,7 +27,7 @@
             class="border-b border-border/10 last:border-0"
           >
             <td v-for="col in columns" :key="`loading-col-${col.key}`" class="px-4 py-3">
-              <div class="h-4 bg-muted/40 rounded-md animate-pulse w-full"/>
+              <div class="h-4 bg-muted/40 rounded-md animate-pulse w-full" />
             </td>
           </tr>
         </template>
@@ -44,7 +44,7 @@
             <td v-for="col in columns" :key="col.key" :class="['p-0', col.cellClass || '']">
               <slot :name="`cell-${col.key}`" :row="row" :index="idx">
                 <div class="px-4 py-2">
-                  {{ (row as any)[col.key] }}
+                  {{ getCellValue(row, col.key) }}
                 </div>
               </slot>
             </td>
@@ -102,4 +102,8 @@ withDefaults(
     emptyIcon: undefined,
   },
 )
+
+function getCellValue(row: T, key: string) {
+  return (row as Record<string, unknown>)[key]
+}
 </script>

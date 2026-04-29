@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event): Promise<any> => {
+export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { activities } = body
 
@@ -11,8 +11,9 @@ export default defineEventHandler(async (event): Promise<any> => {
     const summary = await generateSummary(prompt, { max_tokens: 500, think: false })
 
     return { success: true, summary }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     console.error('AI Daily Summary Error:', error)
-    return { success: false, error: error.message || 'Failed to generate AI summary' }
+    return { success: false, error: msg || 'Failed to generate AI summary' }
   }
 })

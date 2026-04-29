@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia'
 import { useToast } from '~/composables/use-toast'
 import { useCoreStore } from '~/stores/core'
+import type { GitlabCache, GitLabEvent } from '~/types/report'
 
 export const useGitlabStore = defineStore('gitlab', () => {
   const core = useCoreStore()
   const { error } = useToast()
 
-  const gitlabData = ref<any>(null)
+  const gitlabData = ref<GitlabCache | null>(null)
   const fetchingGitlab = ref(false)
   const fetchingProjects = ref(false)
   const allProjects = ref<{ id: number; name: string; path: string }[]>([])
@@ -15,31 +16,31 @@ export const useGitlabStore = defineStore('gitlab', () => {
     if (!gitlabData.value?.events) return []
     const processed = new Set<string>()
     const results: string[] = []
-    const events = Array.isArray(gitlabData.value.events) ? gitlabData.value.events : []
+    const events = gitlabData.value.events as GitLabEvent[]
 
     for (const ev of events) {
-      let desc = ""
-      const action = ev.action_name?.toLowerCase() || ""
-      const target = ev.target_type?.toLowerCase() || ""
-      const project = ev.project_name || ev.target_title || "Project"
+      let desc = ''
+      const action = ev.action_name?.toLowerCase() || ''
+      const target = ev.target_type?.toLowerCase() || ''
+      const project = ev.project_name || ev.target_title || 'Project'
 
-      if (action === "pushed_commit") {
+      if (action === 'pushed_commit') {
         const projectLabel = ev.project_path || project
-        const branchLabel = ev.branch_name ? ` (${ev.branch_name})` : ""
+        const branchLabel = ev.branch_name ? ` (${ev.branch_name})` : ''
         desc = `[${projectLabel}]${branchLabel} ${ev.title}`
-      } else if (action.includes("pushed") && ev.push_data) {
-        const branch = ev.push_data.ref.replace("refs/heads/", "")
+      } else if (action.includes('pushed') && ev.push_data) {
+        const branch = ev.push_data.ref.replace('refs/heads/', '')
         desc = `Pushed to ${project} (${branch})`
-      } else if (action === "opened" && target.includes("mergerequest")) {
+      } else if (action === 'opened' && target.includes('mergerequest')) {
         desc = `Opened MR: ${ev.target_title}`
-      } else if (action === "merged" && target.includes("mergerequest")) {
+      } else if (action === 'merged' && target.includes('mergerequest')) {
         desc = `Merged MR: ${ev.target_title}`
-      } else if (action === "accepted" && target.includes("mergerequest")) {
+      } else if (action === 'accepted' && target.includes('mergerequest')) {
         desc = `Accepted MR: ${ev.target_title}`
-      } else if (action === "commented on") {
+      } else if (action === 'commented on') {
         desc = `Commented on ${target}: ${ev.target_title || project}`
       } else {
-        desc = `${ev.action_name} ${ev.target_type || ""} on ${project}`.trim()
+        desc = `${ev.action_name} ${ev.target_type || ''} on ${project}`.trim()
       }
 
       if (desc && !processed.has(desc)) {
@@ -50,29 +51,33 @@ export const useGitlabStore = defineStore('gitlab', () => {
     return results
   })
 
-  function setCache (cachedGitlab: any) {
+  function setCache(cachedGitlab: GitlabCache) {
     gitlabData.value = cachedGitlab
   }
 
   const fetchGitlabCache = async () => {
-    const res: any = await $fetch("/api/gitlab/cache" as any, { query: { date: core.selectedDate } })
+    const res = await $fetch<GitlabCache>('/api/gitlab/cache', {
+      query: { date: core.selectedDate },
+    })
     if (res.success) {
-      useGitlabStore().setCache(res.gitlab)
+      useGitlabStore().setCache(res)
     }
   }
 
-  async function fetchProjects () {
+  async function fetchProjects() {
     if (!core.settings.gitlab_token) {
-      error("Please set GitLab Token first")
+      error('Please set GitLab Token first')
       return
     }
     fetchingProjects.value = true
     try {
-      const data: any = await $fetch("/api/gitlab/projects" as any)
+      const data = await $fetch<{ projects: { id: number; name: string; path: string }[] }>(
+        '/api/gitlab/projects',
+      )
       allProjects.value = data.projects || []
     } catch (err) {
-      console.error("Failed to fetch projects:", err)
-      error("Failed to fetch GitLab projects")
+      console.error('Failed to fetch projects:', err)
+      error('Failed to fetch GitLab projects')
     } finally {
       fetchingProjects.value = false
     }

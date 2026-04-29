@@ -14,6 +14,6 @@ import { useToast } from '~/composables/use-toast'
 const { success } = useToast()
 
 onMounted(() => {
-  success('App Ready', 'System initialized successfully')
+  success('App Ready', { description: 'System initialized successfully' })
 })
 </script>

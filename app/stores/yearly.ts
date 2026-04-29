@@ -33,7 +33,7 @@ export const useYearlyStore = defineStore('yearly', () => {
       }
     } catch (err: unknown) {
       const e = err as { data?: { error?: string } }
-      error(e.data?.error || 'Failed to fetch yearly data', err)
+      error(e.data?.error || 'Failed to fetch yearly data')
     } finally {
       isLoading.value = false
     }

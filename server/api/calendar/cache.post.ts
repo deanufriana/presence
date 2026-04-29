@@ -1,4 +1,6 @@
-export default defineEventHandler(async (event): Promise<any> => {
+import type { CalendarEvent } from '~/types/calendar'
+
+export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
     const { date, events } = body
@@ -9,26 +11,27 @@ export default defineEventHandler(async (event): Promise<any> => {
     await prisma.calendarEvent.deleteMany({
       where: {
         date: {
-          startsWith: date
-        }
-      }
+          startsWith: date,
+        },
+      },
     })
 
     // Bulk insert new events
     if (events && Array.isArray(events)) {
       await prisma.calendarEvent.createMany({
-        data: events.map((ev: any) => ({
+        data: events.map((ev: CalendarEvent) => ({
           date: ev.date,
-          summary: ev.summary,
+          summary: ev.summary || '',
           startTime: ev.startTime,
-          endTime: ev.endTime
-        }))
+          endTime: ev.endTime,
+        })),
       })
     }
 
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     console.error('API Error (calendar-cache.post):', error)
-    return { success: false, error: error.message }
+    return { success: false, error: msg }
   }
 })
