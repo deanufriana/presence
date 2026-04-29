@@ -7,9 +7,9 @@
             <div class="flex h-7 w-7 items-center justify-center rounded-md bg-amber-500/10">
               <Calendar class="h-4 w-4 text-amber-500" />
             </div>
-            Yearly Report (BAST)
+            Yearly Report
           </CardTitle>
-          <CardDescription class="mt-1">Annual Berita Acara Serah Terima summary</CardDescription>
+          <CardDescription class="mt-1">Summary anual yearly</CardDescription>
         </div>
         <div class="flex items-center gap-2">
           <Button

@@ -20,7 +20,7 @@
             class="relative overflow-hidden group"
             @click="generateAiSummary"
           >
-            <div v-if="summarizing" class="absolute inset-0 bg-violet-500/10 animate-pulse"/>
+            <div v-if="summarizing" class="absolute inset-0 bg-violet-500/10 animate-pulse" />
             <Sparkles v-if="!summarizing" class="h-3.5 w-3.5" />
             <RefreshCw v-else class="h-3.5 w-3.5 animate-spin" />
             <span :class="{ 'animate-pulse': summarizing }">
@@ -52,6 +52,17 @@
           >
             <File class="h-3.5 w-3.5" :class="{ 'animate-bounce': exportingDocx }" />
             Export Task Job
+          </Button>
+
+          <Button
+            variant="outline"
+            size="xs"
+            :disabled="!monthlyRows.length || exportingDocx"
+            class="border-indigo-500/20 hover:border-indigo-500/50 hover:bg-indigo-500/5 text-indigo-600 dark:text-indigo-400"
+            @click="handleBASTExport"
+          >
+            <FileText class="h-3.5 w-3.5" :class="{ 'animate-bounce': exportingDocx }" />
+            Export BAST
           </Button>
         </div>
       </div>
@@ -195,7 +206,7 @@
         <template #cell-actions="{ index }">
           <div class="flex items-center justify-center">
             <button
-              class="h-6 w-6 mx-auto flex items-center justify-center rounded-md text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all duration-200"
+              class="h-6 w-6 mx-auto flex items-center justify-center rounded-md text-red-400 hover:bg-red-500/10 transition-all duration-200"
               title="Remove row"
               @click="removeMonthlyRow(index)"
             >
@@ -219,6 +230,7 @@ import {
   X,
   Trash2,
   File,
+  FileText,
 } from 'lucide-vue-next'
 import { useDocxExport } from '~/composables/useDocxExport'
 import { useToast } from '~/composables/use-toast'
@@ -266,7 +278,7 @@ const {
   copyMonthlyReport,
   fetchMonthlyReport,
 } = monthlyStore
-const { exportToDocx, exportingDocx } = useDocxExport()
+const { exportToDocx, exportBAST, exportingDocx } = useDocxExport()
 const { success, error } = useToast()
 
 const handleDocxExport = async () => {
@@ -275,6 +287,15 @@ const handleDocxExport = async () => {
     success('Monthly report exported to Word!')
   } catch {
     error('Failed to export Word document')
+  }
+}
+
+const handleBASTExport = async () => {
+  try {
+    await exportBAST(monthlyRows.value, selectedDate.value, coreStore.settings)
+    success('BAST exported to Word!')
+  } catch {
+    error('Failed to export BAST document')
   }
 }
 

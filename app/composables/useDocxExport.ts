@@ -250,10 +250,7 @@ export function useDocxExport() {
                 children: [
                   new TextRun({ text: 'Jabatan', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
-                  new TextRun({
-                    text: settings.div_head_position?.split(' ')[0] || 'Kepala Divisi',
-                    size: 24,
-                  }),
+                  new TextRun({ text: 'Kepala Divisi', size: 24 }),
                 ],
               }),
               new Paragraph({
@@ -347,7 +344,7 @@ export function useDocxExport() {
                         ),
                         createBASTDataCell(row.project || '-', AlignmentType.LEFT),
                         createBASTDataCell('Deliver', AlignmentType.CENTER),
-                        createBASTDataCell('Done', AlignmentType.CENTER),
+                        createBASTDataCell(row.done || 'Done', AlignmentType.CENTER),
                         createBASTDataCell(row.status || '-', AlignmentType.LEFT),
                       ],
                     })
@@ -520,7 +517,7 @@ export function useDocxExport() {
       })
 
       const blob = await Packer.toBlob(doc)
-      saveAs(blob, `BAST PEKERJA IT PROJECT - ${settings.user_name}.docx`)
+      saveAs(blob, `BAST PEKERJA IT PROJECT - ${settings.user_name} ${monthName} ${yearName}.docx`)
 
       return true
     } catch (error) {

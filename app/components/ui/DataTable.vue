@@ -36,7 +36,7 @@
             v-for="(row, idx) in data"
             :key="idx"
             :class="[
-              'border-b border-border/10 last:border-0 transition-colors',
+              'border-b border-border/10 last:border-0 transition-colors group',
               typeof rowClass === 'function' ? rowClass(row, idx) : rowClass,
               'hover:bg-muted/5',
             ]"

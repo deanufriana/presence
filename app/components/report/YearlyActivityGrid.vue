@@ -48,7 +48,7 @@
               variant="ghost"
               size="icon"
               class="h-6 w-6 hover:bg-background rounded"
-              @click="coreStore.prevYear()"
+              @click="coreStore.prevYear"
             >
               <ChevronLeft class="h-3.5 w-3.5" />
             </Button>
@@ -60,7 +60,7 @@
               size="icon"
               class="h-6 w-6 hover:bg-background rounded"
               :disabled="isNextYearDisabled"
-              @click="coreStore.nextYear()"
+              @click="coreStore.nextYear"
             >
               <ChevronRight class="h-3.5 w-3.5" />
             </Button>
