@@ -260,8 +260,8 @@ export const useDailyStore = defineStore('daily', () => {
       } else {
         dailyTable.value.push({
           date: date,
-          masuk: updated.masuk || '',
-          pulang: updated.pulang || '',
+          masuk: getRandomTime('07:30', '08:00'),
+          pulang: getRandomTime('17:00', '17:30'),
           ti: updated.ti || '',
           aktivitas: updated.aktivitas || '',
         })

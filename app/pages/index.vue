@@ -39,7 +39,7 @@
           >
 
           <!-- Sync Button -->
-          <Button variant="gradient" size="sm" :disabled="syncing" @click="confirmSync">
+          <Button variant="gradient" size="sm" :disabled="syncing" @click="confirmSync()">
             <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': syncing }" />
             <span class="hidden sm:inline">Sync Activities</span>
           </Button>

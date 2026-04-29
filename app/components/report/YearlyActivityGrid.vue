@@ -90,14 +90,17 @@
         <div
           v-for="month in yearlyActivities"
           :key="month.month"
-          class="relative h-20 rounded-xl border border-border/40 flex flex-col items-center justify-center group transition-all cursor-pointer hover:shadow-xl hover:scale-[1.02] active:scale-95"
+          class="relative h-20 rounded-xl border border-border/40 flex flex-col items-center justify-center group transition-all"
           :class="[
             getMonthContainerClasses(month),
             isSelected(month.month)
               ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-950 border-transparent'
               : '',
+            isFutureMonth(month.month)
+              ? 'opacity-40 cursor-not-allowed grayscale-[0.5]'
+              : 'cursor-pointer hover:shadow-xl hover:scale-[1.02] active:scale-95',
           ]"
-          @click="selectMonth(month.month)"
+          @click="!isFutureMonth(month.month) && selectMonth(month.month)"
         >
           <!-- Month Label -->
           <span
@@ -199,6 +202,11 @@ const selectMonth = (monthStr: string) => {
 
 const isSelected = (monthStr: string) => {
   return selectedDate.value === monthStr
+}
+
+const isFutureMonth = (monthStr: string) => {
+  const currentMonthStr = format(new Date(), 'yyyy-MM')
+  return monthStr > currentMonthStr
 }
 
 const getMonthContainerClasses = (month: YearlyActivityMonth) => {
