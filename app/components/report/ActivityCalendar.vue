@@ -11,23 +11,23 @@
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-2 text-[10px] text-muted-foreground">
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-orange-500"/>
+              <div class="h-2 w-2 rounded-sm bg-orange-500" />
               GitLab
             </div>
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-blue-600"/>
+              <div class="h-2 w-2 rounded-sm bg-blue-600" />
               Jira
             </div>
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-violet-500"/>
+              <div class="h-2 w-2 rounded-sm bg-violet-500" />
               Calendar
             </div>
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-emerald-500"/>
+              <div class="h-2 w-2 rounded-sm bg-emerald-500" />
               Manual
             </div>
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-red-500"/>
+              <div class="h-2 w-2 rounded-sm bg-red-500" />
               Holiday
             </div>
           </div>
@@ -146,7 +146,13 @@
                   v-if="day.isHoliday"
                   class="text-[8px] px-1 bg-red-500/20 text-red-600 dark:text-red-400 rounded"
                 >
-                  {{ day.holiday?.type === 'leave' ? 'Cuti Bersama' : 'Holiday' }}
+                  {{
+                    day.holiday?.type === 'manual'
+                      ? 'Manual'
+                      : day.holiday?.type === 'leave'
+                        ? 'Cuti Bersama'
+                        : 'Holiday'
+                  }}
                 </span>
               </div>
               <div class="space-y-2">

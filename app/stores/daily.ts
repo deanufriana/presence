@@ -18,6 +18,8 @@ export const useDailyStore = defineStore('daily', () => {
   const showManualEntry = ref(false)
   const selectedDayForEntry = ref<{ date: string; dayNum: number } | null>(null)
   const manualActivityText = ref('')
+  const manualHolidayName = ref('')
+  const isManualHoliday = ref(false)
   const isLoading = ref(false)
 
   const showConfirmSync = ref(false)
@@ -243,9 +245,35 @@ export const useDailyStore = defineStore('daily', () => {
   }
 
   const openManualEntry = (day: { date: string; dayNum: number }) => {
+    const calendarStore = useCalendarStore()
     selectedDayForEntry.value = { date: day.date, dayNum: day.dayNum }
     manualActivityText.value = manualActivitiesMap.value[day.date] || ''
+
+    // Find holiday if exists
+    const holiday = calendarStore.holidays.find((h) => h.date === day.date)
+    isManualHoliday.value = !!holiday
+    manualHolidayName.value = holiday ? holiday.name : ''
+
     showManualEntry.value = true
+  }
+
+  const saveManualHoliday = async () => {
+    if (!selectedDayForEntry.value) return
+    try {
+      await $fetch('/api/holidays', {
+        method: 'POST',
+        body: {
+          date: selectedDayForEntry.value.date,
+          name: manualHolidayName.value,
+          is_holiday: isManualHoliday.value,
+        },
+      })
+      const calendarStore = useCalendarStore()
+      await calendarStore.fetchHolidays()
+    } catch (err) {
+      console.error('Failed to save holiday:', err)
+      error('Failed to save holiday')
+    }
   }
 
   const saveActivity = async (date: string, activity: string) => {
@@ -277,9 +305,10 @@ export const useDailyStore = defineStore('daily', () => {
 
   const saveManualActivity = async () => {
     if (!selectedDayForEntry.value) return
+    await saveManualHoliday()
     await saveActivity(selectedDayForEntry.value.date, manualActivityText.value)
     showManualEntry.value = false
-    success(`Activity saved for ${selectedDayForEntry.value.date}`)
+    success(`Data updated for ${selectedDayForEntry.value.date}`)
   }
 
   const syncDayActivity = async (date: string) => {
@@ -330,6 +359,8 @@ export const useDailyStore = defineStore('daily', () => {
     showManualEntry,
     selectedDayForEntry,
     manualActivityText,
+    manualHolidayName,
+    isManualHoliday,
     showConfirmSync,
     syncing,
     summarizingAll,
