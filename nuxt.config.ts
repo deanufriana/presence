@@ -5,25 +5,19 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: 'Presence',
-      link: [
-        { rel: 'icon', type: 'image/png', href: '/favicon.ico' }
-      ]
+      link: [{ rel: 'icon', type: 'image/png', href: '/favicon.ico' }],
     },
   },
   css: ['~/assets/css/main.css'],
   devtools: { enabled: true },
   vite: {
-    plugins: [
-      tailwindcss(),
-    ],
+    plugins: [tailwindcss()],
   },
-  modules: [
-    '@pinia/nuxt',
-  ],
+  modules: ['@pinia/nuxt', '@nuxt/eslint'],
   components: [
     {
       path: '~/components',
       extensions: ['.vue'],
-    }
+    },
   ],
 })
