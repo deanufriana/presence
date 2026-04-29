@@ -223,7 +223,7 @@
                     @keydown.space.prevent="toggleProject(p.id)"
                   >
                     <Checkbox
-                      :checked="selectedProjectIds.includes(p.id)"
+                      :model-value="selectedProjectIds.includes(p.id)"
                       class="h-4 w-4 pointer-events-none"
                     />
                     <div class="flex flex-col min-w-0">

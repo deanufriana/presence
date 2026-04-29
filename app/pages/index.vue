@@ -2,25 +2,17 @@
   <div class="flex flex-col gap-4 max-w-5xl mx-auto">
     <!-- Page Header -->
     <div class="flex flex-col gap-1">
-      <div
-        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-      >
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 class="text-2xl font-bold tracking-tight">Dashboard</h1>
           <p class="text-sm text-muted-foreground mt-1">
-            Generate your daily activity report from GitLab, Jira, and Calendar
-            activity.
+            Generate your daily activity report from GitLab, Jira, and Calendar activity.
           </p>
         </div>
 
         <div class="flex items-center gap-2">
           <!-- Settings Button -->
-          <Button
-            variant="outline"
-            size="sm"
-            @click="showSettings = true"
-            class="gap-2"
-          >
+          <Button variant="outline" size="sm" class="gap-2" @click="showSettings = true">
             <Settings class="h-4 w-4" />
             <span class="hidden sm:inline">Settings</span>
           </Button>
@@ -28,9 +20,9 @@
           <Button
             variant="outline"
             size="sm"
-            @click="triggerCalendarUpload"
             :disabled="importingCalendar"
             class="gap-2 border-border bg-card hover:border-primary/40"
+            @click="triggerCalendarUpload"
           >
             <Upload
               class="h-4 w-4 text-muted-foreground"
@@ -39,41 +31,19 @@
             <span class="hidden sm:inline">Import Calendar</span>
           </Button>
           <input
-            type="file"
             ref="calendarInput"
+            type="file"
             class="hidden"
             accept=".ics"
             @change="handleCalendarUpload"
-          />
+          >
 
           <!-- Sync Button -->
-          <Button
-            variant="gradient"
-            size="sm"
-            @click="confirmSync"
-            :disabled="syncing"
-          >
+          <Button variant="gradient" size="sm" :disabled="syncing" @click="confirmSync">
             <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': syncing }" />
             <span class="hidden sm:inline">Sync Activities</span>
           </Button>
         </div>
-      </div>
-    </div>
-
-    <!-- Status Bar -->
-    <div class="flex items-center gap-4 text-xs text-muted-foreground">
-      <div class="flex items-center gap-1.5">
-        <div
-          class="h-2 w-2 rounded-full"
-          :class="settings.gitlab_token ? 'bg-emerald-500' : 'bg-amber-500'"
-        />
-        <span
-          >GitLab
-          {{ settings.gitlab_token ? "Connected" : "Disconnected" }}</span
-        >
-      </div>
-      <div class="ml-auto text-muted-foreground/60">
-        {{ dateDisplay }}
       </div>
     </div>
 
@@ -121,94 +91,76 @@
     <!-- Modals -->
     <SettingsModal v-if="showSettings" v-model="showSettings" />
 
-    <SyncConfirmModal
-      v-if="showConfirmSync"
-      v-model="showConfirmSync"
-      @confirm="executeSync"
-    />
+    <SyncConfirmModal v-if="showConfirmSync" v-model="showConfirmSync" @confirm="executeSync" />
 
     <ManualActivityModal v-if="showManualEntry" v-model="showManualEntry" />
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  CalendarDays,
-  CalendarRange,
-  Settings,
-  FileText,
-  Upload,
-  RefreshCw,
-} from "lucide-vue-next";
-import { useScrollLock } from "@vueuse/core";
-import { Button } from "~/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
-import DailyReport from "~/components/report/DailyReport.vue";
-import YearlyActivityGrid from "~/components/report/YearlyActivityGrid.vue";
+import { CalendarDays, CalendarRange, Settings, FileText, Upload, RefreshCw } from 'lucide-vue-next'
+import { useScrollLock } from '@vueuse/core'
+import { Button } from '~/components/ui/button'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '~/components/ui/tabs'
+import DailyReport from '~/components/report/DailyReport.vue'
+import YearlyActivityGrid from '~/components/report/YearlyActivityGrid.vue'
 
-const YearlyReport = defineAsyncComponent(
-  () => import("~/components/report/YearlyReport.vue"),
-);
+import { useCoreStore } from '~/stores/core'
+import { useDailyStore } from '~/stores/daily'
+import { useCalendarStore } from '~/stores/calendar'
+import { storeToRefs } from 'pinia'
+
+const YearlyReport = defineAsyncComponent(() => import('~/components/report/YearlyReport.vue'))
 const ActivityCalendar = defineAsyncComponent(
-  () => import("~/components/report/ActivityCalendar.vue"),
-);
-const MonthlyReport = defineAsyncComponent(
-  () => import("~/components/report/MonthlyReport.vue"),
-);
+  () => import('~/components/report/ActivityCalendar.vue'),
+)
+const MonthlyReport = defineAsyncComponent(() => import('~/components/report/MonthlyReport.vue'))
 const ManualActivityModal = defineAsyncComponent(
-  () => import("~/components/report/ManualActivityModal.vue"),
-);
+  () => import('~/components/report/ManualActivityModal.vue'),
+)
 const SyncConfirmModal = defineAsyncComponent(
-  () => import("~/components/report/SyncConfirmModal.vue"),
-);
-const SettingsModal = defineAsyncComponent(
-  () => import("~/components/report/SettingsModal.vue"),
-);
+  () => import('~/components/report/SyncConfirmModal.vue'),
+)
+const SettingsModal = defineAsyncComponent(() => import('~/components/report/SettingsModal.vue'))
 
-import { useCoreStore } from "~/stores/core";
-import { useDailyStore } from "~/stores/daily";
-import { useCalendarStore } from "~/stores/calendar";
-import { storeToRefs } from "pinia";
+const coreStore = useCoreStore()
 
-const coreStore = useCoreStore();
+const { fetchSettings } = coreStore
+const { showSettings, viewMode } = storeToRefs(coreStore)
 
-const { fetchSettings } = coreStore;
-const { dateDisplay, showSettings, viewMode, settings } =
-  storeToRefs(coreStore);
+const dailyStore = useDailyStore()
+const { showConfirmSync, showManualEntry, syncing } = storeToRefs(dailyStore)
+const { executeSync, confirmSync } = dailyStore
 
-const dailyStore = useDailyStore();
-const { showConfirmSync, showManualEntry, syncing } = storeToRefs(dailyStore);
-const { executeSync, confirmSync } = dailyStore;
-
-const calendarStore = useCalendarStore();
-const { importingCalendar } = storeToRefs(calendarStore);
-const { importCalendar } = calendarStore;
+const calendarStore = useCalendarStore()
+const { importingCalendar } = storeToRefs(calendarStore)
+const { importCalendar } = calendarStore
 
 // ─── Calendar Import ──────────────────────────────
-const calendarInput = ref<HTMLInputElement | null>(null);
+const calendarInput = ref<HTMLInputElement | null>(null)
 
 const triggerCalendarUpload = () => {
-  calendarInput.value?.click();
-};
+  calendarInput.value?.click()
+}
 
 const handleCalendarUpload = async (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0];
+  const file = (event.target as HTMLInputElement).files?.[0]
   if (file) {
-    await importCalendar(file);
+    await importCalendar(file)
     // Reset input
     if (calendarInput.value) {
-      calendarInput.value.value = "";
+      calendarInput.value.value = ''
     }
   }
-};
+}
 
 onMounted(() => {
-  fetchSettings();
-});
+  fetchSettings()
+})
 
 // ─── Scroll Lock ──────────────────────────────────
-const isLocked = useScrollLock(process.client ? document.body : null);
+const isLocked = useScrollLock(import.meta.client ? document.body : null)
 watch([showSettings, showManualEntry], ([s, m]) => {
-  isLocked.value = s || m;
-});
+  isLocked.value = s || m
+})
 </script>

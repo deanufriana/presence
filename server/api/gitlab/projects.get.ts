@@ -1,6 +1,4 @@
-import { getGitLabConfig, getGitLabProjects, type RawGitLabProject } from '../../utils/gitlab'
-
-export default defineEventHandler(async (_) => {
+export default defineEventHandler(async () => {
   const config = await getGitLabConfig()
 
   if (!config.token) {
