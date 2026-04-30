@@ -31,7 +31,7 @@
                   <div class="flex items-center space-x-3">
                     <Checkbox
                       id="isHoliday"
-                      v-model:model-value="isManualHoliday"
+                      v-model="isManualHoliday"
                       class="border-red-500 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
                     />
                     <Label

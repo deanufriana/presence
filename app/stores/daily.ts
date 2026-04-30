@@ -214,12 +214,17 @@ export const useDailyStore = defineStore('daily', () => {
   const saveManualHoliday = async () => {
     if (!selectedDayForEntry.value) return
     try {
-      const { upsertManualHoliday } = await import('~/queries/calendar')
-      await upsertManualHoliday({
-        date: selectedDayForEntry.value.date,
-        name: manualHolidayName.value,
-        isHoliday: isManualHoliday.value,
-      })
+      if (isManualHoliday.value) {
+        const { upsertManualHoliday } = await import('~/queries/calendar')
+        await upsertManualHoliday({
+          date: selectedDayForEntry.value.date,
+          name: manualHolidayName.value || 'Manual Holiday',
+          isHoliday: true,
+        })
+      } else {
+        const { deleteHolidayByDate } = await import('~/queries/calendar')
+        await deleteHolidayByDate(selectedDayForEntry.value.date)
+      }
 
       const { useCalendarStore } = await import('~/stores/calendar')
       const calendarStore = useCalendarStore()
@@ -289,7 +294,6 @@ export const useDailyStore = defineStore('daily', () => {
       }
       error(`No activity found for ${date}`)
     } catch {
-      console.error('Failed to sync day activity')
       error('Failed to sync day activity')
     } finally {
       syncingRows.value[date] = false

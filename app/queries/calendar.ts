@@ -63,18 +63,22 @@ export async function upsertHoliday(h: {
   is_holiday: boolean
 }) {
   const db = await getDb()
-  await db
-    .insert(schema.holidays)
-    .values({
-      date: h.holiday_date,
-      name: h.holiday_name,
-      isHoliday: h.is_holiday,
-      updatedAt: new Date(),
-    })
-    .onConflictDoUpdate({
-      target: [schema.holidays.date, schema.holidays.name],
-      set: { isHoliday: h.is_holiday, updatedAt: new Date() },
-    })
+  if (h.is_holiday) {
+    await db
+      .insert(schema.holidays)
+      .values({
+        date: h.holiday_date,
+        name: h.holiday_name,
+        isHoliday: h.is_holiday,
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: [schema.holidays.date, schema.holidays.name],
+        set: { isHoliday: h.is_holiday, updatedAt: new Date() },
+      })
+  } else {
+    await deleteHolidayByDate(h.holiday_date)
+  }
 }
 
 export async function upsertManualHoliday(data: {
@@ -93,4 +97,10 @@ export async function upsertManualHoliday(data: {
       target: [schema.holidays.date, schema.holidays.name],
       set: { isHoliday: data.isHoliday, updatedAt: new Date() },
     })
+}
+
+export async function deleteHolidayByDate(date: string) {
+  const db = await getDb()
+  const { eq } = await import('drizzle-orm')
+  await db.delete(schema.holidays).where(eq(schema.holidays.date, date))
 }
