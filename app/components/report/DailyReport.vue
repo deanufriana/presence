@@ -286,7 +286,6 @@ const copiedRows = ref<Record<string, boolean>>({})
 
 const copyRow = (text: string, date: string) => {
   navigator.clipboard.writeText(text)
-  success(`Copied activity for ${date}`)
   copiedRows.value[date] = true
   setTimeout(() => {
     copiedRows.value[date] = false
