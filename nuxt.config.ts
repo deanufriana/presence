@@ -12,6 +12,20 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   devtools: { enabled: true },
   vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (id.includes('node_modules')) {
+              if (id.includes('lucide-vue-next')) return 'icons'
+              if (id.includes('date-fns')) return 'date-utils'
+              if (id.includes('reka-ui') || id.includes('radix-vue')) return 'ui-core'
+              return 'vendor'
+            }
+          },
+        },
+      },
+    },
     plugins: [tailwindcss()],
     // Tauri expects a fixed port, and it should match tauri.conf.json
     server: {
@@ -27,10 +41,8 @@ export default defineNuxtConfig({
     port: 3000,
   },
   modules: ['@pinia/nuxt', '@nuxt/eslint', 'shadcn-nuxt'],
-  components: [
-    {
-      path: '~/components',
-      extensions: ['.vue'],
-    },
-  ],
+  shadcn: {
+    prefix: '',
+    componentDir: './app/components/ui',
+  },
 })

@@ -30,21 +30,19 @@ export async function upsertSetting(key: string, value: string) {
 
 export async function upsertSettingsBatch(settings: Record<string, string>) {
   const db = await getDb()
-  await db.transaction(async (tx) => {
-    for (const [key, value] of Object.entries(settings)) {
-      await tx
-        .insert(schema.settings)
-        .values({
-          key,
-          value,
-          updatedAt: new Date(),
-        })
-        .onConflictDoUpdate({
-          target: schema.settings.key,
-          set: { value, updatedAt: new Date() },
-        })
-    }
-  })
+  for (const [key, value] of Object.entries(settings)) {
+    await db
+      .insert(schema.settings)
+      .values({
+        key,
+        value,
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: schema.settings.key,
+        set: { value, updatedAt: new Date() },
+      })
+  }
 }
 
 export async function getSetting(key: string): Promise<string | null> {
