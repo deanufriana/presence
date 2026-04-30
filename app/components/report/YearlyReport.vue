@@ -160,7 +160,7 @@ import { useDocxExport } from '~/composables/useDocxExport'
 import { useToast } from '~/composables/use-toast'
 import { Button } from '~/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~/components/ui/card'
-import DataTable from '~/components/ui/DataTable.vue'
+import { DataTable } from '~/components/ui/data-table'
 import {
   Select,
   SelectContent,

@@ -227,7 +227,7 @@ import { Button } from '~/components/ui/button'
 import { Badge } from '~/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~/components/ui/card'
-import DataTable from '~/components/ui/DataTable.vue'
+import { DataTable } from '~/components/ui/data-table'
 import {
   Select,
   SelectContent,

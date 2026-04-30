@@ -222,7 +222,7 @@ import { useExcelExport } from '~/composables/useExcelExport'
 import { Button } from '~/components/ui/button'
 import { useCalendarStore } from '~/stores/calendar'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~/components/ui/card'
-import DataTable from '~/components/ui/DataTable.vue'
+import { DataTable } from '~/components/ui/data-table'
 
 const coreStore = useCoreStore()
 const dailyStore = useDailyStore()

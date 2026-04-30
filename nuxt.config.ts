@@ -2,8 +2,9 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  compatibilityDate: '2026-04-30',
   app: {
-    baseURL: '/',
+    baseURL: '',
     head: {
       title: 'Presence',
       link: [{ rel: 'icon', type: 'image/png', href: '/favicon.ico' }],
@@ -23,16 +24,7 @@ export default defineNuxtConfig({
   vite: {
     build: {
       rollupOptions: {
-        output: {
-          manualChunks: (id) => {
-            if (id.includes('node_modules')) {
-              if (id.includes('lucide-vue-next')) return 'icons'
-              if (id.includes('date-fns')) return 'date-utils'
-              if (id.includes('reka-ui') || id.includes('radix-vue')) return 'ui-core'
-              return 'vendor'
-            }
-          },
-        },
+        output: {},
       },
     },
     plugins: [tailwindcss()],
