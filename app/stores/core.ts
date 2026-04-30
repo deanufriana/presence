@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { format, addMonths, subMonths, addYears, subYears, parse } from 'date-fns'
 import { useToast } from '~/composables/use-toast'
-import type { SettingsData, GitlabCache, JiraCache  } from '~/types/report'
+import type { SettingsData } from '~/types/report'
 import { useGitlabStore } from '~/stores/gitlab'
 import { useJiraStore } from '~/stores/jira'
+import { useCalendarStore } from '~/stores/calendar'
 
 export const useCoreStore = defineStore('core', () => {
   const { success, error } = useToast()
@@ -72,15 +73,18 @@ export const useCoreStore = defineStore('core', () => {
   async function saveSettings() {
     saving.value = true
     try {
+      const { upsertSetting } = await import('~/queries/settings')
+
       const payload = {
         ...settings.value,
         gitlab_selected_projects: selectedProjectIds.value.join(','),
       }
-      await $fetch('/api/settings', {
-        method: 'POST',
-        body: payload,
-      })
-      settings.value = payload
+
+      for (const [key, value] of Object.entries(payload)) {
+        await upsertSetting(key, String(value))
+      }
+
+      settings.value = payload as SettingsData
       success('Settings saved successfully')
       showSettings.value = false
     } catch (err) {
@@ -92,12 +96,21 @@ export const useCoreStore = defineStore('core', () => {
   }
 
   async function fetchSettings() {
-    const data = await $fetch<Partial<SettingsData>>('/api/settings')
-    if (data) {
-      settings.value = { ...settings.value, ...data }
-      if (settings.value.gitlab_selected_projects) {
-        selectedProjectIds.value = settings.value.gitlab_selected_projects.split(',').map(Number)
+    try {
+      const { fetchAllSettings } = await import('~/queries/settings')
+      const data = await fetchAllSettings()
+
+      if (Object.keys(data).length > 0) {
+        settings.value = { ...settings.value, ...data }
+        if (settings.value.gitlab_selected_projects) {
+          selectedProjectIds.value = settings.value.gitlab_selected_projects
+            .split(',')
+            .map((id: string) => parseInt(id))
+            .filter((id: number) => !isNaN(id))
+        }
       }
+    } catch (err) {
+      console.error('Failed to fetch settings:', err)
     }
   }
 
@@ -108,8 +121,6 @@ export const useCoreStore = defineStore('core', () => {
 
   function prevMonth() {
     const current = parse(selectedDate.value, 'yyyy-MM', new Date())
-    // Basic validation to prevent going too far back if needed,
-    // but the picker will handle the strict "not before current month" rule.
     selectedDate.value = format(subMonths(current, 1), 'yyyy-MM')
   }
 
@@ -126,17 +137,17 @@ export const useCoreStore = defineStore('core', () => {
   async function syncAllActivities(force = true) {
     pending.value = true
     try {
-      const res = await $fetch<{ success: boolean; gitlab: GitlabCache; jira: JiraCache }>(
-        `/api/activities/${selectedDate.value}`,
-        {
-          query: { force: force ? 'true' : 'false' },
-        },
-      )
-      if (res.success) {
-        useGitlabStore().setCache(res.gitlab)
-        useJiraStore().setCache(res.jira)
-        success('Activities synced successfully')
-      }
+      const { syncGitLabEvents } = await import('~/utils/gitlab')
+      const { syncJiraActivities } = await import('~/utils/jira')
+
+      const [gitlab, jira] = await Promise.all([
+        syncGitLabEvents(selectedDate.value, force),
+        syncJiraActivities(selectedDate.value, force),
+      ])
+
+      useGitlabStore().setCache(gitlab as never)
+      useJiraStore().setCache(jira as never)
+      success('Activities synced successfully')
     } catch (err) {
       console.error('Failed to sync activities:', err)
       error('Failed to sync activities')

@@ -5,9 +5,7 @@ import {
   type ToastRootProps,
   ToastTitle,
   ToastDescription,
-  ToastAction,
   ToastClose,
-  ToastViewport,
   useForwardPropsEmits,
 } from 'reka-ui'
 import { X, CheckCircle2, AlertCircle, Info, Loader2 } from 'lucide-vue-next'
@@ -20,7 +18,7 @@ interface Props extends ToastRootProps {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  duration: 5000
+  duration: 5000,
 })
 const emits = defineEmits<ToastRootEmits>()
 
@@ -28,10 +26,14 @@ const forwarded = useForwardPropsEmits(props, emits)
 
 const variantClass = computed(() => {
   switch (props.variant) {
-    case 'destructive': return 'bg-destructive text-destructive-foreground border-destructive/50'
-    case 'success': return 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-400 border-emerald-500/20'
-    case 'info': return 'bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-400 border-blue-500/20'
-    default: return 'bg-background text-foreground border-border'
+    case 'destructive':
+      return 'bg-destructive text-destructive-foreground border-destructive/50'
+    case 'success':
+      return 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-400 border-emerald-500/20'
+    case 'info':
+      return 'bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-400 border-blue-500/20'
+    default:
+      return 'bg-background text-foreground border-border'
   }
 })
 </script>
@@ -42,7 +44,7 @@ const variantClass = computed(() => {
     :class="[
       'group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-xl border p-4 pr-8 shadow-lg transition-all',
       'data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full',
-      variantClass
+      variantClass,
     ]"
   >
     <div class="flex gap-3 items-start">

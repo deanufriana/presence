@@ -82,11 +82,9 @@ export const useCalendarStore = defineStore('calendar', () => {
         return
       }
 
-      await $fetch('/api/calendar/cache', {
-        method: 'POST',
-        body: { date: core.selectedDate, events },
-      })
-      calendarData.value = { success: true, events, date: core.selectedDate, cached: true }
+      const { upsertCalendarCache } = await import('~/utils/calendar')
+      const data = await upsertCalendarCache(core.selectedDate, events)
+      calendarData.value = data as CalendarCache
 
       success(`Successfully imported ${events.length} events!`, { id: loadingToastId })
     } catch (err) {
@@ -99,10 +97,9 @@ export const useCalendarStore = defineStore('calendar', () => {
 
   const fetchCalendarEvents = async () => {
     try {
-      const data = await $fetch<CalendarCache>('/api/calendar/cache', {
-        query: { date: core.selectedDate },
-      })
-      calendarData.value = data
+      const { getCalendarCache } = await import('~/utils/calendar')
+      const data = await getCalendarCache(core.selectedDate)
+      calendarData.value = data as CalendarCache
     } catch (err) {
       console.error('Failed to fetch calendar events:', err)
     }
@@ -113,13 +110,11 @@ export const useCalendarStore = defineStore('calendar', () => {
     fetchingHolidays.value = true
     try {
       const [year, month] = core.selectedDate.split('-')
-      if (!month) {
-        return
-      }
-      const data = await $fetch<Holiday[]>('/api/holidays', {
-        query: { year, month: parseInt(month) },
-      })
-      holidays.value = Array.isArray(data) ? data : []
+      if (!year || !month) return
+
+      const { fetchHolidays: fetchHolidaysUtil } = await import('~/utils/calendar')
+      const data = await fetchHolidaysUtil(year, parseInt(month))
+      holidays.value = (data as Holiday[]) || []
     } catch (err) {
       console.error('Failed to fetch holidays:', err)
     } finally {

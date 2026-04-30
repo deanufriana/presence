@@ -12,8 +12,10 @@ node_modules/
 # Optional local cursor file
 .cursor
 
-# Generated Prisma artifacts
-/generated/prisma/
+# Tauri/Rust
+src-tauri/target/
+src-tauri/gen/
+src-tauri/.cargo/
 
 # Local editor and OS files
 .DS_Store

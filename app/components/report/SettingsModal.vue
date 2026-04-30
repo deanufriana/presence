@@ -450,7 +450,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import { useCoreStore } from '~/stores/core'
 import { useGitlabStore } from '~/stores/gitlab'
-import type { OllamaModel, OllamaModelsResponse } from '~/types/ollama'
+import type { OllamaModel } from '~/types/ollama'
 
 defineProps<{
   modelValue: boolean
@@ -474,17 +474,16 @@ const fetchingModels = ref(false)
 async function fetchOllamaModels() {
   fetchingModels.value = true
   try {
-    const res = await $fetch<OllamaModelsResponse>('/api/ollama/models')
-    if (res.success) {
-      ollamaModels.value = res.models
-      // If current model is not in the list and list is not empty, select the first one
-      if (
-        ollamaModels.value.length > 0 &&
-        settings.value &&
-        !ollamaModels.value.find((m) => m.name === settings.value?.ai_model)
-      ) {
-        settings.value.ai_model = ollamaModels.value[0]!.name
-      }
+    const { fetchOllamaModels: fetchModels } = await import('~/utils/ai')
+    const models = await fetchModels(settings.value?.ollama_url || 'http://localhost:11434')
+    ollamaModels.value = models
+    // If current model is not in the list and list is not empty, select the first one
+    if (
+      ollamaModels.value.length > 0 &&
+      settings.value &&
+      !ollamaModels.value.find((m) => m.name === settings.value?.ai_model)
+    ) {
+      settings.value.ai_model = ollamaModels.value[0]!.name
     }
   } catch (err) {
     console.error('Failed to fetch Ollama models:', err)
