@@ -1,4 +1,5 @@
-import { saveAs } from 'file-saver'
+import { save } from '@tauri-apps/plugin-dialog'
+import { writeFile } from '@tauri-apps/plugin-fs'
 import type { ReportRow, SettingsData } from '~/types/report'
 
 export function useExcelExport() {
@@ -145,12 +146,23 @@ export function useExcelExport() {
 
       // --- GENERATE & SAVE ---
       const buffer = await workbook.xlsx.writeBuffer()
-      const blob = new Blob([buffer], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      })
-      saveAs(blob, `Data_Kehadiran_${monthName.replace(' ', '_')}.xlsx`)
+      const uint8Array = new Uint8Array(buffer)
 
-      return true
+      const filePath = await save({
+        filters: [
+          {
+            name: 'Excel',
+            extensions: ['xlsx'],
+          },
+        ],
+        defaultPath: `Data_Kehadiran_${monthName.replace(' ', '_')}.xlsx`,
+      })
+
+      if (filePath) {
+        await writeFile(filePath, uint8Array)
+        return true
+      }
+      return false
     } catch (error) {
       console.error('Export failed:', error)
       throw error

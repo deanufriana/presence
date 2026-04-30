@@ -30,6 +30,11 @@ export async function fetchHolidays(year: string, month: number) {
   const monthStr = month.toString().padStart(2, '0')
   const datePrefix = `${year}-${monthStr}`
 
+  const existing = await getHolidaysByMonth(datePrefix)
+  if (existing && existing.length > 0) {
+    return existing
+  }
+
   const { fetch } = await import('@tauri-apps/plugin-http')
   try {
     const response = await fetch(`https://libur.deno.dev/api?year=${year}&month=${month}`)

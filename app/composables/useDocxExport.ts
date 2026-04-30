@@ -1,4 +1,3 @@
-import { saveAs } from 'file-saver'
 import { format, parse, getDaysInMonth, isWeekend } from 'date-fns'
 import { id as idLocale } from 'date-fns/locale'
 import { useCalendarStore } from '~/stores/calendar'
@@ -549,9 +548,21 @@ export function useDocxExport() {
       })
 
       const blob = await Packer.toBlob(doc)
-      saveAs(blob, `BAST PEKERJA IT PROJECT - ${settings.user_name} ${monthName} ${yearName}.docx`)
+      const uint8Array = new Uint8Array(await blob.arrayBuffer())
 
-      return true
+      const { save } = await import('@tauri-apps/plugin-dialog')
+      const { writeFile } = await import('@tauri-apps/plugin-fs')
+
+      const filePath = await save({
+        filters: [{ name: 'Word Document', extensions: ['docx'] }],
+        defaultPath: `BAST PEKERJA IT PROJECT - ${settings.user_name} ${monthName} ${yearName}.docx`,
+      })
+
+      if (filePath) {
+        await writeFile(filePath, uint8Array)
+        return true
+      }
+      return false
     } catch (error) {
       console.error('BAST export failed:', error)
       throw error
@@ -859,9 +870,21 @@ export function useDocxExport() {
       })
 
       const blob = await Packer.toBlob(doc)
-      saveAs(blob, `Form Task Job - ${settings.user_name}.docx`)
+      const uint8Array = new Uint8Array(await blob.arrayBuffer())
 
-      return true
+      const { save } = await import('@tauri-apps/plugin-dialog')
+      const { writeFile } = await import('@tauri-apps/plugin-fs')
+
+      const filePath = await save({
+        filters: [{ name: 'Word Document', extensions: ['docx'] }],
+        defaultPath: `Form Task Job - ${settings.user_name}.docx`,
+      })
+
+      if (filePath) {
+        await writeFile(filePath, uint8Array)
+        return true
+      }
+      return false
     } catch (error) {
       console.error('Docx export failed:', error)
       throw error
