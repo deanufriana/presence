@@ -248,7 +248,7 @@ const getRowClass = (row: ReportRow) => {
     : ''
 }
 
-const { isAiEnabled, selectedDate } = storeToRefs(coreStore)
+const { isAiEnabled, selectedDate, dateDisplay } = storeToRefs(coreStore)
 const {
   dailyTable,
   summarizingRows,
@@ -271,7 +271,6 @@ const {
   fetchDailyReport,
 } = dailyStore
 
-const { dateDisplay } = storeToRefs(coreStore)
 const { exportToExcel, exporting } = useExcelExport()
 
 const handleExport = async () => {

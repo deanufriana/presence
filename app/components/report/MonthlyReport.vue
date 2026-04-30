@@ -89,7 +89,7 @@
         :loading="isLoading"
         empty-message='Click "AI Generate" or "Add Row" to start your monthly report...'
       >
-        <template #date="{ item: row }">
+        <template #date>
           <div class="flex flex-col sm:items-end">
             <span
               class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 leading-none"
@@ -99,7 +99,7 @@
             <span
               class="text-sm font-black tabular-nums tracking-tighter mt-1 leading-none text-indigo-500 uppercase"
             >
-              {{ formatMonthOnly(row.month) }}
+              {{ formatMonth }}
             </span>
           </div>
         </template>
@@ -262,14 +262,12 @@ import { storeToRefs } from 'pinia'
 import { useCoreStore } from '~/stores/core'
 import { useMonthlyStore } from '~/stores/monthly'
 import { useDailyStore } from '~/stores/daily'
-import { format, parse } from 'date-fns'
-import { id as idLocale } from 'date-fns/locale'
 
 const coreStore = useCoreStore()
 const monthlyStore = useMonthlyStore()
 const dailyStore = useDailyStore()
 
-const { isAiEnabled, selectedDate, dateDisplay } = storeToRefs(coreStore)
+const { isAiEnabled, selectedDate, dateDisplay, formatMonth } = storeToRefs(coreStore)
 const { monthlyRows, monthlyHighlights, summarizing, isLoading } = storeToRefs(monthlyStore)
 const { dailyTable } = storeToRefs(dailyStore)
 
@@ -303,16 +301,6 @@ const copyRow = (text: string, id: string) => {
   setTimeout(() => {
     copiedRows.value[id] = false
   }, 2000)
-}
-
-const formatMonthOnly = (dateStr: string) => {
-  if (!dateStr) return ''
-  try {
-    const d = dateStr.includes('-') ? parse(dateStr, 'yyyy-MM', new Date()) : new Date(dateStr)
-    return format(d, 'MMMM', { locale: idLocale })
-  } catch {
-    return dateStr
-  }
 }
 
 watch(

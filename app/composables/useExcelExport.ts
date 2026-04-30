@@ -5,7 +5,7 @@ import type { ReportRow, SettingsData } from '~/types/report'
 export function useExcelExport() {
   const exporting = ref(false)
 
-  async function exportToExcel(dailyRows: ReportRow[], monthName: string, settings: SettingsData) {
+  async function exportToExcel(dailyRows: ReportRow[], monthYear: string, settings: SettingsData) {
     exporting.value = true
     try {
       const ExcelJS = await import('exceljs')
@@ -53,8 +53,8 @@ export function useExcelExport() {
         valueCell.font = { name: 'Calibri', size: 11, bold: true }
       }
 
-      addMeta(4, 'NAMA', settings.user_name || 'Devi Adi Nufriana')
-      addMeta(5, 'BULAN', monthName.split(' ')[0] || 'April')
+      addMeta(4, 'NAMA', settings.user_name)
+      addMeta(5, 'BULAN', monthYear.split(' ')[0] || 'April')
       addMeta(6, 'JABATAN', settings.user_position || 'Staff IT Governance')
 
       // Placeholder Logo (H1:H6)
@@ -155,7 +155,7 @@ export function useExcelExport() {
             extensions: ['xlsx'],
           },
         ],
-        defaultPath: `Data_Kehadiran_${monthName.replace(' ', '_')}.xlsx`,
+        defaultPath: `Absensi_${settings.user_name}_${monthYear}.xlsx`,
       })
 
       if (filePath) {

@@ -5,6 +5,7 @@ import type { SettingsData } from '~/types/report'
 import { useGitlabStore } from '~/stores/gitlab'
 import { useJiraStore } from '~/stores/jira'
 import { useCalendarStore } from '~/stores/calendar'
+import { id } from 'date-fns/locale'
 
 export const useCoreStore = defineStore('core', () => {
   const { success, error } = useToast()
@@ -55,7 +56,16 @@ export const useCoreStore = defineStore('core', () => {
   const dateDisplay = computed(() => {
     try {
       const d = parse(selectedDate.value, 'yyyy-MM', new Date())
-      return format(d, 'MMMM yyyy')
+      return format(d, 'MMMM yyyy', { locale: id })
+    } catch {
+      return selectedDate.value
+    }
+  })
+
+  const formatMonth = computed(() => {
+    try {
+      const d = parse(selectedDate.value, 'yyyy-MM', new Date())
+      return format(d, 'MMMM', { locale: id })
     } catch {
       return selectedDate.value
     }
@@ -176,6 +186,7 @@ export const useCoreStore = defineStore('core', () => {
     initialLoading,
     isInitialized,
     pending,
+    formatMonth,
     copied,
     settings,
     isAiEnabled,
