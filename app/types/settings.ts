@@ -5,7 +5,7 @@ export interface SettingsData {
   jira_token: string
   jira_url: string
   jira_email: string
-  ai_api_key: string
+  gemini_api_key: string
   openai_api_key: string
   ai_provider: 'gemini' | 'openai' | 'ollama'
   ai_model: string

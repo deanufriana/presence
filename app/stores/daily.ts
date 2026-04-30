@@ -12,7 +12,7 @@ export const useDailyStore = defineStore('daily', () => {
   const summarizingRows = ref<Record<string, boolean>>({})
   const summarizingAll = ref(false)
   const shouldStopSummarizing = ref(false)
-  let currentAbortController: AbortController | null = null
+  // let currentAbortController: AbortController | null = null
   const syncingRows = ref<Record<string, boolean>>({})
 
   const showManualEntry = ref(false)
@@ -39,24 +39,22 @@ export const useDailyStore = defineStore('daily', () => {
   async function fetchDailyReport() {
     try {
       isLoading.value = true
-      const res = await $fetch<{ success: boolean; reports: ReportRow[] }>('/api/report/daily', {
-        query: { date: core.selectedDate },
+      const { getDailyReports } = await import('~/utils/reports')
+      const reports = await getDailyReports(core.selectedDate)
+
+      const rows: ReportRow[] = reports.map((r) => {
+        return {
+          date: r.date,
+          masuk: r.masuk || '',
+          pulang: r.pulang || '',
+          ti: r.ti || '',
+          aktivitas: r.aktivitas || '',
+        }
       })
-      if (res?.success && res.reports) {
-        const rows: ReportRow[] = res.reports.map((r) => {
-          return {
-            date: r.date,
-            masuk: r.masuk || '',
-            pulang: r.pulang || '',
-            ti: r.ti || '',
-            aktivitas: r.aktivitas || '',
-          }
-        })
-        dailyTable.value = rows
-      }
+      dailyTable.value = rows
     } catch (err: unknown) {
-      const e = err as { data?: { error?: string } }
-      error(e.data?.error || 'Failed to fetch daily report')
+      console.error('Failed to fetch daily report:', err)
+      error('Failed to fetch daily report')
     } finally {
       isLoading.value = false
     }
@@ -67,13 +65,7 @@ export const useDailyStore = defineStore('daily', () => {
     newRows.forEach((newRow) => {
       const existingRowIndex = currentRows.findIndex((r) => r.date === newRow.date)
       if (existingRowIndex !== -1) {
-        const existingRow = currentRows[existingRowIndex]
-        if (existingRow) {
-          existingRow.aktivitas = newRow.aktivitas
-          existingRow.masuk = newRow.masuk
-          existingRow.pulang = newRow.pulang
-          existingRow.ti = newRow.ti || existingRow.ti
-        }
+        currentRows[existingRowIndex] = { ...currentRows[existingRowIndex], ...newRow }
       } else {
         currentRows.push(newRow)
       }
@@ -96,13 +88,26 @@ export const useDailyStore = defineStore('daily', () => {
     core.pending = true
     try {
       await core.syncAllActivities(true)
-      const res = await $fetch<{ success: boolean; rows: ReportRow[] }>('/api/report/daily/sync', {
-        query: { date: core.selectedDate, force: 'true' },
-      })
-      if (res?.success && res.rows) {
-        applySyncedRows(res.rows)
-        success('Synced successfully!')
+
+      const { fetchAndGroupActivities, upsertDailyReport } = await import('~/utils/reports')
+      const grouped = await fetchAndGroupActivities(core.selectedDate, true)
+
+      const syncedRows: ReportRow[] = []
+      for (const [date, activities] of Object.entries(grouped)) {
+        const report = await upsertDailyReport({ date, activities })
+        if (report) {
+          syncedRows.push({
+            date: report.date,
+            masuk: report.masuk || '',
+            pulang: report.pulang || '',
+            ti: report.ti || '',
+            aktivitas: report.aktivitas || '',
+          })
+        }
       }
+
+      applySyncedRows(syncedRows)
+      success('Synced successfully!')
     } catch (err) {
       console.error('Failed to sync:', err)
       error('Failed to sync report data')
@@ -115,62 +120,49 @@ export const useDailyStore = defineStore('daily', () => {
   async function summarizeRow(row: ReportRow) {
     if (!row.aktivitas || row.aktivitas.length < 10) return
     summarizingRows.value[row.date] = true
-    const activities = row.aktivitas
+    const activitiesList = row.aktivitas
       .split(/\n|;/)
       .map((a) => a.trim().replace(/^- /, ''))
       .filter(Boolean)
 
-    currentAbortController = new AbortController()
-
     try {
-      const res = await $fetch<{ success: boolean; summary: string; error?: string }>(
-        '/api/report/daily/summary',
-        {
-          method: 'POST',
-          body: { activities },
-          signal: currentAbortController.signal,
-        },
-      )
-      if (res.success) {
-        row.aktivitas = res.summary
-        // Explicitly save to database
-        await saveActivity(row.date, res.summary)
+      const { generateSummary } = await import('~/utils/ai')
+      const { getDailyPrompt } = await import('~/utils/prompts')
+
+      const prompt = getDailyPrompt(activitiesList)
+      const summary = await generateSummary(prompt, {})
+
+      if (summary) {
+        row.aktivitas = summary
+        await saveActivity(row.date, summary)
         success(`Summary generated for ${row.date}`)
-      } else {
-        error(res.error || 'Failed to generate summary')
       }
     } catch (err: unknown) {
-      if ((err as Error).name === 'AbortError') return
       console.error('Failed to summarize row:', err)
-      error('Failed to connect to AI service')
+      error('Failed to generate summary')
     } finally {
       summarizingRows.value[row.date] = false
-      currentAbortController = null
     }
   }
 
   async function summarizeAll() {
     if (summarizingAll.value) {
       shouldStopSummarizing.value = true
-      currentAbortController?.abort()
       return
     }
 
     summarizingAll.value = true
     shouldStopSummarizing.value = false
 
-    // Get list of rows that need summary at the start
     const rowsToProcess = dailyTable.value.filter(
       (row) => row.aktivitas && row.aktivitas.length > 5 && !summarizingRows.value[row.date],
     )
 
-    const processSequentially = async (index: number) => {
+    async function processSequentially(index: number) {
       if (index >= rowsToProcess.length || shouldStopSummarizing.value) return
-
       const row = rowsToProcess[index]
       if (row) {
         await summarizeRow(row)
-        // Explicitly wait before next to be safe
         await new Promise((resolve) => setTimeout(resolve, 500))
         await processSequentially(index + 1)
       }
@@ -178,14 +170,13 @@ export const useDailyStore = defineStore('daily', () => {
 
     try {
       await processSequentially(0)
-      if (shouldStopSummarizing.value) {
-        success('Summarization stopped')
+      if (!shouldStopSummarizing.value) {
+        success('All rows summarized successfully!')
       } else {
-        success('All available rows summarized!')
+        error('Summarization stopped by user')
       }
     } catch (err) {
-      console.error('Failed to summarize all:', err)
-      error('Error during batch summary')
+      console.error('Failed summarize all:', err)
     } finally {
       summarizingAll.value = false
       shouldStopSummarizing.value = false
@@ -194,79 +185,80 @@ export const useDailyStore = defineStore('daily', () => {
 
   async function deleteActivity(date: string) {
     try {
-      await $fetch('/api/report/daily', {
-        method: 'DELETE',
-        body: { date },
-      })
+      const { deleteDailyReport } = await import('~/queries/reports')
+      await deleteDailyReport(date)
 
       const rowIndex = dailyTable.value.findIndex((r) => r.date === date)
       if (rowIndex !== -1) {
         dailyTable.value.splice(rowIndex, 1)
       }
-
-      success(`Activity removed for ${date}`)
-    } catch {
-      console.error('Failed to delete activity')
+      success(`Activity deleted for ${date}`)
+    } catch (err) {
+      console.error('Failed to delete activity:', err)
       error('Failed to delete activity')
     }
   }
 
-  const openManualEntry = (day: { date: string; dayNum: number }) => {
-    const calendarStore = useCalendarStore()
+  async function openManualEntry(day: { date: string; dayNum: number }) {
+    showManualEntry.value = true
     selectedDayForEntry.value = { date: day.date, dayNum: day.dayNum }
     manualActivityText.value = manualActivitiesMap.value[day.date] || ''
 
-    // Find holiday if exists
+    const { useCalendarStore } = await import('~/stores/calendar')
+    const calendarStore = useCalendarStore()
     const holiday = calendarStore.holidays.find((h) => h.date === day.date)
     isManualHoliday.value = !!holiday
     manualHolidayName.value = holiday ? holiday.name : ''
-
-    showManualEntry.value = true
   }
 
   const saveManualHoliday = async () => {
     if (!selectedDayForEntry.value) return
     try {
-      await $fetch('/api/holidays', {
-        method: 'POST',
-        body: {
+      if (isManualHoliday.value) {
+        const { upsertManualHoliday } = await import('~/queries/calendar')
+        await upsertManualHoliday({
           date: selectedDayForEntry.value.date,
-          name: manualHolidayName.value,
-          is_holiday: isManualHoliday.value,
-        },
-      })
+          name: manualHolidayName.value || 'Manual Holiday',
+          isHoliday: true,
+        })
+      } else {
+        const { deleteHolidayByDate } = await import('~/queries/calendar')
+        await deleteHolidayByDate(selectedDayForEntry.value.date)
+      }
+
+      const { useCalendarStore } = await import('~/stores/calendar')
       const calendarStore = useCalendarStore()
       await calendarStore.fetchHolidays()
     } catch (err) {
       console.error('Failed to save holiday:', err)
-      error('Failed to save holiday')
     }
   }
 
   const saveActivity = async (date: string, aktivitas: string) => {
-    const res = await $fetch<{ success: boolean; report: ReportRow }>('/api/report/daily', {
-      method: 'POST',
-      body: { date, aktivitas },
-    })
+    try {
+      const { upsertDailyReport } = await import('~/utils/reports')
+      const report = await upsertDailyReport({ date, activities: [aktivitas] })
 
-    if (res?.success && res.report) {
-      const updated = res.report
-      const rowIndex = dailyTable.value.findIndex((r) => r.date === date)
-      if (dailyTable.value[rowIndex]) {
-        dailyTable.value[rowIndex].aktivitas = updated.aktivitas
-        dailyTable.value[rowIndex].masuk = updated.masuk
-        dailyTable.value[rowIndex].pulang = updated.pulang
-        dailyTable.value[rowIndex].ti = updated.ti
-      } else {
-        dailyTable.value.push({
-          date: date,
-          masuk: getRandomTime('07:30', '08:00'),
-          pulang: getRandomTime('17:00', '17:30'),
-          ti: updated.ti || '',
-          aktivitas: updated.aktivitas || '',
-        })
-        dailyTable.value.sort((a, b) => a.date.localeCompare(b.date))
+      if (report) {
+        const rowIndex = dailyTable.value.findIndex((r) => r.date === date)
+        if (dailyTable.value[rowIndex]) {
+          dailyTable.value[rowIndex].aktivitas = report.aktivitas || ''
+          dailyTable.value[rowIndex].masuk = report.masuk || ''
+          dailyTable.value[rowIndex].pulang = report.pulang || ''
+          dailyTable.value[rowIndex].ti = report.ti || ''
+        } else {
+          dailyTable.value.push({
+            date: date,
+            masuk: report.masuk || '',
+            pulang: report.pulang || '',
+            ti: report.ti || '',
+            aktivitas: report.aktivitas || '',
+          })
+          dailyTable.value.sort((a, b) => a.date.localeCompare(b.date))
+        }
       }
+    } catch (err) {
+      console.error('Failed to save activity:', err)
     }
   }
 
@@ -281,17 +273,27 @@ export const useDailyStore = defineStore('daily', () => {
   const syncDayActivity = async (date: string) => {
     syncingRows.value[date] = true
     try {
-      const res = await $fetch<{ success: boolean; data: ReportRow; error?: string }>(
-        `/api/report/daily/sync/${date}`,
-      )
-      if (res.success && res.data) {
-        applySyncedRows([res.data])
-        success(`Activity synced for ${date}`)
-      } else {
-        error(res.error || `No activity found for ${date}`)
+      const { fetchAndGroupActivities, upsertDailyReport } = await import('~/utils/reports')
+      const grouped = await fetchAndGroupActivities(date, false)
+
+      if (grouped[date]) {
+        const report = await upsertDailyReport({ date, activities: grouped[date] })
+        if (report) {
+          applySyncedRows([
+            {
+              date: report.date,
+              masuk: report.masuk || '',
+              pulang: report.pulang || '',
+              ti: report.ti || '',
+              aktivitas: report.aktivitas || '',
+            },
+          ])
+          success(`Activity synced for ${date}`)
+          return
+        }
       }
+      error(`No activity found for ${date}`)
     } catch {
-      console.error('Failed to sync day activity')
       error('Failed to sync day activity')
     } finally {
       syncingRows.value[date] = false
@@ -302,16 +304,17 @@ export const useDailyStore = defineStore('daily', () => {
     try {
       return format(parseISO(dateStr), 'HH:mm')
     } catch {
-      return dateStr
+      return ''
     }
   }
 
   const updateRow = async (data: ReportRow | ReportRow[]) => {
     try {
-      await $fetch('/api/report/daily', {
-        method: 'POST',
-        body: data,
-      })
+      const { upsertDailyReport } = await import('~/utils/reports')
+      const rows = Array.isArray(data) ? data : [data]
+      for (const row of rows) {
+        await upsertDailyReport({ date: row.date, activities: [row.aktivitas] })
+      }
     } catch {
       console.error('Failed to update row(s)')
       error('Failed to save changes')

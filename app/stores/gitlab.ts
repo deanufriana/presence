@@ -56,11 +56,14 @@ export const useGitlabStore = defineStore('gitlab', () => {
   }
 
   const fetchGitlabCache = async () => {
-    const res = await $fetch<GitlabCache>('/api/gitlab/cache', {
-      query: { date: core.selectedDate },
-    })
-    if (res.success) {
-      useGitlabStore().setCache(res)
+    try {
+      const { getGitLabCache } = await import('~/utils/gitlab')
+      const res = await getGitLabCache(core.selectedDate)
+      if (res.success) {
+        setCache(res as GitlabCache)
+      }
+    } catch (err) {
+      console.error('Failed to fetch gitlab cache:', err)
     }
   }
 
@@ -71,10 +74,24 @@ export const useGitlabStore = defineStore('gitlab', () => {
     }
     fetchingProjects.value = true
     try {
-      const data = await $fetch<{ projects: { id: number; name: string; path: string }[] }>(
-        '/api/gitlab/projects',
-      )
-      allProjects.value = data.projects || []
+      const { getGitLabProjects } = await import('~/utils/gitlab')
+      const config = {
+        token: core.settings.gitlab_token?.trim() || '',
+        url: core.settings.gitlab_url?.trim() || 'https://gitlab-ce.brilife.co.id',
+      }
+
+      if (!config.token) {
+        error('GitLab Token is empty. Please type your token first.')
+        return
+      }
+
+      const projects = await getGitLabProjects()
+      allProjects.value =
+        projects.map((p) => ({
+          id: p.id,
+          name: p.name,
+          path: p.path_with_namespace,
+        })) || []
     } catch (err) {
       console.error('Failed to fetch projects:', err)
       error('Failed to fetch GitLab projects')

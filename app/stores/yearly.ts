@@ -15,24 +15,20 @@ export const useYearlyStore = defineStore('yearly', () => {
   const fetchingActivities = ref(false)
   const isLoading = ref(false)
 
-  const currentYear = computed(() => core.selectedDate.split('-')[0])
+  const currentYear = computed(() => core.selectedDate.split('-')[0] || '')
 
   async function fetchYearlyData() {
     isLoading.value = true
     try {
-      const res = await $fetch<{ success: boolean; rows: YearlyReportRow[]; summary: string }>(
-        '/api/report/yearly',
-        {
-          query: { year: currentYear.value },
-        },
-      )
-      if (res.success) {
-        yearlyRows.value = res.rows || []
-        yearlyHighlights.value = res.summary || ''
+      const { getYearlyReport } = await import('~/utils/reports')
+      const report = await getYearlyReport(currentYear.value)
+      if (report) {
+        yearlyRows.value = (report.rows as YearlyReportRow[]) || []
+        yearlyHighlights.value = report.summary || ''
       }
     } catch (err: unknown) {
-      const e = err as { data?: { error?: string } }
-      error(e.data?.error || 'Failed to fetch yearly data')
+      console.error('Failed to fetch yearly data:', err)
+      error('Failed to fetch yearly data')
     } finally {
       isLoading.value = false
     }
@@ -41,15 +37,9 @@ export const useYearlyStore = defineStore('yearly', () => {
   async function fetchYearlyActivities() {
     fetchingActivities.value = true
     try {
-      const res = await $fetch<{ success: boolean; months: YearlyActivityMonth[] }>(
-        '/api/report/yearly/activities',
-        {
-          query: { year: currentYear.value },
-        },
-      )
-      if (res.success) {
-        yearlyActivities.value = res.months || []
-      }
+      const { getYearlyActivities } = await import('~/utils/reports')
+      const months = await getYearlyActivities(currentYear.value)
+      yearlyActivities.value = months || []
     } catch (err) {
       console.error('Failed to fetch yearly activities:', err)
     } finally {
@@ -61,24 +51,26 @@ export const useYearlyStore = defineStore('yearly', () => {
     summarizing.value = true
     const loadingToastId = loading('Generating yearly report with AI...')
     try {
-      const res = await $fetch<{
-        success: boolean
-        summary: string
-        rows?: YearlyReportRow[]
-        error?: string
-      }>('/api/report/yearly/summary', {
-        method: 'POST',
-        body: { year: currentYear.value },
+      const { getAllMonthlySummaries, parseYearlyMarkdown, upsertYearlyReport } =
+        await import('~/utils/reports')
+      const { generateSummary } = await import('~/utils/ai')
+      const { getYearlyPrompt } = await import('~/utils/prompts')
+
+      const summaries = await getAllMonthlySummaries(currentYear.value)
+      const prompt = getYearlyPrompt(summaries)
+      const rawContent = await generateSummary(prompt, { max_tokens: 4000, think: true })
+
+      const rows = parseYearlyMarkdown(rawContent)
+      const report = await upsertYearlyReport({
+        year: currentYear.value,
+        summary: rawContent.trim(),
+        rows,
       })
 
-      if (res.success) {
-        yearlyHighlights.value = res.summary || ''
-        if (res.rows && Array.isArray(res.rows)) {
-          yearlyRows.value = res.rows
-        }
+      if (report) {
+        yearlyHighlights.value = report.summary
+        yearlyRows.value = report.rows as YearlyReportRow[]
         success('Yearly report generated!', { id: loadingToastId })
-      } else {
-        error(res.error || 'Failed to generate yearly report', { id: loadingToastId })
       }
     } catch (err: unknown) {
       console.error('Failed to generate AI summary:', err)
@@ -104,12 +96,14 @@ export const useYearlyStore = defineStore('yearly', () => {
   }
 
   watchDebounced(
-    yearlyRows,
-    async (newRows) => {
+    [yearlyRows, yearlyHighlights],
+    async ([newRows, newSummary]) => {
       if (newRows.length >= 0) {
-        await $fetch('/api/report/yearly', {
-          method: 'POST',
-          body: { year: currentYear.value, rows: newRows, summary: yearlyHighlights.value },
+        const { upsertYearlyReport } = await import('~/utils/reports')
+        await upsertYearlyReport({
+          year: currentYear.value,
+          rows: newRows as YearlyReportRow[],
+          summary: newSummary as string,
         })
       }
     },

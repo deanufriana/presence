@@ -37,12 +37,6 @@
             accept=".ics"
             @change="handleCalendarUpload"
           >
-
-          <!-- Sync Button -->
-          <Button variant="gradient" size="sm" :disabled="syncing" @click="confirmSync()">
-            <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': syncing }" />
-            <span class="hidden sm:inline">Sync Activities</span>
-          </Button>
         </div>
       </div>
     </div>
@@ -91,14 +85,12 @@
     <!-- Modals -->
     <SettingsModal v-if="showSettings" v-model="showSettings" />
 
-    <SyncConfirmModal v-if="showConfirmSync" v-model="showConfirmSync" @confirm="executeSync" />
-
     <ManualActivityModal v-if="showManualEntry" v-model="showManualEntry" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { CalendarDays, CalendarRange, Settings, FileText, Upload, RefreshCw } from 'lucide-vue-next'
+import { CalendarDays, CalendarRange, Settings, FileText, Upload } from 'lucide-vue-next'
 import { useScrollLock } from '@vueuse/core'
 import { Button } from '~/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '~/components/ui/tabs'
@@ -118,9 +110,7 @@ const MonthlyReport = defineAsyncComponent(() => import('~/components/report/Mon
 const ManualActivityModal = defineAsyncComponent(
   () => import('~/components/report/ManualActivityModal.vue'),
 )
-const SyncConfirmModal = defineAsyncComponent(
-  () => import('~/components/report/SyncConfirmModal.vue'),
-)
+
 const SettingsModal = defineAsyncComponent(() => import('~/components/report/SettingsModal.vue'))
 
 const coreStore = useCoreStore()
@@ -129,8 +119,7 @@ const { fetchSettings } = coreStore
 const { showSettings, viewMode } = storeToRefs(coreStore)
 
 const dailyStore = useDailyStore()
-const { showConfirmSync, showManualEntry, syncing } = storeToRefs(dailyStore)
-const { executeSync, confirmSync } = dailyStore
+const { showManualEntry } = storeToRefs(dailyStore)
 
 const calendarStore = useCalendarStore()
 const { importingCalendar } = storeToRefs(calendarStore)

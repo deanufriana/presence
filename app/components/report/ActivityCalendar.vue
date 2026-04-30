@@ -259,7 +259,7 @@ const { openManualEntry, deleteActivity, syncDayActivity } = dailyStore
 
 const { calendarBlanks, calendarDays } = storeToRefs(calendarStore)
 const { syncingRows } = storeToRefs(dailyStore)
-const { pending: syncingAll, dateDisplay } = storeToRefs(coreStore)
+const { pending: syncingAll, dateDisplay, selectedDate } = storeToRefs(coreStore)
 
 // ─── Class Helpers ────────────────────────────────
 const getDayContainerClasses = (day: CalendarDay) => {
@@ -322,7 +322,11 @@ const getTooltipPositionClasses = (idx: number) => {
   return 'left-1/2 -translate-x-1/2'
 }
 
-onMounted(() => {
-  fetchAllActivities()
-})
+watch(
+  selectedDate,
+  () => {
+    fetchAllActivities()
+  },
+  { immediate: true },
+)
 </script>

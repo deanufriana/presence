@@ -1,18 +1,3 @@
-import {
-  Document,
-  Packer,
-  Paragraph,
-  TextRun,
-  Table,
-  TableRow,
-  TableCell,
-  WidthType,
-  AlignmentType,
-  UnderlineType,
-  VerticalAlign,
-  BorderStyle,
-} from 'docx'
-import { saveAs } from 'file-saver'
 import { format, parse, getDaysInMonth, isWeekend } from 'date-fns'
 import { id as idLocale } from 'date-fns/locale'
 import { useCalendarStore } from '~/stores/calendar'
@@ -21,13 +6,6 @@ import type { Holiday } from '~/types/holiday'
 
 export function useDocxExport() {
   const exportingDocx = ref(false)
-
-  const tableBorders = {
-    top: { style: BorderStyle.SINGLE, size: 1 },
-    bottom: { style: BorderStyle.SINGLE, size: 1 },
-    left: { style: BorderStyle.SINGLE, size: 1 },
-    right: { style: BorderStyle.SINGLE, size: 1 },
-  }
 
   const getWorkingDays = (year: number, month: number) => {
     const calendarStore = useCalendarStore()
@@ -52,6 +30,59 @@ export function useDocxExport() {
     selectedDateStr: string,
     settings: SettingsData,
   ) {
+    const {
+      Document,
+      Packer,
+      Paragraph,
+      TextRun,
+      Table,
+      TableRow,
+      TableCell,
+      WidthType,
+      AlignmentType,
+      VerticalAlign,
+      BorderStyle,
+    } = await import('docx')
+
+    const tableBorders = {
+      top: { style: BorderStyle.SINGLE, size: 1 },
+      bottom: { style: BorderStyle.SINGLE, size: 1 },
+      left: { style: BorderStyle.SINGLE, size: 1 },
+      right: { style: BorderStyle.SINGLE, size: 1 },
+    }
+
+    function createBASTHeaderCell(text: string, width: number) {
+      return new TableCell({
+        width: { size: width, type: WidthType.PERCENTAGE },
+        children: [
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ text, size: 20 })],
+          }),
+        ],
+        verticalAlign: VerticalAlign.CENTER,
+        borders: tableBorders,
+        shading: { fill: 'F2F2F2' },
+      })
+    }
+
+    function createBASTDataCell(
+      text: string,
+      alignment: (typeof AlignmentType)[keyof typeof AlignmentType],
+    ) {
+      return new TableCell({
+        children: [
+          new Paragraph({
+            alignment: alignment,
+            children: [new TextRun({ text: text || '-', size: 18 })],
+          }),
+        ],
+        verticalAlign: VerticalAlign.CENTER,
+        borders: tableBorders,
+        margins: { left: 50, right: 50, top: 50, bottom: 50 },
+      })
+    }
+
     const parsedDate = parse(selectedDateStr, 'yyyy-MM', new Date())
     const dayName = format(new Date(), 'eeee', { locale: idLocale })
     const dayNum = format(new Date(), 'dd')
@@ -517,46 +548,27 @@ export function useDocxExport() {
       })
 
       const blob = await Packer.toBlob(doc)
-      saveAs(blob, `BAST PEKERJA IT PROJECT - ${settings.user_name} ${monthName} ${yearName}.docx`)
+      const uint8Array = new Uint8Array(await blob.arrayBuffer())
 
-      return true
+      const { save } = await import('@tauri-apps/plugin-dialog')
+      const { writeFile } = await import('@tauri-apps/plugin-fs')
+
+      const filePath = await save({
+        filters: [{ name: 'Word Document', extensions: ['docx'] }],
+        defaultPath: `BAST PEKERJA IT PROJECT - ${settings.user_name} ${monthName} ${yearName}.docx`,
+      })
+
+      if (filePath) {
+        await writeFile(filePath, uint8Array)
+        return true
+      }
+      return false
     } catch (error) {
       console.error('BAST export failed:', error)
       throw error
     } finally {
       exportingDocx.value = false
     }
-  }
-
-  // --- HELPERS ---
-
-  function createBASTHeaderCell(text: string, width: number) {
-    return new TableCell({
-      width: { size: width, type: WidthType.PERCENTAGE },
-      children: [
-        new Paragraph({
-          alignment: AlignmentType.CENTER,
-          children: [new TextRun({ text, size: 20 })],
-        }),
-      ],
-      verticalAlign: VerticalAlign.CENTER,
-      borders: tableBorders,
-      shading: { fill: 'F2F2F2' },
-    })
-  }
-
-  function createBASTDataCell(text: string, alignment: AlignSetting) {
-    return new TableCell({
-      children: [
-        new Paragraph({
-          alignment: alignment,
-          children: [new TextRun({ text: text || '-', size: 18 })],
-        }),
-      ],
-      verticalAlign: VerticalAlign.CENTER,
-      borders: tableBorders,
-      margins: { left: 50, right: 50, top: 50, bottom: 50 },
-    })
   }
 
   async function exportToDocx(
@@ -569,6 +581,151 @@ export function useDocxExport() {
     const yearName = format(parsedDate, 'yyyy')
     exportingDocx.value = true
     try {
+      const {
+        Document,
+        Packer,
+        Paragraph,
+        TextRun,
+        Table,
+        TableRow,
+        TableCell,
+        WidthType,
+        AlignmentType,
+        UnderlineType,
+        VerticalAlign,
+        BorderStyle,
+      } = await import('docx')
+
+      const tableBorders = {
+        top: { style: BorderStyle.SINGLE, size: 1 },
+        bottom: { style: BorderStyle.SINGLE, size: 1 },
+        left: { style: BorderStyle.SINGLE, size: 1 },
+        right: { style: BorderStyle.SINGLE, size: 1 },
+      }
+
+      function createProfileRow(label: string, value: string) {
+        return new TableRow({
+          children: [
+            new TableCell({
+              width: { size: 30, type: WidthType.PERCENTAGE },
+              children: [new Paragraph({ children: [new TextRun({ text: label, size: 24 })] })],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: tableBorders,
+              margins: { left: 100, right: 100 },
+            }),
+            new TableCell({
+              width: { size: 5, type: WidthType.PERCENTAGE },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({ text: ':', size: 24 })],
+                }),
+              ],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: tableBorders,
+            }),
+            new TableCell({
+              width: { size: 65, type: WidthType.PERCENTAGE },
+              children: [new Paragraph({ children: [new TextRun({ text: value, size: 24 })] })],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: tableBorders,
+              margins: { left: 100, right: 100 },
+            }),
+          ],
+        })
+      }
+
+      function createHeaderCell(text: string, width: number, subtext?: string) {
+        const children = [
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [new TextRun({ text, bold: true, size: 24 })],
+          }),
+        ]
+
+        if (subtext) {
+          children.push(
+            new Paragraph({
+              alignment: AlignmentType.LEFT,
+              children: [new TextRun({ text: subtext, size: 18, bold: true })],
+            }),
+          )
+        }
+
+        return new TableCell({
+          width: { size: width, type: WidthType.PERCENTAGE },
+          children,
+          verticalAlign: VerticalAlign.CENTER,
+          borders: tableBorders,
+        })
+      }
+
+      function createDataCell(
+        text: string,
+        alignment: (typeof AlignmentType)[keyof typeof AlignmentType],
+      ) {
+        return new TableCell({
+          children: [
+            new Paragraph({
+              alignment,
+              children: [new TextRun({ text, size: 24 })],
+            }),
+          ],
+          verticalAlign: VerticalAlign.CENTER,
+          borders: tableBorders,
+          margins: { left: 100, right: 100, top: 100, bottom: 100 },
+        })
+      }
+
+      function createSignatureHeaderCell(text: string) {
+        return new TableCell({
+          children: [
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text, bold: true, size: 24 })],
+            }),
+          ],
+          verticalAlign: VerticalAlign.CENTER,
+          borders: {
+            top: { style: BorderStyle.NONE },
+            bottom: { style: BorderStyle.NONE },
+            left: { style: BorderStyle.NONE },
+            right: { style: BorderStyle.NONE },
+          },
+        })
+      }
+
+      function createSignaturePlaceholderCell() {
+        return new TableCell({
+          children: [new Paragraph({ children: [new TextRun({ text: '\n\n\n\n', size: 24 })] })],
+          verticalAlign: VerticalAlign.CENTER,
+          borders: {
+            top: { style: BorderStyle.NONE },
+            bottom: { style: BorderStyle.NONE },
+            left: { style: BorderStyle.NONE },
+            right: { style: BorderStyle.NONE },
+          },
+        })
+      }
+
+      function createSignatureNameCell(name: string) {
+        return new TableCell({
+          children: [
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: `(${name})`, bold: true, size: 24 })],
+            }),
+          ],
+          verticalAlign: VerticalAlign.CENTER,
+          borders: {
+            top: { style: BorderStyle.NONE },
+            bottom: { style: BorderStyle.NONE },
+            left: { style: BorderStyle.NONE },
+            right: { style: BorderStyle.NONE },
+          },
+        })
+      }
+
       const doc = new Document({
         styles: {
           default: {
@@ -713,134 +870,27 @@ export function useDocxExport() {
       })
 
       const blob = await Packer.toBlob(doc)
-      saveAs(blob, `Form Task Job - ${settings.user_name}.docx`)
+      const uint8Array = new Uint8Array(await blob.arrayBuffer())
 
-      return true
+      const { save } = await import('@tauri-apps/plugin-dialog')
+      const { writeFile } = await import('@tauri-apps/plugin-fs')
+
+      const filePath = await save({
+        filters: [{ name: 'Word Document', extensions: ['docx'] }],
+        defaultPath: `Form Task Job - ${settings.user_name}.docx`,
+      })
+
+      if (filePath) {
+        await writeFile(filePath, uint8Array)
+        return true
+      }
+      return false
     } catch (error) {
       console.error('Docx export failed:', error)
       throw error
     } finally {
       exportingDocx.value = false
     }
-  }
-
-  // --- HELPERS ---
-
-  function createProfileRow(label: string, value: string) {
-    return new TableRow({
-      children: [
-        new TableCell({
-          width: { size: 30, type: WidthType.PERCENTAGE },
-          children: [new Paragraph({ children: [new TextRun({ text: label, size: 24 })] })],
-          verticalAlign: VerticalAlign.CENTER,
-          borders: tableBorders,
-          margins: { left: 100, right: 100 },
-        }),
-        new TableCell({
-          width: { size: 5, type: WidthType.PERCENTAGE },
-          children: [
-            new Paragraph({
-              alignment: AlignmentType.CENTER,
-              children: [new TextRun({ text: ':', size: 24 })],
-            }),
-          ],
-          verticalAlign: VerticalAlign.CENTER,
-          borders: tableBorders,
-        }),
-        new TableCell({
-          width: { size: 65, type: WidthType.PERCENTAGE },
-          children: [new Paragraph({ children: [new TextRun({ text: value, size: 24 })] })],
-          verticalAlign: VerticalAlign.CENTER,
-          borders: tableBorders,
-          margins: { left: 100, right: 100 },
-        }),
-      ],
-    })
-  }
-
-  function createHeaderCell(text: string, width: number, subtext?: string) {
-    const children = [
-      new Paragraph({
-        alignment: AlignmentType.CENTER,
-        children: [new TextRun({ text, bold: true, size: 24 })],
-      }),
-    ]
-
-    if (subtext) {
-      children.push(
-        new Paragraph({
-          alignment: AlignmentType.LEFT,
-          children: [new TextRun({ text: subtext, size: 18, bold: true })],
-        }),
-      )
-    }
-
-    return new TableCell({
-      width: { size: width, type: WidthType.PERCENTAGE },
-      children,
-      verticalAlign: VerticalAlign.CENTER,
-      borders: tableBorders,
-    })
-  }
-
-  function createDataCell(text: string, alignment: AlignSetting) {
-    return new TableCell({
-      children: [
-        new Paragraph({
-          alignment,
-          children: [new TextRun({ text, size: 24 })],
-        }),
-      ],
-      verticalAlign: VerticalAlign.CENTER,
-      borders: tableBorders,
-      margins: { left: 100, right: 100, top: 100, bottom: 100 },
-    })
-  }
-
-  function createSignatureHeaderCell(text: string) {
-    return new TableCell({
-      children: [
-        new Paragraph({
-          alignment: AlignmentType.CENTER,
-          children: [new TextRun({ text, bold: true, size: 24 })],
-        }),
-      ],
-      verticalAlign: VerticalAlign.CENTER,
-      borders: tableBorders,
-    })
-  }
-
-  function createSignaturePlaceholderCell() {
-    return new TableCell({
-      children: [
-        new Paragraph({
-          alignment: AlignmentType.CENTER,
-          children: [new TextRun({ text: '\n\n\n\n', size: 24 })],
-        }),
-      ],
-      verticalAlign: VerticalAlign.CENTER,
-      borders: tableBorders,
-    })
-  }
-
-  function createSignatureNameCell(text: string) {
-    return new TableCell({
-      children: [
-        new Paragraph({
-          alignment: AlignmentType.CENTER,
-          children: [
-            new TextRun({
-              text,
-              bold: true,
-              size: 24,
-              underline: { type: UnderlineType.SINGLE },
-            }),
-          ],
-        }),
-      ],
-      verticalAlign: VerticalAlign.CENTER,
-      borders: tableBorders,
-    })
   }
 
   return {

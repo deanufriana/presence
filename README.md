@@ -1,38 +1,36 @@
 # Presence 🚀
 
-Presence is an AI-powered attendance and activity reporting system designed to automate the generation of daily and monthly reports by syncing with GitLab activity and Calendar events.
+Presence is a cross-platform desktop application powered by **Tauri** and **Nuxt**, designed to automate the generation of attendance and activity reports by syncing with GitLab activity, Jira, and Calendar events.
 
 ## ✨ Features
 
-- 🔄 **GitLab Sync**: Automatically fetch commits and merge requests from multiple projects.
+- 🖥️ **Desktop Native**: Fast and lightweight desktop app built with Tauri.
+- 🔄 **GitLab & Jira Sync**: Automatically fetch commits, merge requests, and Jira issues.
 - 📅 **Calendar Integration**: Import `.ics` calendar files to track meetings and events.
 - 🤖 **AI Summary**: Automatically summarize your daily activities using **Google Gemini**, **OpenAI**, or local **Ollama** models.
-- ⚡ **Sequential Batch Summary**: Generate summaries for the entire month with one click, processed sequentially to ensure stability for local LLMs.
-- 📊 **Report Generation**: Generate structured daily and monthly reports with ease.
-- 🌙 **Modern UI**: Clean, responsive dashboard built with Nuxt 4, Tailwind CSS 4, and highly customized Shadcn components.
+- ⚡ **Sequential Batch Summary**: Generate summaries for the entire month with one click, optimized for local LLM stability.
+- 📊 **Report Generation**: Generate structured daily, monthly, and yearly reports (Excel & Word).
+- 🌙 **Modern UI**: Clean, responsive dashboard built with Nuxt 4, Tailwind CSS 4, and Shadcn Vue.
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Nuxt 4](https://nuxt.com/) (Vue 3.5+)
+- **Frontend**: [Nuxt 4](https://nuxt.com/) (Vue 3.5+)
+- **Desktop Bridge**: [Tauri v2](https://tauri.app/) (Rust)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **Components**: [Shadcn Vue](https://www.shadcn-vue.com/) with custom design variants
-- **Database & ORM**: [Prisma](https://www.prisma.io/) with SQLite
+- **Components**: [Shadcn Vue](https://www.shadcn-vue.com/)
+- **Database**: [SQLite](https://sqlite.org/) via [Tauri SQL Plugin](https://github.com/tauri-apps/plugins-workspace)
+- **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
 - **State Management**: [Pinia](https://pinia.vuejs.org/)
-- **AI Integration**:
-  - [Google Gemini](https://ai.google.dev/)
-  - [OpenAI](https://openai.com/)
-  - [Ollama](https://ollama.com/) (Local LLMs like Gemma, DeepSeek, etc.)
+- **AI Integration**: Google Gemini, OpenAI, Ollama (Local)
 
 ## 🚀 Getting Started
-
-Follow these steps to get the project up and running on your local machine.
 
 ### 1. Prerequisites
 
 Make sure you have the following installed:
 
-- [Node.js](https://nodejs.org/) (v18.x or later)
-- [npm](https://www.npmjs.com/) or [pnpm](https://pnpm.io/)
+- [Node.js](https://nodejs.org/) (v20.x or later)
+- [Rust](https://www.rust-lang.org/tools/install) (required for Tauri)
 - [Ollama](https://ollama.com/) (optional, for local AI)
 
 ### 2. Installation
@@ -47,59 +45,39 @@ npm install
 
 ### 3. Environment Setup
 
-Copy the example environment file and adjust the settings if necessary:
+Copy the example environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-By default, the project uses a local SQLite database:
+### 4. Running the Application
 
-```env
-DATABASE_URL="file:./prisma/dev.db"
-```
-
-### 4. Database Initialization
-
-Run Prisma migrations to set up your database schema:
+Start the application in development mode:
 
 ```bash
-npx prisma migrate dev --name init
+npm run dev:tauri
 ```
 
-### 5. Running the Application
+This will launch the Nuxt development server and the Tauri window.
 
-Start the development server:
+### 5. Building for Production
+
+To build the standalone executable:
 
 ```bash
-npm run dev
+npm run build:tauri
 ```
 
-The application will be available at `http://localhost:3000`.
+The compiled binaries will be located in `src-tauri/target/release/bundle`.
 
 ## ⚙️ Configuration
 
-Once the app is running, navigate to the **Settings** modal in the dashboard to configure:
+Once the app is running, navigate to the **Settings** modal to configure:
 
-1.  **GitLab Connection**:
-    - `GitLab URL`: Your GitLab instance URL (default: `https://gitlab.com`).
-    - `GitLab Token`: Your Personal Access Token.
-2.  **AI Provider**:
-    - **Gemini**: Enter your Google AI Studio API Key.
-    - **OpenAI**: Enter your OpenAI API Key.
-    - **Ollama**: Connect to a local Ollama instance (default: `http://localhost:11434`). It will automatically fetch your downloaded models (e.g., `gemma:latest`, `deepseek-r1:latest`).
-3.  **Project Selection**:
-    - Select which GitLab projects you want to sync activity from.
-
-## 📖 Usage
-
-1.  **Sync Activities**: Click the **Sync Activities** button to fetch latest data from GitLab.
-2.  **Import Calendar**: Use the **Import Calendar** button to upload your `.ics` file.
-3.  **Generate Reports**:
-    - **Individual**: Click the Sparkle icon on any day to summarize that specific day.
-    - **Batch (Summarize All)**: Click the **Summarize All** button in the Daily Report header. It will process all days in the month sequentially with a short breather between requests to handle local LLM processing smoothly.
-4.  **Month Picker**: Use the refactored Month Picker component to quickly navigate between months.
-5.  **Edit & Save**: You can manually edit any field before saving the report to the database.
+1.  **Integrations**: GitLab Token, Jira Host/Email/Token.
+2.  **AI Provider**: API Keys for Gemini/OpenAI or Ollama endpoint.
+3.  **Project Selection**: Select which GitLab projects to sync activity from.
 
 ## 📄 License
 

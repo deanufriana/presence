@@ -11,9 +11,8 @@ export const useJiraStore = defineStore('jira', () => {
   async function fetchJiraCache() {
     const coreStore = useCoreStore()
     try {
-      const res = await $fetch<JiraCache>('/api/jira/cache', {
-        query: { date: coreStore.selectedDate },
-      })
+      const { getJiraCache } = await import('~/utils/jira')
+      const res = await getJiraCache(coreStore.selectedDate)
       if (res.success) {
         setCache(res)
       }

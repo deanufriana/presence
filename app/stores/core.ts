@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia'
 import { format, addMonths, subMonths, addYears, subYears, parse } from 'date-fns'
 import { useToast } from '~/composables/use-toast'
-import type { SettingsData, GitlabCache, JiraCache  } from '~/types/report'
+import type { SettingsData } from '~/types/report'
 import { useGitlabStore } from '~/stores/gitlab'
 import { useJiraStore } from '~/stores/jira'
+import { useCalendarStore } from '~/stores/calendar'
+import { id } from 'date-fns/locale'
 
 export const useCoreStore = defineStore('core', () => {
   const { success, error } = useToast()
@@ -19,12 +21,12 @@ export const useCoreStore = defineStore('core', () => {
 
   const settings = ref<SettingsData>({
     gitlab_token: '',
-    gitlab_url: 'https://gitlab.com',
+    gitlab_url: 'https://gitlab-ce.brilife.co.id',
     gitlab_selected_projects: '',
     jira_token: '',
     jira_url: '',
     jira_email: '',
-    ai_api_key: '',
+    gemini_api_key: '',
     openai_api_key: '',
     ai_provider: 'gemini',
     ai_model: 'gemini-2.0-flash-lite',
@@ -45,7 +47,7 @@ export const useCoreStore = defineStore('core', () => {
   const isAiEnabled = computed(
     () =>
       !!(
-        settings.value.ai_api_key ||
+        settings.value.gemini_api_key ||
         settings.value.openai_api_key ||
         settings.value.ai_provider === 'ollama'
       ),
@@ -54,7 +56,16 @@ export const useCoreStore = defineStore('core', () => {
   const dateDisplay = computed(() => {
     try {
       const d = parse(selectedDate.value, 'yyyy-MM', new Date())
-      return format(d, 'MMMM yyyy')
+      return format(d, 'MMMM yyyy', { locale: id })
+    } catch {
+      return selectedDate.value
+    }
+  })
+
+  const formatMonth = computed(() => {
+    try {
+      const d = parse(selectedDate.value, 'yyyy-MM', new Date())
+      return format(d, 'MMMM', { locale: id })
     } catch {
       return selectedDate.value
     }
@@ -76,11 +87,11 @@ export const useCoreStore = defineStore('core', () => {
         ...settings.value,
         gitlab_selected_projects: selectedProjectIds.value.join(','),
       }
-      await $fetch('/api/settings', {
-        method: 'POST',
-        body: payload,
-      })
-      settings.value = payload
+
+      const { upsertSettingsBatch } = await import('~/queries/settings')
+      await upsertSettingsBatch(payload as Record<string, string>)
+
+      settings.value = payload as SettingsData
       success('Settings saved successfully')
       showSettings.value = false
     } catch (err) {
@@ -92,12 +103,21 @@ export const useCoreStore = defineStore('core', () => {
   }
 
   async function fetchSettings() {
-    const data = await $fetch<Partial<SettingsData>>('/api/settings')
-    if (data) {
-      settings.value = { ...settings.value, ...data }
-      if (settings.value.gitlab_selected_projects) {
-        selectedProjectIds.value = settings.value.gitlab_selected_projects.split(',').map(Number)
+    try {
+      const { fetchAllSettings } = await import('~/queries/settings')
+      const data = await fetchAllSettings()
+
+      if (Object.keys(data).length > 0) {
+        settings.value = { ...settings.value, ...data }
+        if (settings.value.gitlab_selected_projects) {
+          selectedProjectIds.value = settings.value.gitlab_selected_projects
+            .split(',')
+            .map((id: string) => parseInt(id))
+            .filter((id: number) => !isNaN(id))
+        }
       }
+    } catch (err) {
+      console.error('Failed to fetch settings:', err)
     }
   }
 
@@ -108,8 +128,6 @@ export const useCoreStore = defineStore('core', () => {
 
   function prevMonth() {
     const current = parse(selectedDate.value, 'yyyy-MM', new Date())
-    // Basic validation to prevent going too far back if needed,
-    // but the picker will handle the strict "not before current month" rule.
     selectedDate.value = format(subMonths(current, 1), 'yyyy-MM')
   }
 
@@ -126,17 +144,17 @@ export const useCoreStore = defineStore('core', () => {
   async function syncAllActivities(force = true) {
     pending.value = true
     try {
-      const res = await $fetch<{ success: boolean; gitlab: GitlabCache; jira: JiraCache }>(
-        `/api/activities/${selectedDate.value}`,
-        {
-          query: { force: force ? 'true' : 'false' },
-        },
-      )
-      if (res.success) {
-        useGitlabStore().setCache(res.gitlab)
-        useJiraStore().setCache(res.jira)
-        success('Activities synced successfully')
-      }
+      const { syncGitLabEvents } = await import('~/utils/gitlab')
+      const { syncJiraActivities } = await import('~/utils/jira')
+
+      const [gitlab, jira] = await Promise.all([
+        syncGitLabEvents(selectedDate.value, force),
+        syncJiraActivities(selectedDate.value, force),
+      ])
+
+      useGitlabStore().setCache(gitlab)
+      useJiraStore().setCache(jira)
+      success('Activities synced successfully')
     } catch (err) {
       console.error('Failed to sync activities:', err)
       error('Failed to sync activities')
@@ -168,6 +186,7 @@ export const useCoreStore = defineStore('core', () => {
     initialLoading,
     isInitialized,
     pending,
+    formatMonth,
     copied,
     settings,
     isAiEnabled,

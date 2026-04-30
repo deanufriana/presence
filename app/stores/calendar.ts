@@ -37,22 +37,48 @@ export const useCalendarStore = defineStore('calendar', () => {
     const calEvents = Array.isArray(calendarData.value?.events) ? calendarData.value.events : []
     const jiraEvents = Array.isArray(jiraStore.jiraData?.events) ? jiraStore.jiraData.events : []
 
+    // Pre-group events by date for O(N + M) efficiency
+    const gitlabByDate: Record<string, GitLabEvent[]> = {}
+    gitlabEvents.forEach((ev) => {
+      const date = ev.created_at?.split('T')[0]
+      if (date) {
+        if (!gitlabByDate[date]) gitlabByDate[date] = []
+        gitlabByDate[date].push(ev)
+      }
+    })
+
+    const calByDate: Record<string, CalendarEvent[]> = {}
+    calEvents.forEach((ev) => {
+      const date = ev.date
+      if (date) {
+        if (!calByDate[date]) calByDate[date] = []
+        calByDate[date].push(ev)
+      }
+    })
+
+    const jiraByDate: Record<string, JiraEvent[]> = {}
+    jiraEvents.forEach((ev) => {
+      const date = ev.updated_at?.split('T')[0]
+      if (date) {
+        if (!jiraByDate[date]) jiraByDate[date] = []
+        jiraByDate[date].push(ev)
+      }
+    })
+
+    const holidayByDate: Record<string, Holiday> = {}
+    holidays.value.forEach((h) => {
+      if (h.date) {
+        holidayByDate[h.date] = h
+      }
+    })
+
     for (let i = 1; i <= count; i++) {
       const dayDate = format(new Date(d.getFullYear(), d.getMonth(), i), 'yyyy-MM-dd')
 
-      const dayGitlabEvents = gitlabEvents.filter((ev: GitLabEvent) => {
-        if (!ev.created_at) return false
-        return ev.created_at.startsWith(dayDate)
-      })
-
-      const dayCalendarEvents = calEvents.filter((ev: CalendarEvent) => ev.date === dayDate)
-
-      const dayJiraEvents = jiraEvents.filter((ev: JiraEvent) => {
-        if (!ev.updated_at) return false
-        return ev.updated_at.startsWith(dayDate)
-      })
-
-      const dayHoliday = holidays.value.find((h: Holiday) => h.date === dayDate)
+      const dayGitlabEvents = gitlabByDate[dayDate] || []
+      const dayCalendarEvents = calByDate[dayDate] || []
+      const dayJiraEvents = jiraByDate[dayDate] || []
+      const dayHoliday = holidayByDate[dayDate]
 
       days.push({
         dayNum: i,
@@ -82,11 +108,9 @@ export const useCalendarStore = defineStore('calendar', () => {
         return
       }
 
-      await $fetch('/api/calendar/cache', {
-        method: 'POST',
-        body: { date: core.selectedDate, events },
-      })
-      calendarData.value = { success: true, events, date: core.selectedDate, cached: true }
+      const { upsertCalendarCache } = await import('~/utils/calendar')
+      const data = await upsertCalendarCache(core.selectedDate, events)
+      calendarData.value = data as CalendarCache
 
       success(`Successfully imported ${events.length} events!`, { id: loadingToastId })
     } catch (err) {
@@ -99,10 +123,9 @@ export const useCalendarStore = defineStore('calendar', () => {
 
   const fetchCalendarEvents = async () => {
     try {
-      const data = await $fetch<CalendarCache>('/api/calendar/cache', {
-        query: { date: core.selectedDate },
-      })
-      calendarData.value = data
+      const { getCalendarCache } = await import('~/utils/calendar')
+      const data = await getCalendarCache(core.selectedDate)
+      calendarData.value = data as CalendarCache
     } catch (err) {
       console.error('Failed to fetch calendar events:', err)
     }
@@ -113,13 +136,11 @@ export const useCalendarStore = defineStore('calendar', () => {
     fetchingHolidays.value = true
     try {
       const [year, month] = core.selectedDate.split('-')
-      if (!month) {
-        return
-      }
-      const data = await $fetch<Holiday[]>('/api/holidays', {
-        query: { year, month: parseInt(month) },
-      })
-      holidays.value = Array.isArray(data) ? data : []
+      if (!year || !month) return
+
+      const { fetchHolidays: fetchHolidaysUtil } = await import('~/utils/calendar')
+      const data = await fetchHolidaysUtil(year, parseInt(month))
+      holidays.value = (data as Holiday[]) || []
     } catch (err) {
       console.error('Failed to fetch holidays:', err)
     } finally {

@@ -16,19 +16,15 @@ export const useMonthlyStore = defineStore('monthly', () => {
   async function fetchMonthlyReport() {
     isLoading.value = true
     try {
-      const res = await $fetch<{
-        success: boolean
-        report: { rows: MonthlyReportRow[]; summary: string }
-      }>('/api/report/monthly', {
-        query: { month: core.selectedDate },
-      })
-      if (res?.success && res.report) {
-        monthlyRows.value = res.report.rows || []
-        monthlyHighlights.value = res.report.summary || ''
+      const { getMonthlyReport } = await import('~/utils/reports')
+      const report = await getMonthlyReport(core.selectedDate)
+      if (report) {
+        monthlyRows.value = (report.rows as MonthlyReportRow[]) || []
+        monthlyHighlights.value = report.summary || ''
       }
     } catch (err: unknown) {
-      const e = err as { data?: { error?: string } }
-      error(e.data?.error || 'Failed to fetch monthly report')
+      console.error('Failed to fetch monthly report:', err)
+      error('Failed to fetch monthly report')
     } finally {
       isLoading.value = false
     }
@@ -38,24 +34,35 @@ export const useMonthlyStore = defineStore('monthly', () => {
     summarizing.value = true
     const loadingToastId = loading('Generating monthly report with AI...')
     try {
-      const res = await $fetch<{
-        success: boolean
-        summary: string
-        rows?: MonthlyReportRow[]
-        error?: string
-      }>('/api/report/monthly/summary', {
-        method: 'POST',
-        body: { month: core.selectedDate },
+      const { getDailyReports, parseMonthlyMarkdown, upsertMonthlyReport } =
+        await import('~/utils/reports')
+      const { generateSummary } = await import('~/utils/ai')
+      const { getMonthlyPrompt } = await import('~/utils/prompts')
+
+      const dailyReports = await getDailyReports(core.selectedDate)
+      const activities = dailyReports
+        .map((r) => `[Date: ${r.date}] ${r.aktivitas}`)
+        .filter((act): act is string => !!act && act.length > 5)
+
+      if (activities.length === 0) {
+        error('No activities found for this month', { id: loadingToastId })
+        return
+      }
+
+      const prompt = getMonthlyPrompt(activities)
+      const rawContent = await generateSummary(prompt, { max_tokens: 3000, think: true })
+
+      const rows = parseMonthlyMarkdown(rawContent)
+      const report = await upsertMonthlyReport({
+        month: core.selectedDate,
+        summary: rawContent.trim(),
+        rows,
       })
 
-      if (res.success) {
-        monthlyHighlights.value = res.summary || ''
-        if (res.rows && Array.isArray(res.rows)) {
-          monthlyRows.value = res.rows
-        }
+      if (report) {
+        monthlyHighlights.value = report.summary
+        monthlyRows.value = report.rows as MonthlyReportRow[]
         success('Monthly report and table generated!', { id: loadingToastId })
-      } else {
-        error(res.error || 'Failed to generate monthly report', { id: loadingToastId })
       }
     } catch (err: unknown) {
       console.error('Failed to generate AI summary:', err)
@@ -80,12 +87,14 @@ export const useMonthlyStore = defineStore('monthly', () => {
   }
 
   watchDebounced(
-    monthlyRows,
-    async (newRows) => {
+    [monthlyRows, monthlyHighlights],
+    async ([newRows, newSummary]) => {
       if (newRows.length >= 0) {
-        await $fetch('/api/report/monthly', {
-          method: 'POST',
-          body: { month: core.selectedDate, rows: newRows, summary: monthlyHighlights.value },
+        const { upsertMonthlyReport } = await import('~/utils/reports')
+        await upsertMonthlyReport({
+          month: core.selectedDate,
+          rows: newRows as MonthlyReportRow[],
+          summary: newSummary as string,
         })
       }
     },
