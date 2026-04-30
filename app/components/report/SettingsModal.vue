@@ -502,9 +502,7 @@ watch(
 )
 
 onMounted(() => {
-  fetchProjects()
-  if (settings.value?.ai_provider === 'ollama') {
-    fetchOllamaModels()
-  }
+  if (settings.value?.gitlab_token) fetchProjects()
+  if (settings.value?.ai_provider === 'ollama') fetchOllamaModels()
 })
 </script>
