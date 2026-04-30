@@ -142,8 +142,8 @@ export const useCoreStore = defineStore('core', () => {
         syncJiraActivities(selectedDate.value, force),
       ])
 
-      useGitlabStore().setCache(gitlab as never)
-      useJiraStore().setCache(jira as never)
+      useGitlabStore().setCache(gitlab)
+      useJiraStore().setCache(jira)
       success('Activities synced successfully')
     } catch (err) {
       console.error('Failed to sync activities:', err)

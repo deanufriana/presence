@@ -90,7 +90,12 @@ ${activities.join('\n')}
 </activities>
 `
 
-export const getYearlyPrompt = (monthlySummaries: string[]) => `
+export const getYearlyPrompt = (
+  summaries: {
+    period: string
+    summary: string | null
+  }[],
+) => `
 Kamu adalah Senior Technical Report Writer yang ahli dalam merangkum laporan tahunan IT.
 
 Tugas:
@@ -135,6 +140,6 @@ Aturan Konten & Sintesis:
 </example>
 
 <monthly_summaries>
-${monthlySummaries.join('\n\n---\n\n')}
+${summaries.join('\n\n---\n\n')}
 </monthly_summaries>
 `

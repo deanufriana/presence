@@ -11,7 +11,12 @@
           </CardTitle>
           <CardDescription class="mt-1">Daily attendance and activity log</CardDescription>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-2">
+          <Button variant="gradient" size="xs" :disabled="syncing" @click="confirmSync()">
+            <RefreshCw class="h-3.5 w-3.5" :class="{ 'animate-spin': syncing }" />
+            <span class="hidden sm:inline">Sync Activities</span>
+          </Button>
+
           <Button
             v-if="isAiEnabled && dailyTable.some((r) => r.aktivitas && r.aktivitas.length > 5)"
             :variant="summarizingAll ? 'destructive' : 'ai'"
@@ -198,6 +203,7 @@
         </template>
       </DataTable>
     </CardContent>
+    <SyncConfirmModal v-if="showConfirmSync" v-model="showConfirmSync" @confirm="executeSync" />
   </Card>
 </template>
 
@@ -224,16 +230,29 @@ import { useCalendarStore } from '~/stores/calendar'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~/components/ui/card'
 import { DataTable } from '~/components/ui/data-table'
 
+const SyncConfirmModal = defineAsyncComponent(
+  () => import('~/components/report/SyncConfirmModal.vue'),
+)
+
 const coreStore = useCoreStore()
 const dailyStore = useDailyStore()
 const calendarStore = useCalendarStore()
 const { success } = useToast()
 
 const { isAiEnabled, selectedDate } = storeToRefs(coreStore)
-const { dailyTable, summarizingRows, syncingRows, summarizingAll, isLoading } =
-  storeToRefs(dailyStore)
+const {
+  dailyTable,
+  summarizingRows,
+  syncingRows,
+  summarizingAll,
+  isLoading,
+  syncing,
+  showConfirmSync,
+} = storeToRefs(dailyStore)
 
 const {
+  confirmSync,
+  executeSync,
   summarizeRow,
   summarizeAll,
   openManualEntry,

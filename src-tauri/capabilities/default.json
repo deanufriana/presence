@@ -30,6 +30,9 @@
         },
         {
           "url": "http://localhost:11434/*"
+        },
+        {
+          "url": "https://libur.deno.dev/*"
         }
       ]
     },

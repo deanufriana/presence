@@ -14,7 +14,7 @@ export const useJiraStore = defineStore('jira', () => {
       const { getJiraCache } = await import('~/utils/jira')
       const res = await getJiraCache(coreStore.selectedDate)
       if (res.success) {
-        setCache(res as JiraCache)
+        setCache(res)
       }
     } catch (error) {
       console.error('Failed to fetch jira cache:', error)

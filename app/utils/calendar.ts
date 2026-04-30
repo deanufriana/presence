@@ -32,15 +32,18 @@ export async function fetchHolidays(year: string, month: number) {
 
   const { fetch } = await import('@tauri-apps/plugin-http')
   try {
-    const response = await fetch(`https://api-harilibur.vercel.app/api?year=${year}&month=${month}`)
+    const response = await fetch(`https://libur.deno.dev/api?year=${year}&month=${month}`)
     if (response.ok) {
       const data = (await response.json()) as {
-        holiday_date: string
-        holiday_name: string
-        is_holiday: boolean
+        date: string
+        name: string
       }[]
       for (const h of data) {
-        await upsertHoliday(h)
+        await upsertHoliday({
+          holiday_date: h.date,
+          holiday_name: h.name,
+          is_holiday: true,
+        })
       }
     }
   } catch (err) {
