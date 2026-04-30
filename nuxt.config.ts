@@ -3,12 +3,21 @@ import tailwindcss from '@tailwindcss/vite'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   app: {
+    baseURL: '/',
     head: {
       title: 'Presence',
       link: [{ rel: 'icon', type: 'image/png', href: '/favicon.ico' }],
     },
   },
   ssr: false,
+  router: {
+    options: {
+      hashMode: true,
+    },
+  },
+  experimental: {
+    payloadExtraction: false,
+  },
   css: ['~/assets/css/main.css'],
   devtools: { enabled: true },
   vite: {
