@@ -1,10 +1,4 @@
-import {
-  getCalendarEventsByMonth,
-  deleteCalendarEventsByMonth,
-  insertCalendarEvent,
-  getHolidaysByMonth,
-  upsertHoliday,
-} from '~/queries/calendar'
+import { getCalendarEventsByMonth, getHolidaysByMonth, upsertHoliday } from '~/queries/calendar'
 
 import type { CalendarEvent } from '~/types/report'
 
@@ -16,15 +10,18 @@ export async function getCalendarCache(month: string) {
 }
 
 export async function upsertCalendarCache(date: string, events: CalendarEvent[]) {
+  const { deleteCalendarEventsByMonth, insertCalendarEvents } = await import('~/queries/calendar')
   await deleteCalendarEventsByMonth(date)
 
-  for (const event of events) {
-    await insertCalendarEvent({
-      date: event.date,
-      summary: event.summary || '',
-      startTime: event.startTime,
-      endTime: event.endTime,
-    })
+  if (events.length > 0) {
+    await insertCalendarEvents(
+      events.map((event) => ({
+        date: event.date,
+        summary: event.summary || '',
+        startTime: event.startTime,
+        endTime: event.endTime,
+      })),
+    )
   }
   return await getCalendarCache(date)
 }

@@ -34,8 +34,13 @@ async function generateGemini(prompt: string, options: AiOptions) {
   })
   if (!apiKey?.value) throw new Error('Gemini API Key not set')
 
+  const modelSetting = await db.query.settings.findFirst({
+    where: eq(schema.settings.key, 'ai_model'),
+  })
+  const model = modelSetting?.value || 'gemini-2.0-flash'
+
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey.value}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.value}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -62,6 +67,11 @@ async function generateOpenAi(prompt: string, options: AiOptions) {
   })
   if (!apiKey?.value) throw new Error('OpenAI API Key not set')
 
+  const modelSetting = await db.query.settings.findFirst({
+    where: eq(schema.settings.key, 'ai_model'),
+  })
+  const model = modelSetting?.value || 'gpt-4o'
+
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -69,7 +79,7 @@ async function generateOpenAi(prompt: string, options: AiOptions) {
       Authorization: `Bearer ${apiKey.value}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model,
       messages: [{ role: 'user', content: prompt }],
       max_tokens: options.max_tokens || 2048,
       temperature: options.temperature || 0.7,
@@ -86,7 +96,7 @@ async function generateOllama(prompt: string, options: AiOptions) {
     where: eq(schema.settings.key, 'ollama_url'),
   })
   const modelSetting = await db.query.settings.findFirst({
-    where: eq(schema.settings.key, 'ollama_model'),
+    where: eq(schema.settings.key, 'ai_model'),
   })
 
   const baseUrl = urlSetting?.value || 'http://localhost:11434'

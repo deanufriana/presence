@@ -88,17 +88,19 @@ export async function upsertMonthlyReport(
 
   if (Array.isArray(rows)) {
     await db.delete(schema.monthlyReports).where(eq(schema.monthlyReports.month, month))
-    for (const row of rows) {
-      await db.insert(schema.monthlyReports).values({
-        month,
-        project: row.project,
-        progres: row.progres,
-        done: row.done,
-        status: row.status,
-        sources: row.sources ? JSON.stringify(row.sources) : null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
+    if (rows.length > 0) {
+      await db.insert(schema.monthlyReports).values(
+        rows.map((row) => ({
+          month,
+          project: row.project,
+          progres: row.progres,
+          done: row.done,
+          status: row.status,
+          sources: row.sources ? JSON.stringify(row.sources) : null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })),
+      )
     }
   }
   return await getMonthlyReport(month)
@@ -142,18 +144,20 @@ export async function upsertYearlyReport(year: string, summary?: string, rows?: 
 
   if (Array.isArray(rows)) {
     await db.delete(schema.yearlyReports).where(eq(schema.yearlyReports.year, year))
-    for (const row of rows) {
-      await db.insert(schema.yearlyReports).values({
-        year,
-        tanggal: row.tanggal,
-        month: row.month,
-        task: row.task,
-        deliverable: row.deliverable,
-        status: row.status,
-        keterangan: row.keterangan,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
+    if (rows.length > 0) {
+      await db.insert(schema.yearlyReports).values(
+        rows.map((row) => ({
+          year,
+          tanggal: row.tanggal,
+          month: row.month,
+          task: row.task,
+          deliverable: row.deliverable,
+          status: row.status,
+          keterangan: row.keterangan,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })),
+      )
     }
   }
   return await getYearlyReport(year)

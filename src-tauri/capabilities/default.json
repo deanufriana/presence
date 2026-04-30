@@ -11,25 +11,25 @@
       "identifier": "http:default",
       "allow": [
         {
-          "url": "https://api-harilibur.vercel.app/api"
+          "url": "https://api-harilibur.vercel.app/api*"
         },
         {
-          "url": "https://generativelanguage.googleapis.com"
+          "url": "https://generativelanguage.googleapis.com/*"
         },
         {
-          "url": "https://api.openai.com"
+          "url": "https://api.openai.com/*"
         },
         {
-          "url": "https://gitlab.com"
+          "url": "https://gitlab.com/*"
         },
         {
-          "url": "https://gitlab-ce.brilife.co.id"
+          "url": "https://gitlab-ce.brilife.co.id/*"
         },
         {
-          "url": "https://brilife.atlassian.net"
+          "url": "https://brilife.atlassian.net/*"
         },
         {
-          "url": "http://localhost:11434"
+          "url": "http://localhost:11434/*"
         }
       ]
     },

@@ -13,12 +13,7 @@
     <PopoverContent class="w-64 p-3" align="end">
       <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <Button
-            variant="outline"
-            size="icon"
-            class="h-7 w-7"
-            @click="changeYear(-1)"
-          >
+          <Button variant="outline" size="icon" class="h-7 w-7" @click="changeYear(-1)">
             <ChevronLeft class="h-4 w-4" />
           </Button>
           <div class="text-sm font-bold">{{ pickerYear }}</div>
@@ -26,8 +21,8 @@
             variant="outline"
             size="icon"
             class="h-7 w-7"
-            @click="changeYear(1)"
             :disabled="pickerYear >= new Date().getFullYear()"
+            @click="changeYear(1)"
           >
             <ChevronRight class="h-4 w-4" />
           </Button>
@@ -40,8 +35,7 @@
             variant="ghost"
             class="h-9 w-full text-[10px] font-medium"
             :class="{
-              'bg-primary text-primary-foreground hover:bg-primary/90':
-                isCurrentMonth(i),
+              'bg-primary text-primary-foreground hover:bg-primary/90': isCurrentMonth(i),
             }"
             :disabled="isMonthDisabled(i)"
             @click="selectMonth(i)"
@@ -55,83 +49,63 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Calendar as CalendarIcon,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-vue-next";
-import { Button } from "~/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
-import {
-  format,
-  parse,
-  isValid,
-  setMonth,
-  setYear,
-} from "date-fns";
-import { DateFormatter } from "@internationalized/date";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { Button } from '~/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover'
+import { format, parse, isValid, setMonth, setYear } from 'date-fns'
+import { DateFormatter } from '@internationalized/date'
 
-const modelValue = defineModel<string>({ required: true });
+const modelValue = defineModel<string>({ required: true })
 
-const df = new DateFormatter("en-US", {
-  month: "long",
-  year: "numeric",
-});
+const df = new DateFormatter('en-US', {
+  month: 'long',
+  year: 'numeric',
+})
 
-const months = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-const internalDate = ref(new Date());
+const internalDate = ref(new Date())
 
 // Sync string "YYYY-MM" to internalDate
 watch(
   modelValue,
   (newVal) => {
-    if (!newVal) return;
-    const parsed = parse(newVal, "yyyy-MM", new Date());
+    if (!newVal) return
+    const parsed = parse(newVal, 'yyyy-MM', new Date())
     if (isValid(parsed)) {
-      internalDate.value = parsed;
+      internalDate.value = parsed
     }
   },
   { immediate: true },
-);
+)
 
-const pickerYear = computed(() => internalDate.value.getFullYear());
+const pickerYear = computed(() => internalDate.value.getFullYear())
 
 const changeYear = (delta: number) => {
-  internalDate.value = setYear(
-    internalDate.value,
-    internalDate.value.getFullYear() + delta,
-  );
-  modelValue.value = format(internalDate.value, "yyyy-MM");
-};
+  internalDate.value = setYear(internalDate.value, internalDate.value.getFullYear() + delta)
+  modelValue.value = format(internalDate.value, 'yyyy-MM')
+}
 
 const selectMonth = (monthIndex: number) => {
-  internalDate.value = setMonth(internalDate.value, monthIndex);
-  modelValue.value = format(internalDate.value, "yyyy-MM");
-};
+  internalDate.value = setMonth(internalDate.value, monthIndex)
+  modelValue.value = format(internalDate.value, 'yyyy-MM')
+}
 
 const isCurrentMonth = (monthIndex: number) => {
-  return internalDate.value.getMonth() === monthIndex;
-};
+  return internalDate.value.getMonth() === monthIndex
+}
 
 const isMonthDisabled = (monthIndex: number) => {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
-  
-  if (pickerYear.value > currentYear) return true;
-  if (pickerYear.value === currentYear && monthIndex > currentMonth) return true;
-  return false;
-};
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth()
+
+  if (pickerYear.value > currentYear) return true
+  if (pickerYear.value === currentYear && monthIndex > currentMonth) return true
+  return false
+}
 
 const dateDisplay = computed(() => {
-  return df.format(internalDate.value);
-});
+  return df.format(internalDate.value)
+})
 </script>

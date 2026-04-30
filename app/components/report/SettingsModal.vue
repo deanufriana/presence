@@ -351,7 +351,7 @@
                 <div v-if="settings.ai_provider === 'gemini'" class="space-y-1.5">
                   <Label class="text-xs">Gemini API Key</Label>
                   <Input
-                    v-model="settings.ai_api_key"
+                    v-model="settings.gemini_api_key"
                     type="password"
                     placeholder="Enter your Google AI API Key"
                     class="h-9 text-sm"

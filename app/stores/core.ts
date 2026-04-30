@@ -25,7 +25,7 @@ export const useCoreStore = defineStore('core', () => {
     jira_token: '',
     jira_url: '',
     jira_email: '',
-    ai_api_key: '',
+    gemini_api_key: '',
     openai_api_key: '',
     ai_provider: 'gemini',
     ai_model: 'gemini-2.0-flash-lite',
@@ -46,7 +46,7 @@ export const useCoreStore = defineStore('core', () => {
   const isAiEnabled = computed(
     () =>
       !!(
-        settings.value.ai_api_key ||
+        settings.value.gemini_api_key ||
         settings.value.openai_api_key ||
         settings.value.ai_provider === 'ollama'
       ),
@@ -73,16 +73,13 @@ export const useCoreStore = defineStore('core', () => {
   async function saveSettings() {
     saving.value = true
     try {
-      const { upsertSetting } = await import('~/queries/settings')
-
       const payload = {
         ...settings.value,
         gitlab_selected_projects: selectedProjectIds.value.join(','),
       }
 
-      for (const [key, value] of Object.entries(payload)) {
-        await upsertSetting(key, String(value))
-      }
+      const { upsertSettingsBatch } = await import('~/queries/settings')
+      await upsertSettingsBatch(payload as Record<string, string>)
 
       settings.value = payload as SettingsData
       success('Settings saved successfully')

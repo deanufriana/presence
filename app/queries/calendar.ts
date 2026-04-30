@@ -32,6 +32,24 @@ export async function insertCalendarEvent(event: {
   })
 }
 
+export async function insertCalendarEvents(
+  events: {
+    date: string
+    summary: string
+    startTime?: string
+    endTime?: string
+  }[],
+) {
+  const db = await getDb()
+  if (events.length === 0) return
+  await db.insert(schema.calendarEvents).values(
+    events.map((e) => ({
+      ...e,
+      updatedAt: new Date(),
+    })),
+  )
+}
+
 export async function getHolidaysByMonth(datePrefix: string) {
   const db = await getDb()
   return await db.query.holidays.findMany({

@@ -19,6 +19,9 @@ interface Props extends ToastRootProps {
 
 const props = withDefaults(defineProps<Props>(), {
   duration: 5000,
+  variant: 'default',
+  title: undefined,
+  description: undefined,
 })
 const emits = defineEmits<ToastRootEmits>()
 
