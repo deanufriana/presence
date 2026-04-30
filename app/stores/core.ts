@@ -20,7 +20,7 @@ export const useCoreStore = defineStore('core', () => {
 
   const settings = ref<SettingsData>({
     gitlab_token: '',
-    gitlab_url: 'https://gitlab.com',
+    gitlab_url: 'https://gitlab-ce.brilife.co.id',
     gitlab_selected_projects: '',
     jira_token: '',
     jira_url: '',

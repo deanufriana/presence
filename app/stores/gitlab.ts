@@ -77,7 +77,7 @@ export const useGitlabStore = defineStore('gitlab', () => {
       const { getGitLabProjects } = await import('~/utils/gitlab')
       const config = {
         token: core.settings.gitlab_token?.trim() || '',
-        url: core.settings.gitlab_url?.trim() || 'https://gitlab.com',
+        url: core.settings.gitlab_url?.trim() || 'https://gitlab-ce.brilife.co.id',
       }
 
       if (!config.token) {
@@ -85,7 +85,7 @@ export const useGitlabStore = defineStore('gitlab', () => {
         return
       }
 
-      const projects = await getGitLabProjects(config)
+      const projects = await getGitLabProjects()
       allProjects.value =
         projects.map((p) => ({
           id: p.id,

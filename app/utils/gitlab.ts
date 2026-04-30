@@ -48,15 +48,15 @@ export async function getGitLabConfig(): Promise<GitLabConfig> {
 
   return {
     token: token || '',
-    url: url || 'https://gitlab.com',
+    url: url || 'https://gitlab-ce.brilife.co.id',
   }
 }
 
 export async function fetchGitLab<T = unknown>(
   path: string,
-  config: GitLabConfig,
   query: Record<string, string | number | boolean> = {},
 ): Promise<T> {
+  const config = await getGitLabConfig()
   if (!config.token) {
     throw new Error('GitLab Token is missing in configuration')
   }
@@ -75,12 +75,12 @@ export async function fetchGitLab<T = unknown>(
   return (await response.json()) as T
 }
 
-export async function getGitLabUser(config: GitLabConfig): Promise<RawGitLabUser> {
-  return await fetchGitLab<RawGitLabUser>('user', config)
+export async function getGitLabUser(): Promise<RawGitLabUser> {
+  return await fetchGitLab<RawGitLabUser>('user')
 }
 
-export async function getGitLabProjects(config: GitLabConfig): Promise<RawGitLabProject[]> {
-  return await fetchGitLab<RawGitLabProject[]>('projects', config, {
+export async function getGitLabProjects(): Promise<RawGitLabProject[]> {
+  return await fetchGitLab<RawGitLabProject[]>('projects', {
     membership: true,
     simple: true,
     per_page: 100,
@@ -88,56 +88,36 @@ export async function getGitLabProjects(config: GitLabConfig): Promise<RawGitLab
   })
 }
 
-export async function getProjectDetails(
-  config: GitLabConfig,
-  projectId: number,
-): Promise<RawGitLabProject> {
-  return await fetchGitLab<RawGitLabProject>(`projects/${projectId}`, config)
+export async function getProjectDetails(projectId: number): Promise<RawGitLabProject> {
+  return await fetchGitLab<RawGitLabProject>(`projects/${projectId}`)
 }
 
 export async function getProjectCommits(
-  config: GitLabConfig,
   projectId: number,
   query: { since?: string; until?: string; per_page?: number },
 ): Promise<RawGitLabCommit[]> {
   return await fetchGitLab<RawGitLabCommit[]>(
     `projects/${projectId}/repository/commits`,
-    config,
     query as Record<string, string | number | boolean>,
   )
 }
 
-export async function getCommitRefs(
-  config: GitLabConfig,
-  projectId: number,
-  sha: string,
-): Promise<RawGitLabRef[]> {
-  return await fetchGitLab<RawGitLabRef[]>(
-    `projects/${projectId}/repository/commits/${sha}/refs`,
-    config,
-    { type: 'branch' },
-  )
+export async function getCommitRefs(projectId: number, sha: string): Promise<RawGitLabRef[]> {
+  return await fetchGitLab<RawGitLabRef[]>(`projects/${projectId}/repository/commits/${sha}/refs`, {
+    type: 'branch',
+  })
 }
 
-export async function syncGitLabEvents(
-  dateStr: string,
-  force: boolean = false,
-  overrideConfig?: GitLabConfig,
-) {
+export async function syncGitLabEvents(dateStr: string, force: boolean = false) {
   const { startOfMonth, endOfMonth, parse, format } = await import('date-fns')
   const baseDate = parse(dateStr, 'yyyy-MM', new Date())
   const firstDay = format(startOfMonth(baseDate), 'yyyy-MM-dd')
   const lastDay = format(endOfMonth(baseDate), 'yyyy-MM-dd')
 
-  const config = overrideConfig || (await getGitLabConfig())
   const projectsSetting = await getSetting('gitlab_selected_projects')
   const selectedProjectIds = projectsSetting ? projectsSetting.split(',').map(Number) : []
 
-  if (!config.token) {
-    throw new Error('GitLab Token is missing in configuration')
-  }
-
-  const user = await getGitLabUser(config)
+  const user = await getGitLabUser()
   const userEmail = user.email
 
   if (!force) {
@@ -153,8 +133,8 @@ export async function syncGitLabEvents(
 
   const commitPromises = selectedProjectIds.map(async (projectId: number) => {
     try {
-      const project = await getProjectDetails(config, projectId)
-      const commits = await getProjectCommits(config, projectId, {
+      const project = await getProjectDetails(projectId)
+      const commits = await getProjectCommits(projectId, {
         since: `${firstDay}T00:00:00+07:00`,
         until: `${lastDay}T23:59:59+07:00`,
         per_page: 100,
@@ -166,7 +146,7 @@ export async function syncGitLabEvents(
         authoredCommits.map(async (c) => {
           let branchNames: string[] = []
           try {
-            const refs = await getCommitRefs(config, projectId, c.id)
+            const refs = await getCommitRefs(projectId, c.id)
             branchNames = (refs || []).map((r) => r?.name).filter(Boolean)
           } catch {
             branchNames = []

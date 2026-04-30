@@ -48,10 +48,16 @@ export async function getDb() {
         if (method === 'run') {
           await sqlite.execute(sql, sqlParams)
           return { rows: [] }
-        } else {
-          const rows = await sqlite.select<Record<string, unknown>[]>(sql, sqlParams)
-          return { rows: rows.map((row) => Object.values(row)) }
         }
+
+        const rows = await sqlite.select<Record<string, unknown>[]>(sql, sqlParams)
+        const mappedRows = rows.map((row) => Object.values(row))
+
+        if (method === 'get') {
+          return { rows: mappedRows[0] }
+        }
+
+        return { rows: mappedRows }
       },
       { schema },
     )

@@ -176,7 +176,7 @@
                   <Label class="text-xs">Instance URL</Label>
                   <Input
                     v-model="settings.gitlab_url"
-                    placeholder="https://gitlab.com"
+                    placeholder="https://gitlab-ce.brilife.co.id"
                     class="h-9 text-sm"
                   />
                 </div>
