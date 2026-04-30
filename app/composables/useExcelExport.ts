@@ -46,11 +46,11 @@ export function useExcelExport() {
       const addMeta = (row: number, label: string, value: string) => {
         const labelCell = dailySheet.getCell(`B${row}`)
         labelCell.value = label
-        labelCell.font = { name: 'Calibri', size: 11, bold: true }
+        labelCell.font = { name: 'Calibri', size: 12, bold: true }
 
         const valueCell = dailySheet.getCell(`C${row}`)
         valueCell.value = `: ${value}`
-        valueCell.font = { name: 'Calibri', size: 11, bold: true }
+        valueCell.font = { name: 'Calibri', size: 12, bold: true }
       }
 
       addMeta(4, 'NAMA', settings.user_name)
