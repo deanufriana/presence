@@ -21,7 +21,7 @@ export async function upsertCalendarCache(date: string, events: CalendarEvent[])
   for (const event of events) {
     await insertCalendarEvent({
       date: event.date,
-      summary: event.summary,
+      summary: event.summary || '',
       startTime: event.startTime,
       endTime: event.endTime,
     })

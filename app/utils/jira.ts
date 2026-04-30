@@ -83,16 +83,16 @@ export async function syncJiraActivities(dateStr: string, force: boolean = false
     fields: 'summary,issuetype,status,project,updated',
   })
   const issues = data.issues || []
-  const events = issues.map((issue) => ({
+  const events: JiraEvent[] = issues.map((issue) => ({
     id: issue.id,
     key: issue.key,
     summary: issue.fields.summary,
     type: issue.fields.issuetype.name,
     status: issue.fields.status.name,
     project_name: issue.fields.project.name,
-    updatedAt: new Date(issue.fields.updated),
-    userEmail: config.email,
-    webUrl: `${config.baseUrl}/browse/${issue.key}`,
+    updated_at: issue.fields.updated,
+    user_email: config.email,
+    web_url: `${config.baseUrl}/browse/${issue.key}`,
   }))
 
   for (const event of events) {
@@ -110,16 +110,16 @@ export async function getJiraCache(dateStr: string) {
 
   const activities = await getJiraActivitiesByPeriod(firstDay, lastDay)
 
-  const events = activities.map((a) => ({
+  const events: JiraEvent[] = activities.map((a) => ({
     id: a.id,
     key: a.key,
     summary: a.summary,
     type: a.type,
     status: a.status,
     project_name: a.projectName,
-    updatedAt: a.updatedAt.toISOString(),
-    userEmail: a.userEmail,
-    webUrl: a.webUrl,
+    updated_at: a.updatedAt.toISOString(),
+    user_email: a.userEmail,
+    web_url: a.webUrl,
   }))
 
   return { success: true, events, date: dateStr, cached: true }

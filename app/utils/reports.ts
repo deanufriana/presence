@@ -62,23 +62,29 @@ export async function fetchAndGroupActivities(dateStr: string, isMonth: boolean 
 
   // GitLab
   gitlabRes.events.forEach((ev: GitLabEvent) => {
-    const date = ev.created_at.split('T')[0]
-    if (!grouped[date]) grouped[date] = []
-    grouped[date].push(formatGitLabActivity(ev))
+    const date = ev.created_at?.split('T')[0]
+    if (date) {
+      if (!grouped[date]) grouped[date] = []
+      grouped[date].push(formatGitLabActivity(ev))
+    }
   })
 
   // Calendar
   calendarCache.events.forEach((ev: CalendarEvent) => {
     const date = ev.date
-    if (!grouped[date]) grouped[date] = []
-    grouped[date].push(formatCalendarActivity(ev))
+    if (date) {
+      if (!grouped[date]) grouped[date] = []
+      grouped[date].push(formatCalendarActivity(ev))
+    }
   })
 
   // Jira
   jiraRes.events.forEach((ev: JiraEvent) => {
-    const date = ev.updatedAt.split('T')[0]
-    if (!grouped[date]) grouped[date] = []
-    grouped[date].push(formatJiraActivity(ev))
+    const date = ev.updated_at?.split('T')[0]
+    if (date) {
+      if (!grouped[date]) grouped[date] = []
+      grouped[date].push(formatJiraActivity(ev))
+    }
   })
 
   // Deduplicate and filter

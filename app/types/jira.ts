@@ -7,6 +7,7 @@ export interface JiraEvent {
   project_name: string | null
   updated_at: string
   web_url: string | null
+  user_email: string
 }
 
 export interface JiraCache {

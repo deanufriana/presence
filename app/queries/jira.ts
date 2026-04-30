@@ -24,9 +24,9 @@ export async function upsertJiraActivity(event: JiraEvent) {
       type: event.type,
       status: event.status,
       projectName: event.project_name,
-      updatedAt: event.updatedAt,
-      userEmail: event.userEmail,
-      webUrl: event.webUrl,
+      updatedAt: new Date(event.updated_at),
+      userEmail: event.user_email,
+      webUrl: event.web_url,
     })
     .onConflictDoUpdate({
       target: schema.jiraActivities.id,
@@ -36,9 +36,9 @@ export async function upsertJiraActivity(event: JiraEvent) {
         type: event.type,
         status: event.status,
         projectName: event.project_name,
-        updatedAt: event.updatedAt,
-        userEmail: event.userEmail,
-        webUrl: event.webUrl,
+        updatedAt: new Date(event.updated_at),
+        userEmail: event.user_email,
+        webUrl: event.web_url,
       },
     })
 }

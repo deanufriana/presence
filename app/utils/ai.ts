@@ -1,4 +1,5 @@
 import { getDb, schema } from '~/db'
+import type { OllamaModel } from '~/types/ollama'
 import { eq } from 'drizzle-orm'
 import { fetch } from '@tauri-apps/plugin-http'
 
@@ -119,6 +120,6 @@ export async function fetchOllamaModels(baseUrl: string) {
   const { fetch } = await import('@tauri-apps/plugin-http')
   const response = await fetch(`${baseUrl}/api/tags`)
   if (!response.ok) throw new Error('Failed to fetch Ollama models')
-  const data = (await response.json()) as { models?: string[] }
+  const data = (await response.json()) as { models?: OllamaModel[] }
   return data.models || []
 }

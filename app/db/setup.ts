@@ -114,7 +114,7 @@ export async function initSchema(db: Awaited<ReturnType<typeof getDb>>) {
 
   for (const query of queries) {
     try {
-      // @ts-expect-error - access internal sqlite execute via proxy or just use the db.run if available
+      // access internal sqlite execute via proxy or just use the db.run if available
       // Since we're using the proxy, we can just execute raw SQL via the bridge
       await (
         db as unknown as { $client: { execute: (q: string) => Promise<void> } }
