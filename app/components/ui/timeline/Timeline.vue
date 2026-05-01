@@ -39,6 +39,7 @@
       <div
         v-for="(item, index) in items"
         :key="index"
+        :data-key="itemKey ? (item as any)[itemKey] : undefined"
         class="flex flex-col sm:flex-row gap-4 sm:gap-8 group/row"
       >
         <!-- Date/Label Section -->
@@ -91,6 +92,7 @@ interface Props {
   emptyMessage?: string
   emptySubmessage?: string
   getRowClass?: (item: T) => string
+  itemKey?: string
 }
 
 withDefaults(defineProps<Props>(), {
@@ -98,5 +100,6 @@ withDefaults(defineProps<Props>(), {
   emptyMessage: 'No records found',
   emptySubmessage: '',
   getRowClass: () => '',
+  itemKey: '',
 })
 </script>

@@ -25,17 +25,6 @@ export const useDailyStore = defineStore('daily', () => {
   const showConfirmSync = ref(false)
   const syncing = ref(false)
 
-  // Computed map for quick lookup by date
-  const manualActivitiesMap = computed(() => {
-    const map: Record<string, string> = {}
-    dailyTable.value.forEach((row) => {
-      if (row.aktivitas) {
-        map[row.date] = row.aktivitas
-      }
-    })
-    return map
-  })
-
   async function fetchDailyReport() {
     try {
       isLoading.value = true
@@ -202,7 +191,9 @@ export const useDailyStore = defineStore('daily', () => {
   async function openManualEntry(day: { date: string; dayNum: number }) {
     showManualEntry.value = true
     selectedDayForEntry.value = { date: day.date, dayNum: day.dayNum }
-    manualActivityText.value = manualActivitiesMap.value[day.date] || ''
+
+    const row = dailyTable.value.find((r) => r.date === day.date)
+    manualActivityText.value = row?.aktivitas || ''
 
     const { useCalendarStore } = await import('~/stores/calendar')
     const calendarStore = useCalendarStore()

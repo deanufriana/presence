@@ -31,16 +31,18 @@
               Holiday
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="xxs"
-            :disabled="syncingAll"
-            class="gap-1.5 border-border/50 h-7"
-            @click="syncAllActivities()"
-          >
-            <RefreshCw class="h-3 w-3" :class="{ 'animate-spin': syncingAll }" />
-            Sync All
-          </Button>
+          <div class="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="xs"
+              :disabled="syncingAll"
+              class="gap-1.5 border-border/50"
+              @click="syncAllActivities()"
+            >
+              <RefreshCw class="h-3.5 w-3.5" :class="{ 'animate-spin': syncingAll }" />
+              Sync All
+            </Button>
+          </div>
         </div>
       </div>
     </CardHeader>

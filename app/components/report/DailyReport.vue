@@ -5,7 +5,7 @@
         <div>
           <CardTitle class="flex items-center gap-2 text-base">
             <div class="flex h-7 w-7 items-center justify-center rounded-md bg-violet-500/10">
-              <FileText class="h-4 w-4 text-violet-500" />
+              <FileText v-once class="h-4 w-4 text-violet-500" />
             </div>
             Daily Report
           </CardTitle>
@@ -18,7 +18,10 @@
           </Button>
 
           <Button
-            v-if="isAiEnabled && dailyTable.some((r) => r.aktivitas && r.aktivitas.length > 5)"
+            v-if="
+              isAiEnabled &&
+              dailyTable.some((r: ReportRow) => r.aktivitas && r.aktivitas.length > 5)
+            "
             :variant="summarizingAll ? 'destructive' : 'ai'"
             size="xs"
             @click="summarizeAll"
@@ -37,21 +40,22 @@
     </CardHeader>
     <CardContent class="p-0">
       <Timeline
-        :items="dailyTable"
+        :items="optimizedRows"
         :loading="isLoading"
         empty-message="No reports found for this month"
         empty-submessage="Click 'Sync Activities' to auto-create your report"
         :get-row-class="getRowClass"
+        item-key="date"
       >
         <template #date="{ item: row }">
           <div class="flex flex-col sm:items-end">
             <span
               class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 leading-none"
             >
-              {{ format(new Date(row.date), 'EEE') }}
+              {{ row.dayName }}
             </span>
             <span class="text-xl font-black tabular-nums tracking-tighter mt-1 leading-none">
-              {{ format(new Date(row.date), 'dd') }}
+              {{ row.dayNum }}
             </span>
           </div>
         </template>
@@ -64,7 +68,7 @@
               class="flex items-center gap-1.5 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20"
               title="Jam Masuk"
             >
-              <Clock class="h-3 w-3" />
+              <Clock v-once class="h-3 w-3" />
               {{ row.masuk }}
             </div>
             <div
@@ -72,7 +76,7 @@
               class="flex items-center gap-1.5 text-[10px] text-blue-600 dark:text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20"
               title="Jam Pulang"
             >
-              <Clock class="h-3 w-3" />
+              <Clock v-once class="h-3 w-3" />
               {{ row.pulang }}
             </div>
             <div
@@ -80,7 +84,7 @@
               class="flex items-center gap-1.5 text-[10px] text-amber-600 dark:text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20"
               title="TI"
             >
-              <Zap class="h-3 w-3" />
+              <Zap v-once class="h-3 w-3" />
               {{ row.ti }}
             </div>
           </div>
@@ -98,53 +102,20 @@
 
         <template #badge="{ item: row }">
           <div
-            v-if="isHoliday(row.date)"
+            v-if="row.holidayName"
             class="absolute -top-3 left-4 px-2 py-0.5 rounded-md bg-red-500 text-[10px] font-bold text-white shadow-lg z-20"
           >
-            {{ getHolidayName(row.date) }}
+            {{ row.holidayName }}
           </div>
         </template>
 
         <template #content="{ item: row }">
-          <div class="flex-1 min-h-[60px]" @dragover.prevent @drop="handleDrop($event, row.date)">
-            <div
-              :class="{
-                'animate-pulse opacity-50': summarizingRows[row.date],
-                'ring-1 ring-violet-500/20 rounded-xl': syncingRows[row.date],
-              }"
-              class="transition-all duration-500"
-            >
-              <div v-if="row.aktivitas" class="space-y-2">
-                <div
-                  v-for="(item, i) in parseActivities(row.aktivitas)"
-                  :key="i"
-                  draggable="true"
-                  class="group/item flex items-start gap-3 p-2.5 rounded-xl bg-muted/40 border border-transparent hover:border-violet-500/20 hover:bg-violet-500/5 cursor-grab active:cursor-grabbing transition-all relative"
-                  @click.stop
-                  @dragstart="handleDragStart($event, item, row.date)"
-                >
-                  <div
-                    v-if="!/^[-*•]/.test(item)"
-                    class="h-2 w-2 rounded-full bg-violet-400 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(167,139,250,0.5)]"
-                  />
-                  <span class="flex-1 text-sm leading-relaxed text-foreground/90">{{ item }}</span>
-                  <button
-                    class="opacity-0 group-hover/item:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all shrink-0"
-                    title="Remove item"
-                    @click.stop="deleteActivityItem(row.date, item)"
-                  >
-                    <Trash2 class="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-              <div
-                v-else
-                class="h-full flex items-center text-muted-foreground/40 italic text-xs py-4 px-2 rounded-xl border border-dashed border-border/50"
-              >
-                No activities logged for this day. Click sync or add manually.
-              </div>
-            </div>
-          </div>
+          <DailyReportRow
+            v-memo="[row.aktivitas, summarizingRows[row.date], syncingRows[row.date]]"
+            :row="row"
+            :is-summarizing="summarizingRows[row.date]"
+            :is-syncing="syncingRows[row.date]"
+          />
         </template>
 
         <template #actions="{ item: row }">
@@ -154,11 +125,11 @@
             @click="
               openManualEntry({
                 date: row.date,
-                dayNum: parseInt(row.date.split('-').pop() || '0'),
+                dayNum: parseInt(row.dayNum),
               })
             "
           >
-            <Pencil class="h-4 w-4" />
+            <Pencil v-once class="h-4 w-4" />
           </button>
 
           <button
@@ -168,7 +139,7 @@
             @click="copyRow(row.aktivitas, row.date)"
           >
             <Check v-if="copiedRows[row.date]" class="h-4 w-4 text-emerald-500" />
-            <Copy v-else class="h-4 w-4" />
+            <Copy v-else v-once class="h-4 w-4" />
           </button>
 
           <button
@@ -179,7 +150,7 @@
             @click="summarizeRow(row)"
           >
             <RefreshCw v-if="summarizingRows[row.date]" class="h-4 w-4 animate-spin" />
-            <Sparkles v-else class="h-4 w-4" />
+            <Sparkles v-else v-once class="h-4 w-4" />
           </button>
 
           <button
@@ -198,7 +169,7 @@
             title="Clear Day"
             @click="deleteActivity(row.date)"
           >
-            <Trash2 class="h-4 w-4" />
+            <Trash2 v-once class="h-4 w-4" />
           </button>
         </template>
       </Timeline>
@@ -212,7 +183,7 @@ import { storeToRefs } from 'pinia'
 import { useToast } from '~/composables/use-toast'
 import { useDailyStore } from '~/stores/daily'
 import { useCoreStore } from '~/stores/core'
-import { format, isWeekend } from 'date-fns'
+import { format, isWeekend, parseISO } from 'date-fns'
 import type { ReportRow } from '~/types/report'
 import {
   FileText,
@@ -231,6 +202,7 @@ import { Button } from '~/components/ui/button'
 import { useCalendarStore } from '~/stores/calendar'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~/components/ui/card'
 import { Timeline } from '~/components/ui/timeline'
+import DailyReportRow from '~/components/report/DailyReportRow.vue'
 
 const SyncConfirmModal = defineAsyncComponent(
   () => import('~/components/report/SyncConfirmModal.vue'),
@@ -241,12 +213,6 @@ const dailyStore = useDailyStore()
 const calendarStore = useCalendarStore()
 const { getHolidayName, isHoliday } = calendarStore
 const { success } = useToast()
-
-const getRowClass = (row: ReportRow) => {
-  return isWeekend(new Date(row.date)) || isHoliday(row.date)
-    ? 'bg-red-50/50 dark:bg-red-950/20 hover:bg-red-100/50 dark:hover:bg-red-900/30'
-    : ''
-}
 
 const { isAiEnabled, selectedDate, dateDisplay } = storeToRefs(coreStore)
 const {
@@ -267,11 +233,39 @@ const {
   openManualEntry,
   deleteActivity,
   syncDayActivity,
-  updateRow,
   fetchDailyReport,
 } = dailyStore
 
 const { exportToExcel, exporting } = useExcelExport()
+
+// Optimized row data for rendering
+type OptimizedReportRow = ReportRow & {
+  dayName: string
+  dayNum: string
+  isWeekend: boolean
+  holidayName: string | undefined
+  isHoliday: boolean
+}
+
+const optimizedRows = computed<OptimizedReportRow[]>(() => {
+  return dailyTable.value.map((row: ReportRow) => {
+    const dateObj = parseISO(row.date)
+    return {
+      ...row,
+      dayName: format(dateObj, 'EEE'),
+      dayNum: format(dateObj, 'dd'),
+      isWeekend: isWeekend(dateObj),
+      holidayName: getHolidayName(row.date),
+      isHoliday: isHoliday(row.date),
+    }
+  })
+})
+
+const getRowClass = (row: OptimizedReportRow) => {
+  return row.isWeekend || row.isHoliday
+    ? 'bg-red-50/50 dark:bg-red-950/20 hover:bg-red-100/50 dark:hover:bg-red-900/30'
+    : ''
+}
 
 const handleExport = async () => {
   try {
@@ -300,56 +294,22 @@ watch(
   { immediate: true },
 )
 
-// ─── Drag & Drop ──────────────────────────────────
-const parseActivities = (text: string) => {
-  if (!text) return []
-  return text
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean)
+const scrollToToday = () => {
+  const todayStr = format(new Date(), 'yyyy-MM-dd')
+  nextTick(() => {
+    const todayEl = document.querySelector(`[data-key="${todayStr}"]`)
+    if (todayEl) {
+      todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  })
 }
 
-const handleDragStart = (event: DragEvent, item: string, date: string) => {
-  if (event.dataTransfer) {
-    event.dataTransfer.setData('text/plain', item)
-    event.dataTransfer.setData('sourceDate', date)
-    event.dataTransfer.effectAllowed = 'move'
-  }
-}
-
-const handleDrop = async (event: DragEvent, targetDate: string) => {
-  const item = event.dataTransfer?.getData('text/plain')
-  const sourceDate = event.dataTransfer?.getData('sourceDate')
-
-  if (!item || !sourceDate || sourceDate === targetDate) return
-
-  const sourceRow = dailyTable.value.find((r) => r.date === sourceDate)
-  const targetRow = dailyTable.value.find((r) => r.date === targetDate)
-
-  if (!sourceRow || !targetRow) return
-
-  // 1. Update source
-  const sourceItems = parseActivities(sourceRow.aktivitas)
-  sourceRow.aktivitas = sourceItems.filter((i) => i !== item).join('\n')
-
-  // 2. Update target
-  const targetItems = parseActivities(targetRow.aktivitas)
-  targetItems.push(item)
-  targetRow.aktivitas = targetItems.join('\n')
-
-  await updateRow([sourceRow, targetRow])
-
-  success(`Moved activity to ${targetDate}`)
-}
-
-const deleteActivityItem = async (date: string, item: string) => {
-  const row = dailyTable.value.find((r) => r.date === date)
-  if (row) {
-    const items = parseActivities(row.aktivitas)
-    const newItems = items.filter((i) => i !== item)
-    row.aktivitas = newItems.join('\n')
-    await updateRow(row)
-    success(`Removed activity from ${date}`)
-  }
-}
+watch(
+  () => dailyTable.value,
+  (newVal) => {
+    if (newVal.length > 0) {
+      scrollToToday()
+    }
+  },
+)
 </script>
