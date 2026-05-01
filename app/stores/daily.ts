@@ -315,7 +315,6 @@ export const useDailyStore = defineStore('daily', () => {
   return {
     isLoading,
     dailyTable,
-    manualActivitiesMap,
     summarizingRows,
     syncingRows,
     showManualEntry,

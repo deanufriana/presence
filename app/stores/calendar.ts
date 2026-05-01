@@ -72,6 +72,13 @@ export const useCalendarStore = defineStore('calendar', () => {
       }
     })
 
+    const dailyByDate: Record<string, boolean> = {}
+    dailyStore.dailyTable.forEach((row) => {
+      if (row.aktivitas) {
+        dailyByDate[row.date] = true
+      }
+    })
+
     for (let i = 1; i <= count; i++) {
       const dayDate = format(new Date(d.getFullYear(), d.getMonth(), i), 'yyyy-MM-dd')
 
@@ -89,7 +96,7 @@ export const useCalendarStore = defineStore('calendar', () => {
         calendarEvents: dayCalendarEvents,
         jiraEvents: dayJiraEvents,
         jiraCount: dayJiraEvents.length,
-        hasManual: !!dailyStore.manualActivitiesMap[dayDate],
+        hasManual: !!dailyByDate[dayDate],
         holiday: dayHoliday,
         isHoliday: !!dayHoliday,
       })
