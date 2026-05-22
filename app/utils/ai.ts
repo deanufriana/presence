@@ -20,6 +20,8 @@ export async function generateSummary(prompt: string, options: AiOptions = {}) {
     return await generateGemini(prompt, options)
   } else if (provider === 'openai') {
     return await generateOpenAi(prompt, options)
+  } else if (provider === 'deepseek') {
+    return await generateDeepSeek(prompt, options)
   } else if (provider === 'ollama') {
     return await generateOllama(prompt, options)
   }
@@ -73,6 +75,36 @@ async function generateOpenAi(prompt: string, options: AiOptions) {
   const model = modelSetting?.value || 'gpt-4o'
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey.value}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: options.max_tokens || 2048,
+      temperature: options.temperature || 0.7,
+    }),
+  })
+
+  const data = (await response.json()) as { choices?: { message?: { content?: string } }[] }
+  return data.choices?.[0]?.message?.content || ''
+}
+
+async function generateDeepSeek(prompt: string, options: AiOptions) {
+  const db = await getDb()
+  const apiKey = await db.query.settings.findFirst({
+    where: eq(schema.settings.key, 'deepseek_api_key'),
+  })
+  if (!apiKey?.value) throw new Error('DeepSeek API Key not set')
+
+  const modelSetting = await db.query.settings.findFirst({
+    where: eq(schema.settings.key, 'ai_model'),
+  })
+  const model = modelSetting?.value || 'deepseek-chat'
+
+  const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -7,7 +7,8 @@ export interface SettingsData {
   jira_email: string
   gemini_api_key: string
   openai_api_key: string
-  ai_provider: 'gemini' | 'openai' | 'ollama'
+  deepseek_api_key: string
+  ai_provider: 'gemini' | 'openai' | 'ollama' | 'deepseek'
   ai_model: string
   ollama_url: string
   user_name: string

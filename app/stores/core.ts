@@ -28,6 +28,7 @@ export const useCoreStore = defineStore('core', () => {
     jira_email: '',
     gemini_api_key: '',
     openai_api_key: '',
+    deepseek_api_key: '',
     ai_provider: 'gemini',
     ai_model: 'gemini-2.0-flash-lite',
     ollama_url: 'http://localhost:11434',
@@ -49,6 +50,7 @@ export const useCoreStore = defineStore('core', () => {
       !!(
         settings.value.gemini_api_key ||
         settings.value.openai_api_key ||
+        settings.value.deepseek_api_key ||
         settings.value.ai_provider === 'ollama'
       ),
   )

@@ -289,22 +289,15 @@
                 <Tabs
                   :model-value="settings.ai_provider"
                   class="w-auto"
-                  @update:model-value="
-                    (v) => {
-                      settings.ai_provider = v as 'gemini' | 'openai' | 'ollama'
-                      settings.ai_model =
-                        v === 'gemini'
-                          ? 'gemini-2.0-flash-lite'
-                          : v === 'openai'
-                            ? 'gpt-4o-mini'
-                            : 'gemma:latest'
-                    }
-                  "
+                  @update:model-value="onProviderChange"
                 >
                   <TabsList class="h-8">
                     <TabsTrigger value="gemini" class="text-[10px] px-3 h-7"> Gemini </TabsTrigger>
                     <TabsTrigger value="openai" class="text-[10px] px-3 h-7"> OpenAI </TabsTrigger>
                     <TabsTrigger value="ollama" class="text-[10px] px-3 h-7"> Ollama </TabsTrigger>
+                    <TabsTrigger value="deepseek" class="text-[10px] px-3 h-7">
+                      DeepSeek
+                    </TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
@@ -335,6 +328,10 @@
                         <SelectItem value="gpt-4o-mini"> GPT-4o Mini </SelectItem>
                         <SelectItem value="gpt-4o"> GPT-4o </SelectItem>
                         <SelectItem value="gpt-3.5-turbo"> GPT-3.5 Turbo </SelectItem>
+                      </SelectGroup>
+                      <SelectGroup v-else-if="settings.ai_provider === 'deepseek'">
+                        <SelectItem value="deepseek-chat"> DeepSeek Chat </SelectItem>
+                        <SelectItem value="deepseek-reasoner"> DeepSeek Reasoner </SelectItem>
                       </SelectGroup>
                       <SelectGroup v-else-if="settings.ai_provider === 'ollama'">
                         <SelectItem v-for="m in ollamaModels" :key="m.name" :value="m.name">
@@ -371,6 +368,19 @@
                   />
                   <p class="text-[10px] text-muted-foreground">
                     Standard industry provider for GPT models.
+                  </p>
+                </div>
+
+                <div v-else-if="settings.ai_provider === 'deepseek'" class="space-y-1.5">
+                  <Label class="text-xs">DeepSeek API Key</Label>
+                  <Input
+                    v-model="settings.deepseek_api_key"
+                    type="password"
+                    placeholder="sk-xxxxxxxxxxxxxxxx"
+                    class="h-9 text-sm"
+                  />
+                  <p class="text-[10px] text-muted-foreground">
+                    DeepSeek's cost-efficient AI for text processing.
                   </p>
                 </div>
 
@@ -500,6 +510,18 @@ watch(
     }
   },
 )
+
+function onProviderChange(v: string | number) {
+  settings.value!.ai_provider = v as 'gemini' | 'openai' | 'ollama' | 'deepseek'
+  settings.value!.ai_model =
+    v === 'gemini'
+      ? 'gemini-2.0-flash-lite'
+      : v === 'openai'
+        ? 'gpt-4o-mini'
+        : v === 'deepseek'
+          ? 'deepseek-chat'
+          : 'gemma:latest'
+}
 
 onMounted(() => {
   if (settings.value?.gitlab_token) fetchProjects()
