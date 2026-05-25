@@ -81,6 +81,32 @@
         <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <!-- Left Column: Jira Fields Form -->
           <FieldGroup class="space-y-4 lg:col-span-5">
+            <!-- Task Details Preview -->
+            <div class="p-3.5 rounded-xl border border-muted bg-muted/20 space-y-1.5">
+              <div
+                class="flex items-center justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
+              >
+                <span>Selected Task Row</span>
+                <Badge
+                  variant="secondary"
+                  class="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20 text-[9px] px-1.5"
+                >
+                  {{ exportRow?.progres || '100%' }} done
+                </Badge>
+              </div>
+              <p class="text-sm font-semibold text-foreground leading-snug">
+                {{ exportRow?.project }}
+              </p>
+              <div
+                v-if="exportRow?.sources?.length"
+                class="text-[10px] text-muted-foreground flex items-center gap-1"
+              >
+                <CalendarDays class="size-3 shrink-0 text-indigo-500" />
+                Summarized from {{ exportRow.sources.length }} active dates:
+                <span class="font-mono text-foreground">{{ exportRow.sources.join(', ') }}</span>
+              </div>
+            </div>
+
             <!-- Project and Issue Type Side-by-Side -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <!-- Target Project -->
@@ -174,7 +200,6 @@
               </Field>
             </div>
 
-            <!-- Issue Summary -->
             <Field>
               <FieldLabel class="text-xs font-bold text-muted-foreground uppercase tracking-wide"
                 >Issue Summary</FieldLabel
@@ -185,36 +210,40 @@
                 class="h-9 text-xs"
               />
             </Field>
+
+            <!-- Issue Description -->
+            <Field>
+              <div class="flex items-center justify-between mb-1.5">
+                <FieldLabel
+                  class="text-xs font-bold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5"
+                >
+                  <FileText class="h-3.5 w-3.5 text-muted-foreground" />
+                  Description
+                  <span class="text-[9px] lowercase font-normal">(optional)</span>
+                </FieldLabel>
+                <Button
+                  v-if="coreStore.isAiEnabled"
+                  variant="ghost"
+                  size="sm"
+                  class="h-6 text-[10px] font-semibold gap-1 px-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50/50 dark:text-purple-400 dark:hover:bg-purple-950/20"
+                  :disabled="isDescriptionLoading || !issueSummary.trim()"
+                  @click="generateParentDescription"
+                >
+                  <Sparkles v-if="!isDescriptionLoading" class="h-3 w-3 text-purple-500" />
+                  <RefreshCw v-else class="h-3 w-3 animate-spin text-purple-500" />
+                  {{ isDescriptionLoading ? 'Generating...' : 'AI Generate' }}
+                </Button>
+              </div>
+              <Textarea
+                v-model="issueDescription"
+                placeholder="Describe this issue... or click AI Generate to auto-fill based on summary."
+                class="text-xs min-h-[80px] resize-none"
+              />
+            </Field>
           </FieldGroup>
 
           <!-- Right Column: Task Details Preview & Child Subtasks Selection -->
           <div class="space-y-4 lg:col-span-7">
-            <!-- Task Details Preview -->
-            <div class="p-3.5 rounded-xl border border-muted bg-muted/20 space-y-1.5">
-              <div
-                class="flex items-center justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
-              >
-                <span>Selected Task Row</span>
-                <Badge
-                  variant="secondary"
-                  class="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20 text-[9px] px-1.5"
-                >
-                  {{ exportRow?.progres || '100%' }} done
-                </Badge>
-              </div>
-              <p class="text-sm font-semibold text-foreground leading-snug">
-                {{ exportRow?.project }}
-              </p>
-              <div
-                v-if="exportRow?.sources?.length"
-                class="text-[10px] text-muted-foreground flex items-center gap-1"
-              >
-                <CalendarDays class="size-3 shrink-0 text-indigo-500" />
-                Summarized from {{ exportRow.sources.length }} active dates:
-                <span class="font-mono text-foreground">{{ exportRow.sources.join(', ') }}</span>
-              </div>
-            </div>
-
             <!-- Child Subtasks Selection -->
             <FieldSet
               v-if="displayActivities && displayActivities.length"
@@ -253,35 +282,54 @@
               </div>
 
               <FieldGroup
-                class="space-y-1.5 max-h-72 overflow-y-auto border border-border/50 rounded-lg p-3 bg-muted/5"
+                class="space-y-1 max-h-72 overflow-y-auto border border-border/50 rounded-lg p-3 bg-muted/5"
               >
-                <Field
+                <div
                   v-for="(act, idx) in displayActivities"
                   :key="idx"
-                  orientation="horizontal"
-                  class="flex items-start gap-2.5 p-1.5 rounded-md hover:bg-muted/10 transition-colors"
+                  class="p-2 rounded-md hover:bg-muted/10 transition-colors border-b border-border/20 last:border-0"
                 >
-                  <Checkbox
-                    :id="'subtask-' + idx"
-                    :checked="selectedSubtasks.includes(act)"
-                    class="mt-0.5"
-                    @update:checked="
-                      (checked: boolean) => {
-                        if (checked) {
-                          selectedSubtasks.push(act)
-                        } else {
-                          selectedSubtasks = selectedSubtasks.filter((x) => x !== act)
+                  <div class="flex items-start gap-2.5">
+                    <Checkbox
+                      :id="'subtask-' + idx"
+                      :checked="selectedSubtasks.some((s) => s.id === act.id)"
+                      class="mt-1"
+                      @update:checked="
+                        (checked: boolean) => {
+                          if (checked) {
+                            selectedSubtasks.push(act)
+                          } else {
+                            selectedSubtasks = selectedSubtasks.filter((x) => x.id !== act.id)
+                          }
                         }
-                      }
-                    "
-                  />
-                  <FieldLabel
-                    :for="'subtask-' + idx"
-                    class="text-xs font-medium text-foreground cursor-pointer select-none leading-normal"
-                  >
-                    {{ act }}
-                  </FieldLabel>
-                </Field>
+                      "
+                    />
+                    <div class="flex-1 min-w-0 space-y-1">
+                      <FieldLabel
+                        v-if="!selectedSubtasks.some((s) => s.id === act.id)"
+                        :for="'subtask-' + idx"
+                        class="text-xs font-medium text-foreground cursor-pointer select-none leading-normal"
+                      >
+                        {{ act.title }}
+                      </FieldLabel>
+                      <div
+                        v-else
+                        class="animate-in fade-in slide-in-from-top-1 duration-150 space-y-1"
+                      >
+                        <Input
+                          v-model="act.title"
+                          placeholder="Task title"
+                          class="h-7 text-[11px]"
+                        />
+                        <Textarea
+                          v-model="act.description"
+                          placeholder="Task description (optional)"
+                          class="text-[10px] min-h-[36px] resize-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </FieldGroup>
             </FieldSet>
           </div>
@@ -320,6 +368,7 @@ import {
   CalendarDays,
   ListTodo,
   Sparkles,
+  FileText,
 } from 'lucide-vue-next'
 import { Button } from '~/components/ui/button'
 import {
@@ -332,6 +381,7 @@ import {
 } from '~/components/ui/dialog'
 import { Field, FieldGroup, FieldLabel, FieldSet, FieldLegend } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Badge } from '~/components/ui/badge'
 import {
@@ -343,13 +393,15 @@ import {
   SelectGroup,
   SelectLabel,
 } from '~/components/ui/select'
+import type { JiraChildTask } from '~/types/report'
+import type { JiraConfig as JiraApiConfig } from '~/utils/jira'
 import { storeToRefs } from 'pinia'
 import { useJiraStore } from '~/stores/jira'
 import { useCoreStore } from '~/stores/core'
 import { useToast } from '~/composables/use-toast'
 import { getJiraConfig, createJiraIssue, buildAdfRowDescription } from '~/utils/jira'
-import type { JiraConfig } from '~/utils/jira'
 import { generateSummary } from '~/utils/ai'
+import { getJiraGroupSubtasksPrompt, getJiraParentDescriptionPrompt } from '~/utils/prompts'
 
 const props = defineProps<{
   modelValue: boolean
@@ -363,12 +415,19 @@ const jiraStore = useJiraStore()
 const coreStore = useCoreStore()
 const { success, error } = useToast()
 
-const { exportRow, exportPeriod, candidateParents } = storeToRefs(jiraStore)
+const {
+  exportRow,
+  exportPeriod,
+  candidateParents,
+  exportChildTasks,
+  exportDescription,
+  exportProjectKey,
+} = storeToRefs(jiraStore)
 const exportRowActivities = computed(() => jiraStore.exportRowActivities || [])
 
 const subtaskTypes = computed(() => (jiraStore.cachedIssueTypes || []).filter((t) => t.subtask))
-const selectedSubtasks = ref<string[]>([])
-const displayActivities = ref<string[]>([])
+const selectedSubtasks = ref<JiraChildTask[]>([])
+const displayActivities = ref<JiraChildTask[]>([])
 const myselfAccount = computed(() => jiraStore.cachedMyself)
 const isAILoading = ref(false)
 
@@ -398,9 +457,11 @@ const selectedIssueTypeId = ref('')
 const parentSelectionType = ref('none') // 'none' | 'custom' | '[parentKey]'
 const customParentKey = ref('')
 const issueSummary = ref('')
+const issueDescription = ref('')
+const isDescriptionLoading = ref(false)
 
 const successIssue = ref<{ key: string; webUrl: string } | null>(null)
-let jiraConfigData: JiraConfig | null = null
+let jiraConfigData: JiraApiConfig | null = null
 
 async function loadJiraConfig() {
   loadingConfig.value = true
@@ -416,19 +477,9 @@ async function loadJiraConfig() {
     }
     jiraConfigData = config
 
-    // Pre-select project and summary based on bracket prefix: [PROJECT] Task description
-    let parsedSummary = exportRow.value?.project || ''
-    let matchedProjectKey = ''
-
-    if (parsedSummary) {
-      const match = parsedSummary.match(/^\[([^\]]+)\]\s*(.+)$/)
-      if (match) {
-        matchedProjectKey = match[1] || ''
-        parsedSummary = match[2] || ''
-      }
-    }
-
-    issueSummary.value = parsedSummary
+    // Use store's pre-extracted project key; parse summary from bracket prefix
+    const summaryMatch = exportRow.value?.project?.match(/^\[([^\]]+)\]\s*(.+)$/)
+    issueSummary.value = summaryMatch?.[2] || exportRow.value?.project || ''
 
     // Load projects, myself, and issue types using Pinia caching action
     await jiraStore.loadJiraMetadata(config)
@@ -438,12 +489,14 @@ async function loadJiraConfig() {
       return
     }
 
-    // Determine target project
-    const foundProject = projects.value.find(
-      (p) =>
-        p.key.toLowerCase() === matchedProjectKey.toLowerCase() ||
-        p.name.toLowerCase().includes(matchedProjectKey.toLowerCase()),
-    )
+    // Determine target project using store's pre-extracted project key
+    const foundProject = exportProjectKey.value
+      ? projects.value.find(
+          (p) =>
+            p.key.toLowerCase() === exportProjectKey.value.toLowerCase() ||
+            p.name.toLowerCase().includes(exportProjectKey.value.toLowerCase()),
+        )
+      : null
 
     if (foundProject) {
       selectedProjectKey.value = foundProject.key
@@ -456,8 +509,25 @@ async function loadJiraConfig() {
       }
     }
 
-    displayActivities.value = [...(exportRowActivities.value || [])]
-    selectedSubtasks.value = [...(exportRowActivities.value || [])]
+    // Pre-fill description from stored Jira export data
+    issueDescription.value = exportDescription.value || ''
+
+    // Pre-fill child tasks from stored Jira export data, fallback to raw activities
+    if (exportChildTasks.value?.length) {
+      displayActivities.value = exportChildTasks.value.map((t) => ({
+        id: t.id || crypto.randomUUID(),
+        title: t.title,
+        description: t.description || '',
+      }))
+      selectedSubtasks.value = [...displayActivities.value]
+    } else {
+      displayActivities.value = (exportRowActivities.value || []).map((a) => ({
+        id: crypto.randomUUID(),
+        title: a,
+        description: '',
+      }))
+      selectedSubtasks.value = [...displayActivities.value]
+    }
 
     // Default issue type selection
     const defaultType = coreStore.settings.jira_default_issuetype
@@ -492,6 +562,9 @@ async function submitJiraIssue() {
   if (!jiraConfigData || !exportRow.value) return
   creating.value = true
 
+  // Save current edits to local DB before creating Jira issue
+  saveJiraExportData()
+
   try {
     // Save defaults to store settings so they carry over
     coreStore.settings.jira_default_project = selectedProjectKey.value
@@ -510,11 +583,12 @@ async function submitJiraIssue() {
       parentKey = parentSelectionType.value
     }
 
-    // Build ADF description
+    // Build ADF description – merge BAST table with optional user-provided text
     const adfDescription = await buildAdfRowDescription(
       exportRow.value,
       coreStore.settings,
       exportPeriod.value,
+      issueDescription.value.trim() || undefined,
     )
 
     const payload: Parameters<typeof createJiraIssue>[1] = {
@@ -546,22 +620,34 @@ async function submitJiraIssue() {
     if (selectedSubtasks.value.length > 0) {
       const subtaskTypeId = subtaskTypes.value[0]?.id
       if (subtaskTypeId) {
-        for (const subtaskSummary of selectedSubtasks.value) {
+        for (const childTask of selectedSubtasks.value) {
           try {
-            const subtaskPayload: Parameters<typeof createJiraIssue>[1] = {
-              fields: {
-                project: { key: selectedProjectKey.value },
-                summary: subtaskSummary,
-                issuetype: { id: subtaskTypeId },
-                parent: { key: res.key },
-              },
+            const fields: Record<string, unknown> = {
+              project: { key: selectedProjectKey.value },
+              summary: childTask.title,
+              issuetype: { id: subtaskTypeId },
+              parent: { key: res.key },
+            }
+            if (childTask.description) {
+              fields.description = {
+                type: 'doc',
+                version: 1,
+                content: [
+                  {
+                    type: 'paragraph',
+                    content: [{ type: 'text', text: childTask.description }],
+                  },
+                ],
+              }
             }
             if (myselfAccount.value?.accountId) {
-              subtaskPayload.fields.assignee = { id: myselfAccount.value.accountId }
+              fields.assignee = { id: myselfAccount.value.accountId }
             }
-            await createJiraIssue(jiraConfigData, subtaskPayload)
+            await createJiraIssue(jiraConfigData, {
+              fields: fields as Parameters<typeof createJiraIssue>[1]['fields'],
+            })
           } catch (subErr) {
-            console.error(`Failed to create subtask: ${subtaskSummary}`, subErr)
+            console.error(`Failed to create subtask: ${childTask.title}`, subErr)
           }
         }
       }
@@ -586,20 +672,8 @@ async function groupSubtasksWithAI() {
   isAILoading.value = true
 
   try {
-    const prompt = `You are a professional software project manager and Jira expert.
-The user is exporting a monthly activity report row to Jira as a parent task.
-Parent Task Summary: "${issueSummary.value || exportRow.value?.project || ''}"
-
-Here is a list of raw, detailed daily developer activities:
-${selectedSubtasks.value.map((act) => `- ${act}`).join('\n')}
-
-Please group, clean up, and consolidate these raw activities into a clean, professional, and concise list of child subtasks (aim for 3-7 items depending on complexity).
-Additionally, you MUST filter out and completely exclude any activities that are not related to the topic of the Parent Task Summary.
-
-IMPORTANT Requirements:
-1. Respond ONLY with a valid JSON array of strings, for example: ["Consolidated task 1", "Consolidated task 2"]
-2. Do not wrap the JSON in markdown code blocks like \`\`\`json.
-3. Do not write any other explanation, introduction, headers, or commentary.`
+    const parentSummary = issueSummary.value || exportRow.value?.project || ''
+    const prompt = getJiraGroupSubtasksPrompt(parentSummary, selectedSubtasks.value)
 
     const response = await generateSummary(prompt, { temperature: 0.2 })
     let cleanText = response.trim()
@@ -610,24 +684,39 @@ IMPORTANT Requirements:
       }
     }
 
-    let parsed: string[] = []
+    let parsed: JiraChildTask[] = []
     try {
       const json = JSON.parse(cleanText)
       if (Array.isArray(json)) {
-        parsed = json.map((item) => String(item).trim()).filter(Boolean)
+        parsed = json
+          .map((item: unknown): JiraChildTask | null => {
+            if (typeof item === 'string') {
+              return { id: crypto.randomUUID(), title: String(item).trim(), description: '' }
+            }
+            if (item && typeof item === 'object' && 'title' in (item as Record<string, unknown>)) {
+              return {
+                id: crypto.randomUUID(),
+                title: String((item as Record<string, unknown>).title).trim(),
+                description: String((item as Record<string, unknown>).description || '').trim(),
+              }
+            }
+            return null
+          })
+          .filter((t): t is JiraChildTask => t !== null && t.title.length > 0)
       }
     } catch {
-      // Fallback: split by lines and strip bullets
       parsed = cleanText
         .split('\n')
         .map((line) => line.replace(/^[-*•\d.\s]+/, '').trim())
         .filter((line) => line.length > 2)
+        .map((line) => ({ id: crypto.randomUUID(), title: line, description: '' }))
     }
 
     if (parsed.length > 0) {
       displayActivities.value = parsed
       selectedSubtasks.value = [...parsed]
       success('AI grouped and filtered subtasks successfully!')
+      saveJiraExportData()
     } else {
       error('AI did not return any valid subtasks.')
     }
@@ -640,7 +729,44 @@ IMPORTANT Requirements:
   }
 }
 
+async function saveJiraExportData() {
+  if (!exportPeriod.value || !exportProjectKey.value) return
+  try {
+    const { upsertJiraExportData } = await import('~/queries/jiraExport')
+    await upsertJiraExportData({
+      month: exportPeriod.value,
+      project: exportProjectKey.value,
+      description: issueDescription.value.trim() || null,
+      childTasks: JSON.stringify(displayActivities.value.filter((t) => t.title.trim())),
+    })
+  } catch (err) {
+    console.error('Failed to save Jira export data:', err)
+  }
+}
+
+async function generateParentDescription() {
+  if (!issueSummary.value.trim() || isDescriptionLoading.value) return
+  isDescriptionLoading.value = true
+
+  try {
+    const prompt = getJiraParentDescriptionPrompt(
+      issueSummary.value.trim(),
+      displayActivities.value,
+    )
+
+    const response = await generateSummary(prompt, { temperature: 0.3 })
+    issueDescription.value = response.trim()
+    success('Description generated!')
+  } catch (err: unknown) {
+    const errMsg = err instanceof Error ? err.message : String(err)
+    error(errMsg || 'Failed to generate description')
+  } finally {
+    isDescriptionLoading.value = false
+  }
+}
+
 function closeModal() {
+  saveJiraExportData()
   emit('update:modelValue', false)
 }
 

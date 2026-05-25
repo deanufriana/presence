@@ -23,6 +23,8 @@ export async function getDb() {
       'CREATE TABLE IF NOT EXISTS JiraActivity (id TEXT PRIMARY KEY, key TEXT NOT NULL, summary TEXT NOT NULL, type TEXT NOT NULL, status TEXT, projectName TEXT, updatedAt INTEGER NOT NULL, userEmail TEXT NOT NULL, webUrl TEXT)',
       'CREATE TABLE IF NOT EXISTS YearlyReport (id INTEGER PRIMARY KEY AUTOINCREMENT, year TEXT NOT NULL, tanggal TEXT, month TEXT, task TEXT, deliverable TEXT, status TEXT, keterangan TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
       'CREATE TABLE IF NOT EXISTS Holiday (id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, name TEXT NOT NULL, is_holiday INTEGER NOT NULL, type TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
+      'CREATE TABLE IF NOT EXISTS JiraExportData (id INTEGER PRIMARY KEY AUTOINCREMENT, month TEXT NOT NULL, project TEXT NOT NULL, description TEXT, childTasks TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
+      'CREATE UNIQUE INDEX IF NOT EXISTS monthProjectIdx ON JiraExportData (month, project)',
       'CREATE INDEX IF NOT EXISTS authorEmailIdx ON GitLabCommit (authorEmail)',
       'CREATE INDEX IF NOT EXISTS createdAtIdx ON GitLabCommit (createdAt)',
       'CREATE INDEX IF NOT EXISTS dateIdx ON CalendarEvent (date)',

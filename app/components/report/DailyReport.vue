@@ -314,10 +314,13 @@ const scrollToToday = () => {
   })
 }
 
+const hasScrolledToToday = ref(false)
+
 watch(
   () => dailyTable.value,
   (newVal) => {
-    if (newVal.length > 0) {
+    if (newVal.length > 0 && !hasScrolledToToday.value) {
+      hasScrolledToToday.value = true
       scrollToToday()
     }
   },

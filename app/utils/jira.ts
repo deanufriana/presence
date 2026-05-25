@@ -143,6 +143,7 @@ export async function buildAdfRowDescription(
   row: MonthlyReportRow,
   settings: SettingsData,
   selectedDateStr: string,
+  userDescription?: string,
 ): Promise<Record<string, unknown>> {
   const { parse, format } = await import('date-fns')
   const { id: idLocale } = await import('date-fns/locale')
@@ -164,10 +165,21 @@ export async function buildAdfRowDescription(
   const divHeadName = settings.div_head_name || '-'
   const divHeadPosition = settings.div_head_position || '-'
 
+  const descriptionNodes: Record<string, unknown>[] = userDescription
+    ? [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: userDescription }],
+        },
+        { type: 'rule' },
+      ]
+    : []
+
   return {
     type: 'doc',
     version: 1,
     content: [
+      ...descriptionNodes,
       {
         type: 'heading',
         attrs: { level: 2 },

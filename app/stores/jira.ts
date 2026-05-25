@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { JiraCache, JiraEvent, MonthlyReportRow } from '~/types/report'
+import type { JiraCache, JiraEvent, MonthlyReportRow, JiraChildTask } from '~/types/report'
 import type { JiraProject, JiraIssueType, JiraMyself, JiraConfig } from '~/utils/jira'
 
 export const useJiraStore = defineStore('jira', () => {
@@ -11,6 +11,9 @@ export const useJiraStore = defineStore('jira', () => {
   const exportPeriod = ref('')
   const candidateParents = ref<JiraEvent[]>([])
   const exportRowActivities = ref<string[]>([])
+  const exportDescription = ref('')
+  const exportChildTasks = ref<JiraChildTask[]>([])
+  const exportProjectKey = ref('')
 
   // Cached metadata to avoid redundant API calls
   const cachedProjects = ref<JiraProject[]>([])
@@ -79,6 +82,33 @@ export const useJiraStore = defineStore('jira', () => {
     exportPeriod.value = period
     candidateParents.value = []
     exportRowActivities.value = []
+    exportDescription.value = ''
+    exportChildTasks.value = []
+
+    // Extract stable project key from bracket prefix [PROJ]
+    const projectKeyMatch = row.project?.match(/^\[([^\]]+)\]/)
+    exportProjectKey.value = projectKeyMatch?.[1]?.toUpperCase() || row.project?.trim() || ''
+
+    // Load pre-generated Jira export data from DB using stable project key
+    try {
+      const { getJiraExportData } = await import('~/queries/jiraExport')
+      const saved = await getJiraExportData(period, exportProjectKey.value)
+      if (saved) {
+        exportDescription.value = saved.description || ''
+        if (saved.childTasks) {
+          try {
+            const parsed = JSON.parse(saved.childTasks)
+            if (Array.isArray(parsed)) {
+              exportChildTasks.value = parsed as JiraChildTask[]
+            }
+          } catch {
+            // ignore parse errors
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load Jira export data:', err)
+    }
 
     if (row.sources && row.sources.length > 0) {
       try {
@@ -133,6 +163,9 @@ export const useJiraStore = defineStore('jira', () => {
     exportPeriod,
     candidateParents,
     exportRowActivities,
+    exportDescription,
+    exportChildTasks,
+    exportProjectKey,
     triggerRowJiraExport,
     // Cached metadata
     cachedProjects,

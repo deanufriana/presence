@@ -94,7 +94,6 @@
 
 <script setup lang="ts">
 import { CalendarDays, CalendarRange, Settings, FileText, Upload } from 'lucide-vue-next'
-import { useScrollLock } from '@vueuse/core'
 import { Button } from '~/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '~/components/ui/tabs'
 import DailyReport from '~/components/report/DailyReport.vue'
@@ -156,11 +155,5 @@ const handleCalendarUpload = async (event: Event) => {
 
 onMounted(() => {
   fetchSettings()
-})
-
-// ─── Scroll Lock ──────────────────────────────────
-const isLocked = useScrollLock(import.meta.client ? document.body : null)
-watch([showSettings, showManualEntry, showExportModal], ([s, m, j]) => {
-  isLocked.value = s || m || j
 })
 </script>

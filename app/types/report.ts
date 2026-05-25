@@ -47,6 +47,22 @@ export interface YearlyReportRow {
   keterangan: string
 }
 
+export interface JiraChildTask {
+  id?: string
+  title: string
+  description: string
+}
+
+export interface JiraExportData {
+  id: number
+  month: string
+  project: string
+  description: string | null
+  childTasks: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface YearlyActivityMonth {
   month: string
   hasGitlab: boolean

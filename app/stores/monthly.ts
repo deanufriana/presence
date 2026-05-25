@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { useCoreStore } from '~/stores/core'
 import { useToast } from '~/composables/use-toast'
-import type { MonthlyReportRow } from '~/types/report'
+import type { MonthlyReportRow, JiraChildTask } from '~/types/report'
 import { watchDebounced } from '@vueuse/core'
 
 export const useMonthlyStore = defineStore('monthly', () => {
@@ -62,13 +62,66 @@ export const useMonthlyStore = defineStore('monthly', () => {
       if (report) {
         monthlyHighlights.value = report.summary
         monthlyRows.value = report.rows as MonthlyReportRow[]
-        success('Monthly report and table generated!', { id: loadingToastId })
       }
+
+      // Generate Jira export data inline (inside loading toast)
+      if (rows.length > 0) {
+        await generateJiraExportData(activities, rows, report?.summary)
+      }
+
+      success('Monthly report and table generated!', { id: loadingToastId })
     } catch (err: unknown) {
       console.error('Failed to generate AI summary:', err)
       error('AI service error', { id: loadingToastId })
     } finally {
       summarizing.value = false
+    }
+  }
+
+  async function generateJiraExportData(
+    activities: string[],
+    rows: { project: string; sources?: string[] }[],
+    monthlySummary?: string,
+  ) {
+    try {
+      const { generateSummary } = await import('~/utils/ai')
+      const { getJiraExportPrompt } = await import('~/utils/prompts')
+      const { upsertJiraExportData } = await import('~/queries/jiraExport')
+
+      const jiraPrompt = getJiraExportPrompt(activities, rows, monthlySummary)
+      const jiraRaw = await generateSummary(jiraPrompt, { max_tokens: 8192, temperature: 0.2 })
+
+      let clean = jiraRaw.trim()
+      if (clean.startsWith('```')) {
+        const match = clean.match(/^(?:```[a-zA-Z]*\n?)([\s\S]*?)(?:\n?```)$/)
+        if (match) clean = (match[1] || '').trim()
+      }
+
+      const jiraData = JSON.parse(clean) as {
+        project: string
+        description: string
+        childTasks: JiraChildTask[]
+      }[]
+
+      if (!Array.isArray(jiraData)) return
+
+      for (const item of jiraData) {
+        if (!item.project) continue
+        const keyMatch = item.project.match(/^\[([^\]]+)\]/)
+        const projectKey = keyMatch?.[1]?.toUpperCase() || item.project.trim()
+        const childTasks = (item.childTasks || []).map((ct) => ({
+          title: ct.title || '',
+          description: ct.description || '',
+        }))
+        await upsertJiraExportData({
+          month: core.selectedDate,
+          project: projectKey,
+          description: item.description || null,
+          childTasks: JSON.stringify(childTasks),
+        })
+      }
+    } catch (err) {
+      console.error('Failed to generate/save Jira export data:', err)
     }
   }
 

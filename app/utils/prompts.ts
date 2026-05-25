@@ -18,18 +18,18 @@ Aturan Pengelompokan & Format (WAJIB):
 4. Judul proyek wajib menggunakan format tebal: **Nama Proyek**
 5. Di bawah tiap proyek, gunakan bullet "-" dengan MAKSIMAL 3 bullet per proyek. Pilih 3 pencapaian yang paling berdampak/penting.
 6. Gunakan tepat 1 kalimat per bullet.
-21. Setiap bullet WAJIB diawali dengan daftar tanggal sumber dari aktivitas aslinya dalam kurung siku, contoh: \`[2024-04-01, 2024-04-05] Deskripsi pekerjaan...\`
+7. Setiap bullet WAJIB diawali dengan daftar tanggal sumber dari aktivitas aslinya dalam kurung siku, contoh: \`[2024-04-01, 2024-04-05] Deskripsi pekerjaan...\`
 
 Aturan Konten & Sintesis:
-7. Fokus pada nilai bisnis dan dampak teknis dari setiap pencapaian (misal: meningkatkan efisiensi, menjamin keamanan data).
-8. JANGAN menghapus detail spesifik mengenai lokasi atau bagian aplikasi yang dikerjakan (misal: "pada modul autentikasi", "di sistem reporting"). Detail "di mana" implementasi dilakukan sangat penting.
-9. Gabungkan aktivitas/commit yang serupa atau yang terjadi pada tanggal yang sama menjadi 1 bullet umum yang komprehensif tanpa menghilangkan konteks teknis utamanya.
-10. Ringkas log aktivitas meeting (misal: "Meeting from... with discuss about...") menjadi satu ringkasan koordinasi/diskusi teknis yang relevan dengan proyek.
-11. DILARANG halusinasi; ekstrak data murni dari daftar aktivitas yang diberikan.
-12. JANGAN menyertakan nama branch (misal: feature/api, develop) ke dalam ringkasan.
+8. Fokus pada nilai bisnis dan dampak teknis dari setiap pencapaian (misal: meningkatkan efisiensi, menjamin keamanan data).
+9. JANGAN menghapus detail spesifik mengenai lokasi atau bagian aplikasi yang dikerjakan (misal: "pada modul autentikasi", "di sistem reporting"). Detail "di mana" implementasi dilakukan sangat penting.
+10. Gabungkan aktivitas/commit yang serupa atau yang terjadi pada tanggal yang sama menjadi 1 bullet umum yang komprehensif tanpa menghilangkan konteks teknis utamanya.
+11. Ringkas log aktivitas meeting (misal: "Meeting from... with discuss about...") menjadi satu ringkasan koordinasi/diskusi teknis yang relevan dengan proyek.
+12. DILARANG halusinasi; ekstrak data murni dari daftar aktivitas yang diberikan.
+13. JANGAN menyertakan nama branch (misal: feature/api, develop) ke dalam ringkasan.
 
 Aturan Label Status (WAJIB):
-13. Setiap bullet WAJIB diakhiri dengan salah satu dari 3 label status berikut (tulis persis seperti ini):
+14. Setiap bullet WAJIB diakhiri dengan salah satu dari 3 label status berikut (tulis persis seperti ini):
     - [Status: Project] -> Untuk pekerjaan fitur baru/pengembangan proyek utama.
     - [Status: Project Enhance] -> Untuk improvement, refactoring kode, optimasi, atau perbaikan.
     - [Status: Continuing (Daily)] -> Untuk monitoring, support, operasional, aktivitas berulang harian, atau meeting rutin/koordinasi.
@@ -143,3 +143,93 @@ Aturan Konten & Sintesis:
 ${summaries.join('\n\n---\n\n')}
 </monthly_summaries>
 `
+
+export const getJiraExportPrompt = (
+  activities: string[],
+  rows: { project: string; sources?: string[] }[],
+  monthlySummary?: string,
+) => `
+Kamu adalah seorang Jira Expert dan Technical Writer yang ahli dalam menyusun tiket Jira yang profesional.
+
+Tugas:
+Berdasarkan aktivitas harian developer dan ringkasan bulanan yang telah dibuat, buatlah data Jira untuk setiap baris laporan bulanan. Gunakan ringkasan bulanan sebagai referensi utama untuk menulis deskripsi Jira yang koheren dan konsisten dengan laporan bulanan.
+
+<instructions>
+Untuk setiap baris proyek berikut, buatkan:
+1. **description**: Deskripsi Jira issue yang profesional (2-4 kalimat) yang menjelaskan tujuan, scope, dan dampak dari pekerjaan. Gunakan ringkasan bulanan sebagai acuan agar deskripsi Jira selaras dengan laporan.
+2. **childTasks**: Daftar child subtask yang representatif (3-7 item) dengan masing-masing memiliki **title** (judul singkat) dan **description** (deskripsi 1-2 kalimat).
+
+Aturan:
+- Gunakan Bahasa Indonesia untuk semua teks.
+- Jangan terjemahkan istilah teknis (refactoring, bug, feature, deployment, dll).
+- Fokus pada nilai bisnis dan dampak teknis.
+- Child task harus spesifik dan actionable, bukan aktivitas umum.
+- JANGAN halusinasi; ekstrak dari data aktivitas yang diberikan.
+
+RESPOND HANYA DENGAN JSON ARRAY dengan format berikut (TANPA markdown, TANPA penjelasan):
+[
+  {
+    "project": "[ProjectName] Description...",
+    "description": "Deskripsi Jira issue...",
+    "childTasks": [
+      { "title": "Judul child task", "description": "Deskripsi child task..." },
+      { "title": "Judul child task", "description": "Deskripsi child task..." }
+    ]
+  }
+]
+
+Pastikan field "project" cocok PERSIS dengan project baris yang diberikan.
+</instructions>
+
+${monthlySummary ? `<monthly_summary>\n${monthlySummary}\n</monthly_summary>\n` : ''}
+<daily_activities>
+${activities.join('\n')}
+</daily_activities>
+
+<monthly_rows>
+${rows.map((r) => `- Project: ${r.project} | Sources: ${(r.sources || []).join(', ')}`).join('\n')}
+</monthly_rows>
+`
+
+export const getJiraGroupSubtasksPrompt = (
+  issueSummary: string,
+  subtasks: { title: string; description?: string }[],
+) => {
+  const currentTasks = subtasks.map((t) => t.title).join('\n')
+  return `Anda adalah manajer proyek profesional dan ahli Jira.
+Pengguna mengekspor baris laporan aktivitas bulanan ke Jira sebagai parent task.
+Ringkasan Parent Task: "${issueSummary}"
+
+Berikut adalah daftar aktivitas harian developer yang masih mentah:
+${currentTasks}
+
+Kelompokkan, bersihkan, dan konsolidasi aktivitas mentah ini menjadi daftar child subtask yang bersih, profesional, dan ringkas (target 3-7 item tergantung kompleksitas).
+Selain itu, Anda WAJIB memfilter dan mengecualikan sepenuhnya aktivitas yang tidak terkait dengan topik Ringkasan Parent Task.
+
+PERSYARATAN PENTING:
+1. Jawab HANYA dengan JSON array of objects yang valid, contoh: [{"title": "Tugas 1 yang dikonsolidasi", "description": "Deskripsi tugas"}, {"title": "Tugas 2", "description": "Deskripsi tugas"}]
+2. Jangan bungkus JSON dalam markdown code block seperti \`\`\`json.
+3. Jangan tulis penjelasan, pengantar, header, atau komentar apapun.
+4. Gunakan Bahasa Indonesia untuk title dan description.`
+}
+
+export const getJiraParentDescriptionPrompt = (
+  issueSummary: string,
+  subtasks: { title: string; description?: string }[],
+) => {
+  const subtaskContext = subtasks.length
+    ? `\n\nRelated child subtasks planned for this issue:\n${subtasks.map((a) => `- ${a.title}`).join('\n')}`
+    : ''
+
+  return `Anda adalah manajer proyek profesional dan ahli Jira.
+Tulis deskripsi Jira issue yang jelas dan ringkas (2-4 kalimat maksimal) untuk tugas berikut.
+
+Ringkasan Tugas: "${issueSummary}"${subtaskContext}
+
+Persyaratan:
+1. Jelaskan tujuan dan cakupan tugas dalam bahasa yang profesional.
+2. Sebutkan apa yang akan dikerjakan dan mengapa itu penting.
+3. Gunakan Bahasa Indonesia untuk deskripsi.
+4. Jangan gunakan sub-list, heading, atau format markdown.
+5. Tulis dalam teks biasa saja, tanpa bullet point.`
+}
