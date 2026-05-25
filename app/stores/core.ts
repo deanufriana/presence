@@ -15,7 +15,6 @@ export const useCoreStore = defineStore('core', () => {
   const initialLoading = ref(true)
   const isInitialized = ref(false)
   const pending = ref(false)
-  const copied = ref(false)
   const viewMode = ref<'monthly' | 'yearly'>('monthly')
   const selectedProjectIds = ref<number[]>([])
   const selectedJiraProjects = ref<string[]>([])
@@ -210,7 +209,6 @@ export const useCoreStore = defineStore('core', () => {
     isInitialized,
     pending,
     formatMonth,
-    copied,
     settings,
     isAiEnabled,
     dateDisplay,

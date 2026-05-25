@@ -8,13 +8,6 @@ export async function getJiraExportData(month: string, project: string) {
   })
 }
 
-export async function getJiraExportDataByMonth(month: string) {
-  const db = await getDb()
-  return await db.query.jiraExportData.findMany({
-    where: eq(schema.jiraExportData.month, month),
-  })
-}
-
 export async function upsertJiraExportData(data: {
   month: string
   project: string
@@ -52,11 +45,4 @@ export async function upsertJiraExportData(data: {
   })
 
   return await getJiraExportData(data.month, data.project)
-}
-
-export async function deleteJiraExportData(month: string, project: string) {
-  const db = await getDb()
-  await db
-    .delete(schema.jiraExportData)
-    .where(and(eq(schema.jiraExportData.month, month), eq(schema.jiraExportData.project, project)))
 }

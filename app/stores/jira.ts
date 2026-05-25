@@ -35,6 +35,8 @@ export const useJiraStore = defineStore('jira', () => {
       }
     } catch (error) {
       console.error('Failed to fetch jira cache:', error)
+      const { error: toastError } = useToast()
+      toastError('Failed to sync Jira activities')
     }
   }
 
@@ -86,8 +88,8 @@ export const useJiraStore = defineStore('jira', () => {
     exportChildTasks.value = []
 
     // Extract stable project key from bracket prefix [PROJ]
-    const projectKeyMatch = row.project?.match(/^\[([^\]]+)\]/)
-    exportProjectKey.value = projectKeyMatch?.[1]?.toUpperCase() || row.project?.trim() || ''
+    const { extractProjectKey } = await import('~/utils/format')
+    exportProjectKey.value = extractProjectKey(row.project || '')
 
     // Load pre-generated Jira export data from DB using stable project key
     try {
@@ -147,6 +149,8 @@ export const useJiraStore = defineStore('jira', () => {
         exportRowActivities.value = Array.from(new Set(parsedActivities))
       } catch (err) {
         console.error('Failed to fetch candidate parents or daily activities:', err)
+        const { error: toastError } = useToast()
+        toastError('Failed to load activities for Jira export')
         return
       }
     }

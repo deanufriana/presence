@@ -91,11 +91,8 @@ export const useMonthlyStore = defineStore('monthly', () => {
       const jiraPrompt = getJiraExportPrompt(activities, rows, monthlySummary)
       const jiraRaw = await generateSummary(jiraPrompt, { max_tokens: 8192, temperature: 0.2 })
 
-      let clean = jiraRaw.trim()
-      if (clean.startsWith('```')) {
-        const match = clean.match(/^(?:```[a-zA-Z]*\n?)([\s\S]*?)(?:\n?```)$/)
-        if (match) clean = (match[1] || '').trim()
-      }
+      const { stripMarkdownCodeBlock, extractProjectKey } = await import('~/utils/format')
+      const clean = stripMarkdownCodeBlock(jiraRaw)
 
       const jiraData = JSON.parse(clean) as {
         project: string
@@ -107,8 +104,7 @@ export const useMonthlyStore = defineStore('monthly', () => {
 
       for (const item of jiraData) {
         if (!item.project) continue
-        const keyMatch = item.project.match(/^\[([^\]]+)\]/)
-        const projectKey = keyMatch?.[1]?.toUpperCase() || item.project.trim()
+        const projectKey = extractProjectKey(item.project)
         const childTasks = (item.childTasks || []).map((ct) => ({
           title: ct.title || '',
           description: ct.description || '',
@@ -122,6 +118,7 @@ export const useMonthlyStore = defineStore('monthly', () => {
       }
     } catch (err) {
       console.error('Failed to generate/save Jira export data:', err)
+      error('Failed to prepare Jira descriptions')
     }
   }
 
@@ -142,7 +139,7 @@ export const useMonthlyStore = defineStore('monthly', () => {
   watchDebounced(
     [monthlyRows, monthlyHighlights],
     async ([newRows, newSummary]) => {
-      if (newRows.length >= 0) {
+      if (newRows.length > 0) {
         const { upsertMonthlyReport } = await import('~/utils/reports')
         await upsertMonthlyReport({
           month: core.selectedDate,

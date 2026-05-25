@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { useCoreStore } from '~/stores/core'
 import { useToast } from '~/composables/use-toast'
-import { format, parseISO } from 'date-fns'
 import type { ReportRow } from '~/types/report'
 
 export const useDailyStore = defineStore('daily', () => {
@@ -291,14 +290,6 @@ export const useDailyStore = defineStore('daily', () => {
     }
   }
 
-  function formatTime(dateStr: string) {
-    try {
-      return format(parseISO(dateStr), 'HH:mm')
-    } catch {
-      return ''
-    }
-  }
-
   const updateRow = async (data: ReportRow | ReportRow[]) => {
     try {
       const { upsertDailyReport } = await import('~/utils/reports')
@@ -334,7 +325,6 @@ export const useDailyStore = defineStore('daily', () => {
     openManualEntry,
     saveManualActivity,
     syncDayActivity,
-    formatTime,
     updateRow,
   }
 })

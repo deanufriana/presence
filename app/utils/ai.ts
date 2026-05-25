@@ -2,6 +2,7 @@ import { getDb, schema } from '~/db'
 import type { OllamaModel } from '~/types/ollama'
 import { eq } from 'drizzle-orm'
 import { fetch } from '@tauri-apps/plugin-http'
+import { stripMarkdownCodeBlock } from './format'
 
 export interface AiOptions {
   max_tokens?: number
@@ -164,4 +165,28 @@ export async function fetchOllamaModels(baseUrl: string) {
   if (!response.ok) throw new Error('Failed to fetch Ollama models')
   const data = (await response.json()) as { models?: OllamaModel[] }
   return data.models || []
+}
+
+export function parseAiJsonResponse<T>(
+  response: string,
+  parseItem: (item: unknown) => T | null,
+  lineFallback: (line: string) => T | null,
+): T[] {
+  const clean = stripMarkdownCodeBlock(response)
+
+  try {
+    const json = JSON.parse(clean)
+    if (Array.isArray(json)) {
+      return json.map(parseItem).filter((t): t is T => t !== null)
+    }
+  } catch {
+    // fallback to line parsing below
+  }
+
+  return clean
+    .split('\n')
+    .map((line) => line.replace(/^[-*•\d.\s]+/, '').trim())
+    .filter((line) => line.length > 2)
+    .map(lineFallback)
+    .filter((t): t is T => t !== null)
 }

@@ -2,6 +2,8 @@
   <Dialog :open="modelValue" @update:open="closeModal">
     <DialogContent
       class="w-full max-w-5xl lg:max-w-6xl max-h-[90vh] overflow-hidden flex flex-col p-0 border-blue-500/20 shadow-2xl"
+      @keydown.ctrl.enter.prevent="submitJiraIssue"
+      @keydown.meta.enter.prevent="submitJiraIssue"
     >
       <DialogHeader class="border-b border-border/40 bg-muted/10 p-6">
         <DialogTitle class="flex items-center gap-2 text-base">
@@ -245,93 +247,17 @@
           <!-- Right Column: Task Details Preview & Child Subtasks Selection -->
           <div class="space-y-4 lg:col-span-7">
             <!-- Child Subtasks Selection -->
-            <FieldSet
-              v-if="displayActivities && displayActivities.length"
-              class="space-y-2 border-t border-border/40 pt-3"
-            >
-              <div class="flex items-center justify-between gap-2">
-                <FieldLegend
-                  class="text-xs font-bold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5"
-                >
-                  <ListTodo class="size-3.5 text-blue-500" />
-                  Create Child Subtasks
-                  <span class="text-[9px] lowercase font-normal text-muted-foreground"
-                    >(from daily activities)</span
-                  >
-                </FieldLegend>
-
-                <!-- AI Group & Summarize Button -->
-                <Button
-                  v-if="coreStore.isAiEnabled"
-                  variant="outline"
-                  size="sm"
-                  class="h-7 text-[10px] font-semibold gap-1 px-2 border-purple-500/30 text-purple-600 hover:text-purple-700 hover:bg-purple-50/50 dark:text-purple-400 dark:border-purple-500/20 dark:hover:bg-purple-950/20 cursor-pointer"
-                  :disabled="isAILoading || !selectedSubtasks.length"
-                  @click="groupSubtasksWithAI"
-                >
-                  <Sparkles v-if="!isAILoading" class="text-purple-500" data-icon="inline-start" />
-                  <RefreshCw v-else class="animate-spin text-purple-500" data-icon="inline-start" />
-                  {{ isAILoading ? 'AI Summarizing...' : 'AI Group & Summarize' }}
-                </Button>
-                <span
-                  v-else
-                  class="text-[9px] text-muted-foreground italic flex items-center gap-0.5"
-                >
-                  AI disabled (no API keys)
-                </span>
-              </div>
-
-              <FieldGroup
-                class="space-y-1 max-h-72 overflow-y-auto border border-border/50 rounded-lg p-3 bg-muted/5"
-              >
-                <div
-                  v-for="(act, idx) in displayActivities"
-                  :key="idx"
-                  class="p-2 rounded-md hover:bg-muted/10 transition-colors border-b border-border/20 last:border-0"
-                >
-                  <div class="flex items-start gap-2.5">
-                    <Checkbox
-                      :id="'subtask-' + idx"
-                      :checked="selectedSubtasks.some((s) => s.id === act.id)"
-                      class="mt-1"
-                      @update:checked="
-                        (checked: boolean) => {
-                          if (checked) {
-                            selectedSubtasks.push(act)
-                          } else {
-                            selectedSubtasks = selectedSubtasks.filter((x) => x.id !== act.id)
-                          }
-                        }
-                      "
-                    />
-                    <div class="flex-1 min-w-0 space-y-1">
-                      <FieldLabel
-                        v-if="!selectedSubtasks.some((s) => s.id === act.id)"
-                        :for="'subtask-' + idx"
-                        class="text-xs font-medium text-foreground cursor-pointer select-none leading-normal"
-                      >
-                        {{ act.title }}
-                      </FieldLabel>
-                      <div
-                        v-else
-                        class="animate-in fade-in slide-in-from-top-1 duration-150 space-y-1"
-                      >
-                        <Input
-                          v-model="act.title"
-                          placeholder="Task title"
-                          class="h-7 text-[11px]"
-                        />
-                        <Textarea
-                          v-model="act.description"
-                          placeholder="Task description (optional)"
-                          class="text-[10px] min-h-[36px] resize-none"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </FieldGroup>
-            </FieldSet>
+            <JiraChildTaskList
+              v-if="displayActivities.length"
+              :tasks="displayActivities"
+              :selected-ids="selectedSubtaskIds"
+              :ai-enabled="coreStore.isAiEnabled"
+              :ai-loading="isAILoading"
+              @toggle="handleSubtaskToggle"
+              @change-title="handleSubtaskTitleUpdate"
+              @change-description="handleSubtaskDescriptionUpdate"
+              @group-with-ai="groupSubtasksWithAI"
+            />
           </div>
         </div>
       </div>
@@ -366,7 +292,6 @@ import {
   CheckCircle2,
   ExternalLink,
   CalendarDays,
-  ListTodo,
   Sparkles,
   FileText,
 } from 'lucide-vue-next'
@@ -379,11 +304,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog'
-import { Field, FieldGroup, FieldLabel, FieldSet, FieldLegend } from '~/components/ui/field'
+import { Field, FieldGroup, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
-import { Checkbox } from '~/components/ui/checkbox'
 import { Badge } from '~/components/ui/badge'
+import JiraChildTaskList from '~/components/report/JiraChildTaskList.vue'
 import {
   Select,
   SelectContent,
@@ -400,7 +325,8 @@ import { useJiraStore } from '~/stores/jira'
 import { useCoreStore } from '~/stores/core'
 import { useToast } from '~/composables/use-toast'
 import { getJiraConfig, createJiraIssue, buildAdfRowDescription } from '~/utils/jira'
-import { generateSummary } from '~/utils/ai'
+import { generateSummary, parseAiJsonResponse } from '~/utils/ai'
+import { generateId, parseProjectText } from '~/utils/format'
 import { getJiraGroupSubtasksPrompt, getJiraParentDescriptionPrompt } from '~/utils/prompts'
 
 const props = defineProps<{
@@ -426,7 +352,7 @@ const {
 const exportRowActivities = computed(() => jiraStore.exportRowActivities || [])
 
 const subtaskTypes = computed(() => (jiraStore.cachedIssueTypes || []).filter((t) => t.subtask))
-const selectedSubtasks = ref<JiraChildTask[]>([])
+const selectedSubtaskIds = ref<string[]>([])
 const displayActivities = ref<JiraChildTask[]>([])
 const myselfAccount = computed(() => jiraStore.cachedMyself)
 const isAILoading = ref(false)
@@ -478,8 +404,7 @@ async function loadJiraConfig() {
     jiraConfigData = config
 
     // Use store's pre-extracted project key; parse summary from bracket prefix
-    const summaryMatch = exportRow.value?.project?.match(/^\[([^\]]+)\]\s*(.+)$/)
-    issueSummary.value = summaryMatch?.[2] || exportRow.value?.project || ''
+    issueSummary.value = parseProjectText(exportRow.value?.project || '').summary
 
     // Load projects, myself, and issue types using Pinia caching action
     await jiraStore.loadJiraMetadata(config)
@@ -515,18 +440,18 @@ async function loadJiraConfig() {
     // Pre-fill child tasks from stored Jira export data, fallback to raw activities
     if (exportChildTasks.value?.length) {
       displayActivities.value = exportChildTasks.value.map((t) => ({
-        id: t.id || crypto.randomUUID(),
+        id: t.id || generateId(),
         title: t.title,
         description: t.description || '',
       }))
-      selectedSubtasks.value = [...displayActivities.value]
+      selectedSubtaskIds.value = displayActivities.value.map((t) => t.id || '').filter(Boolean)
     } else {
       displayActivities.value = (exportRowActivities.value || []).map((a) => ({
-        id: crypto.randomUUID(),
+        id: generateId(),
         title: a,
         description: '',
       }))
-      selectedSubtasks.value = [...displayActivities.value]
+      selectedSubtaskIds.value = displayActivities.value.map((t) => t.id || '').filter(Boolean)
     }
 
     // Default issue type selection
@@ -555,6 +480,16 @@ async function loadJiraConfig() {
     configError.value = true
   } finally {
     loadingConfig.value = false
+  }
+
+  // Auto-generate description if AI is enabled and description is empty
+  if (
+    coreStore.isAiEnabled &&
+    issueSummary.value.trim() &&
+    !issueDescription.value.trim() &&
+    !isDescriptionLoading.value
+  ) {
+    generateParentDescription()
   }
 }
 
@@ -617,10 +552,13 @@ async function submitJiraIssue() {
     const res = await createJiraIssue(jiraConfigData, payload)
 
     // Create child subtasks under the newly created parent issue
-    if (selectedSubtasks.value.length > 0) {
+    if (selectedSubtaskIds.value.length > 0) {
       const subtaskTypeId = subtaskTypes.value[0]?.id
       if (subtaskTypeId) {
-        for (const childTask of selectedSubtasks.value) {
+        const selectedTasks = displayActivities.value.filter((t) =>
+          selectedSubtaskIds.value.includes(t.id || ''),
+        )
+        for (const childTask of selectedTasks) {
           try {
             const fields: Record<string, unknown> = {
               project: { key: selectedProjectKey.value },
@@ -667,54 +605,63 @@ async function submitJiraIssue() {
   }
 }
 
+function handleSubtaskToggle(id: string, checked: boolean) {
+  if (checked) {
+    if (!selectedSubtaskIds.value.includes(id)) {
+      selectedSubtaskIds.value.push(id)
+    }
+  } else {
+    selectedSubtaskIds.value = selectedSubtaskIds.value.filter((x) => x !== id)
+  }
+}
+
+function handleSubtaskTitleUpdate(id: string, title: string) {
+  const task = displayActivities.value.find((t) => t.id === id)
+  if (task) task.title = title
+}
+
+function handleSubtaskDescriptionUpdate(id: string, description: string) {
+  const task = displayActivities.value.find((t) => t.id === id)
+  if (task) task.description = description
+}
+
 async function groupSubtasksWithAI() {
-  if (!selectedSubtasks.value.length || isAILoading.value) return
+  if (!selectedSubtaskIds.value.length || isAILoading.value) return
   isAILoading.value = true
 
   try {
     const parentSummary = issueSummary.value || exportRow.value?.project || ''
-    const prompt = getJiraGroupSubtasksPrompt(parentSummary, selectedSubtasks.value)
+    const selectedTasks = displayActivities.value.filter((t) =>
+      selectedSubtaskIds.value.includes(t.id || ''),
+    )
+    const prompt = getJiraGroupSubtasksPrompt(parentSummary, selectedTasks)
 
     const response = await generateSummary(prompt, { temperature: 0.2 })
-    let cleanText = response.trim()
-    if (cleanText.startsWith('```')) {
-      const match = cleanText.match(/^(?:```[a-zA-Z]*\n?)([\s\S]*?)(?:\n?```)$/)
-      if (match) {
-        cleanText = (match[1] || '').trim()
-      }
-    }
 
-    let parsed: JiraChildTask[] = []
-    try {
-      const json = JSON.parse(cleanText)
-      if (Array.isArray(json)) {
-        parsed = json
-          .map((item: unknown): JiraChildTask | null => {
-            if (typeof item === 'string') {
-              return { id: crypto.randomUUID(), title: String(item).trim(), description: '' }
-            }
-            if (item && typeof item === 'object' && 'title' in (item as Record<string, unknown>)) {
-              return {
-                id: crypto.randomUUID(),
-                title: String((item as Record<string, unknown>).title).trim(),
-                description: String((item as Record<string, unknown>).description || '').trim(),
-              }
-            }
-            return null
-          })
-          .filter((t): t is JiraChildTask => t !== null && t.title.length > 0)
-      }
-    } catch {
-      parsed = cleanText
-        .split('\n')
-        .map((line) => line.replace(/^[-*•\d.\s]+/, '').trim())
-        .filter((line) => line.length > 2)
-        .map((line) => ({ id: crypto.randomUUID(), title: line, description: '' }))
-    }
+    const parsed = parseAiJsonResponse<JiraChildTask>(
+      response,
+      (item) => {
+        if (typeof item === 'string') {
+          return { id: generateId(), title: String(item).trim(), description: '' }
+        }
+        if (item && typeof item === 'object' && 'title' in (item as Record<string, unknown>)) {
+          return {
+            id: generateId(),
+            title: String((item as Record<string, unknown>).title).trim(),
+            description: String((item as Record<string, unknown>).description || '').trim(),
+          }
+        }
+        return null
+      },
+      (line) => {
+        const title = line.replace(/^[-*•\d.\s]+/, '').trim()
+        return title.length > 2 ? { id: generateId(), title, description: '' } : null
+      },
+    )
 
     if (parsed.length > 0) {
       displayActivities.value = parsed
-      selectedSubtasks.value = [...parsed]
+      selectedSubtaskIds.value = parsed.map((t) => t.id || '').filter(Boolean)
       success('AI grouped and filtered subtasks successfully!')
       saveJiraExportData()
     } else {
@@ -741,6 +688,7 @@ async function saveJiraExportData() {
     })
   } catch (err) {
     console.error('Failed to save Jira export data:', err)
+    error('Failed to save changes')
   }
 }
 

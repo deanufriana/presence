@@ -98,7 +98,7 @@ export const useYearlyStore = defineStore('yearly', () => {
   watchDebounced(
     [yearlyRows, yearlyHighlights],
     async ([newRows, newSummary]) => {
-      if (newRows.length >= 0) {
+      if (newRows.length > 0) {
         const { upsertYearlyReport } = await import('~/utils/reports')
         await upsertYearlyReport({
           year: currentYear.value,

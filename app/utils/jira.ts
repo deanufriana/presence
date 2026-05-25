@@ -291,10 +291,8 @@ export async function buildAdfRowDescription(
 }
 
 export async function syncJiraActivities(dateStr: string, force: boolean = false) {
-  const { startOfMonth, endOfMonth, parse, format } = await import('date-fns')
-  const baseDate = parse(dateStr, 'yyyy-MM', new Date())
-  const firstDay = format(startOfMonth(baseDate), 'yyyy-MM-dd')
-  const lastDay = format(endOfMonth(baseDate), 'yyyy-MM-dd')
+  const { getMonthRange } = await import('./dates')
+  const { firstDayStr, lastDayStr } = getMonthRange(dateStr)
 
   const config = await getJiraConfig()
 
@@ -306,7 +304,7 @@ export async function syncJiraActivities(dateStr: string, force: boolean = false
   if (!config.baseUrl) return { success: true, events: [], date: dateStr }
 
   // JQL for updated issues by current user in the month
-  const jql = `updated >= "${firstDay}" AND updated <= "${lastDay}" AND assignee = currentUser() ORDER BY updated DESC`
+  const jql = `updated >= "${firstDayStr}" AND updated <= "${lastDayStr}" AND assignee = currentUser() ORDER BY updated DESC`
   const data = await fetchJira<{ issues: JiraIssue[] }>('search/jql', config, {
     query: { jql, maxResults: 100, fields: 'summary,issuetype,status,project,updated' },
   })
@@ -331,10 +329,8 @@ export async function syncJiraActivities(dateStr: string, force: boolean = false
 }
 
 export async function getJiraCache(dateStr: string) {
-  const { startOfMonth, endOfMonth, parse } = await import('date-fns')
-  const baseDate = parse(dateStr, 'yyyy-MM', new Date())
-  const firstDay = startOfMonth(baseDate)
-  const lastDay = endOfMonth(baseDate)
+  const { getMonthRange } = await import('./dates')
+  const { firstDay, lastDay } = getMonthRange(dateStr)
 
   const activities = await getJiraActivitiesByPeriod(firstDay, lastDay)
 

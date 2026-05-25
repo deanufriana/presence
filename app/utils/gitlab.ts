@@ -109,10 +109,8 @@ export async function getCommitRefs(projectId: number, sha: string): Promise<Raw
 }
 
 export async function syncGitLabEvents(dateStr: string, force: boolean = false) {
-  const { startOfMonth, endOfMonth, parse, format } = await import('date-fns')
-  const baseDate = parse(dateStr, 'yyyy-MM', new Date())
-  const firstDay = format(startOfMonth(baseDate), 'yyyy-MM-dd')
-  const lastDay = format(endOfMonth(baseDate), 'yyyy-MM-dd')
+  const { getMonthRange } = await import('./dates')
+  const { firstDayStr: firstDay, lastDayStr: lastDay } = getMonthRange(dateStr)
 
   const projectsSetting = await getSetting('gitlab_selected_projects')
   const selectedProjectIds = projectsSetting ? projectsSetting.split(',').map(Number) : []
@@ -182,10 +180,8 @@ export async function syncGitLabEvents(dateStr: string, force: boolean = false) 
 }
 
 export async function getGitLabCache(dateStr: string) {
-  const { startOfMonth, endOfMonth, parse } = await import('date-fns')
-  const baseDate = parse(dateStr, 'yyyy-MM', new Date())
-  const firstDay = startOfMonth(baseDate)
-  const lastDay = endOfMonth(baseDate)
+  const { getMonthRange } = await import('./dates')
+  const { firstDay, lastDay } = getMonthRange(dateStr)
 
   const commits = await getGitLabCommitsByPeriod(firstDay, lastDay)
 
