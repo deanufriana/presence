@@ -18,6 +18,7 @@ export const useCoreStore = defineStore('core', () => {
   const copied = ref(false)
   const viewMode = ref<'monthly' | 'yearly'>('monthly')
   const selectedProjectIds = ref<number[]>([])
+  const selectedJiraProjects = ref<string[]>([])
 
   const settings = ref<SettingsData>({
     gitlab_token: '',
@@ -43,6 +44,9 @@ export const useCoreStore = defineStore('core', () => {
     dept_head_position: 'Department Head',
     div_head_name: 'Ida Wahyuni Yanuarti',
     div_head_position: 'Kepala Divisi Teknologi Informasi',
+    jira_default_project: '',
+    jira_default_issuetype: '',
+    jira_selected_projects: '',
   })
 
   const isAiEnabled = computed(
@@ -82,12 +86,22 @@ export const useCoreStore = defineStore('core', () => {
     }
   }
 
-  async function saveSettings() {
+  function toggleJiraProject(key: string) {
+    const index = selectedJiraProjects.value.indexOf(key)
+    if (index === -1) {
+      selectedJiraProjects.value.push(key)
+    } else {
+      selectedJiraProjects.value.splice(index, 1)
+    }
+  }
+
+  async function saveSettings(): Promise<boolean> {
     saving.value = true
     try {
       const payload = {
         ...settings.value,
         gitlab_selected_projects: selectedProjectIds.value.join(','),
+        jira_selected_projects: selectedJiraProjects.value.join(','),
       }
 
       const { upsertSettingsBatch } = await import('~/queries/settings')
@@ -96,9 +110,11 @@ export const useCoreStore = defineStore('core', () => {
       settings.value = payload as SettingsData
       success('Settings saved successfully')
       showSettings.value = false
+      return true
     } catch (err) {
       console.error('Failed to save settings:', err)
       error('Failed to save settings')
+      return false
     } finally {
       saving.value = false
     }
@@ -116,6 +132,11 @@ export const useCoreStore = defineStore('core', () => {
             .split(',')
             .map((id: string) => parseInt(id))
             .filter((id: number) => !isNaN(id))
+        }
+        if (settings.value.jira_selected_projects) {
+          selectedJiraProjects.value = settings.value.jira_selected_projects
+            .split(',')
+            .filter((k: string) => k.trim().length > 0)
         }
       }
     } catch (err) {
@@ -194,11 +215,13 @@ export const useCoreStore = defineStore('core', () => {
     isAiEnabled,
     dateDisplay,
     selectedProjectIds,
+    selectedJiraProjects,
     saveSettings,
     syncAllActivities,
     fetchAllActivities,
     fetchSettings,
     toggleProject,
+    toggleJiraProject,
     nextMonth,
     prevMonth,
     nextYear,

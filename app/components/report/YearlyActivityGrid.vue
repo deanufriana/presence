@@ -3,8 +3,8 @@
     <CardHeader class="border-b border-border/40 bg-muted/10 py-3">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <CardTitle class="flex items-center gap-2 text-base shrink-0">
-          <div class="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-500/10">
-            <LayoutGrid class="h-4 w-4 text-indigo-500" />
+          <div class="flex size-7 items-center justify-center rounded-md bg-indigo-500/10">
+            <LayoutGrid class="size-4 text-indigo-500" />
           </div>
           <span>Activity Overview</span>
         </CardTitle>
@@ -47,10 +47,10 @@
             <Button
               variant="ghost"
               size="icon"
-              class="h-6 w-6 hover:bg-background rounded"
+              class="size-6 hover:bg-background rounded"
               @click="coreStore.prevYear"
             >
-              <ChevronLeft class="h-3.5 w-3.5" />
+              <ChevronLeft />
             </Button>
             <span class="text-[10px] font-bold w-10 text-center text-muted-foreground">{{
               currentYear
@@ -58,11 +58,11 @@
             <Button
               variant="ghost"
               size="icon"
-              class="h-6 w-6 hover:bg-background rounded"
+              class="size-6 hover:bg-background rounded"
               :disabled="isNextYearDisabled"
               @click="coreStore.nextYear"
             >
-              <ChevronRight class="h-3.5 w-3.5" />
+              <ChevronRight />
             </Button>
           </div>
 
@@ -73,7 +73,7 @@
             class="h-7 gap-1.5 px-2 text-[10px] border-indigo-500/20 hover:border-indigo-500/40 hover:bg-indigo-500/5 text-indigo-600 dark:text-indigo-400"
             @click="fetchYearlyActivities"
           >
-            <RefreshCw class="h-3 w-3" :class="{ 'animate-spin': fetchingActivities }" />
+            <RefreshCw :class="{ 'animate-spin': fetchingActivities }" data-icon="inline-start" />
             <span class="hidden xs:inline">Sync</span>
           </Button>
         </div>
@@ -113,7 +113,7 @@
           <!-- Activity Indicators (Large Dots) -->
           <div class="flex gap-2">
             <div
-              class="h-2.5 w-2.5 rounded-full shadow-sm transition-all duration-300"
+              class="size-2.5 rounded-full shadow-sm transition-all duration-300"
               :class="
                 month.hasGitlab
                   ? 'bg-orange-500 scale-110 shadow-orange-500/50'
@@ -122,14 +122,14 @@
               title="GitLab"
             />
             <div
-              class="h-2.5 w-2.5 rounded-full shadow-sm transition-all duration-300"
+              class="size-2.5 rounded-full shadow-sm transition-all duration-300"
               :class="
                 month.hasJira ? 'bg-blue-600 scale-110 shadow-blue-600/50' : 'bg-muted/20 scale-100'
               "
               title="Jira"
             />
             <div
-              class="h-2.5 w-2.5 rounded-full shadow-sm transition-all duration-300"
+              class="size-2.5 rounded-full shadow-sm transition-all duration-300"
               :class="
                 month.hasCalendar
                   ? 'bg-violet-500 scale-110 shadow-violet-500/50'
@@ -138,7 +138,7 @@
               title="Calendar"
             />
             <div
-              class="h-2.5 w-2.5 rounded-full shadow-sm transition-all duration-300"
+              class="size-2.5 rounded-full shadow-sm transition-all duration-300"
               :class="
                 month.hasDaily
                   ? 'bg-emerald-500 scale-110 shadow-emerald-500/50'
@@ -151,7 +151,7 @@
           <!-- Status Badge -->
           <div v-if="month.hasActivity" class="absolute top-2 right-2">
             <div
-              class="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.6)]"
+              class="size-1.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.6)]"
             />
           </div>
 

@@ -7,7 +7,7 @@
     @confirm="$emit('confirm')"
   >
     <template #icon>
-      <RefreshCw class="h-6 w-6 animate-spin-slow" />
+      <RefreshCw class="size-6 animate-spin-slow" />
     </template>
     Fresh activities from GitLab and Calendar will replace your existing report data for this month.
     Any manual edits for the synced dates will be overwritten.

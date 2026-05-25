@@ -24,20 +24,22 @@
           >
             <GripVertical
               v-once
-              class="drag-handle h-3.5 w-3.5 text-muted-foreground/30 group-hover/item:text-violet-500/50 mt-1 shrink-0 transition-colors cursor-grab active:cursor-grabbing"
+              class="drag-handle size-3.5 text-muted-foreground/30 group-hover/item:text-violet-500/50 mt-1 shrink-0 transition-colors cursor-grab active:cursor-grabbing"
             />
             <div
               v-if="!/^[-*•]/.test(item.text)"
-              class="h-2 w-2 rounded-full bg-violet-400 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(167,139,250,0.5)]"
+              class="size-2 rounded-full bg-violet-400 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(167,139,250,0.5)]"
             />
             <span class="flex-1 text-sm leading-relaxed text-foreground/90">{{ item.text }}</span>
-            <button
-              class="opacity-0 group-hover/item:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all shrink-0"
+            <Button
+              variant="ghost"
+              size="icon"
+              class="opacity-0 group-hover/item:opacity-100 size-8 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-all shrink-0"
               title="Remove item"
               @click.stop="deleteItem(item.text)"
             >
-              <Trash2 v-once class="h-3.5 w-3.5" />
-            </button>
+              <Trash2 v-once />
+            </Button>
           </div>
         </template>
       </draggable>
@@ -62,10 +64,10 @@
           @keyup.esc="cancelAdding"
         />
         <Button size="xs" variant="gradient" @click="confirmAdd">
-          <Check v-once class="h-3.5 w-3.5" />
+          <Check v-once />
         </Button>
         <Button size="xs" variant="ghost" @click="cancelAdding">
-          <X v-once class="h-3.5 w-3.5" />
+          <X v-once />
         </Button>
       </div>
       <Button
@@ -76,7 +78,8 @@
       >
         <Plus
           v-once
-          class="h-3.5 w-3.5 group-hover/add:rotate-90 transition-transform duration-300"
+          class="group-hover/add:rotate-90 transition-transform duration-300"
+          data-icon="inline-start"
         />
         <span class="text-[10px] font-bold uppercase tracking-wider">Add Activity</span>
       </Button>

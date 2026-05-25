@@ -3,31 +3,31 @@
     <CardHeader class="border-b border-border/40 bg-muted/10">
       <div class="flex items-center justify-between">
         <CardTitle class="flex items-center gap-2 text-base">
-          <div class="flex h-7 w-7 items-center justify-center rounded-md bg-orange-500/10">
-            <CalendarRange class="h-4 w-4 text-orange-500" />
+          <div class="flex size-7 items-center justify-center rounded-md bg-orange-500/10">
+            <CalendarRange class="size-4 text-orange-500" />
           </div>
           Activity Calendar ({{ dateDisplay }})
         </CardTitle>
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-2 text-[10px] text-muted-foreground">
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-orange-500" />
+              <div class="size-2 rounded-sm bg-orange-500" />
               GitLab
             </div>
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-blue-600" />
+              <div class="size-2 rounded-sm bg-blue-600" />
               Jira
             </div>
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-violet-500" />
+              <div class="size-2 rounded-sm bg-violet-500" />
               Calendar
             </div>
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-emerald-500" />
+              <div class="size-2 rounded-sm bg-emerald-500" />
               Manual
             </div>
             <div class="flex items-center gap-1">
-              <div class="h-2 w-2 rounded-sm bg-red-500" />
+              <div class="size-2 rounded-sm bg-red-500" />
               Holiday
             </div>
           </div>
@@ -36,10 +36,10 @@
               variant="outline"
               size="xs"
               :disabled="syncingAll"
-              class="gap-1.5 border-border/50"
+              class="border-border/50"
               @click="syncAllActivities()"
             >
-              <RefreshCw class="h-3.5 w-3.5" :class="{ 'animate-spin': syncingAll }" />
+              <RefreshCw :class="{ 'animate-spin': syncingAll }" data-icon="inline-start" />
               Sync All
             </Button>
           </div>
@@ -74,17 +74,21 @@
             @click="openManualEntry(day)"
           >
             <!-- Day Action Button (top-right) -->
-            <button
+            <Button
               v-if="day.hasManual"
-              class="absolute -top-1.5 -right-1.5 h-7 w-7 flex items-center justify-center rounded-full border border-red-500/50 bg-red-500/25 text-red-200 hover:bg-red-500/40 hover:text-white shadow-lg shadow-red-500/20 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
+              variant="destructive"
+              size="icon"
+              class="absolute -top-1.5 -right-1.5 size-7 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
               title="Delete activity"
               @click.stop="deleteActivity(day.date)"
             >
-              <Trash2 class="h-4 w-4" />
-            </button>
-            <button
+              <Trash2 />
+            </Button>
+            <Button
               v-if="day.count > 0 || day.jiraCount > 0"
-              class="absolute -top-1.5 -left-1.5 h-7 w-7 flex items-center justify-center rounded-full border border-emerald-500/50 bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/35 hover:text-white shadow-lg shadow-emerald-500/20 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
+              variant="emerald"
+              size="icon"
+              class="absolute -top-1.5 -left-1.5 size-7 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
               :class="{
                 'opacity-100 bg-emerald-500/40': syncingRows[day.date],
               }"
@@ -92,8 +96,8 @@
               title="Sync activity"
               @click.stop="syncDayActivity(day.date)"
             >
-              <RefreshCw class="h-4 w-4" :class="{ 'animate-spin': syncingRows[day.date] }" />
-            </button>
+              <RefreshCw :class="{ 'animate-spin': syncingRows[day.date] }" />
+            </Button>
 
             <span class="text-[10px] font-medium" :class="getDayTextClasses(day)">{{
               day.dayNum
@@ -105,27 +109,27 @@
               <div
                 v-for="dot in Math.min(day.count, 2)"
                 :key="'c-' + dot"
-                class="h-1 w-1 rounded-full bg-orange-500"
+                class="size-1 rounded-full bg-orange-500"
               />
               <!-- Jira Dot (Blue) -->
               <div
                 v-if="day.jiraCount > 0"
-                class="h-1 w-1 rounded-full bg-blue-600 shadow-sm shadow-blue-600/50"
+                class="size-1 rounded-full bg-blue-600 shadow-sm shadow-blue-600/50"
               />
               <!-- Calendar Event Dot (Violet) -->
               <div
                 v-if="day.calendarEvents?.length > 0"
-                class="h-1 w-1 rounded-full bg-violet-500 shadow-sm shadow-violet-500/50"
+                class="size-1 rounded-full bg-violet-500 shadow-sm shadow-violet-500/50"
               />
               <!-- Manual Dot (Emerald) -->
               <div
                 v-if="day.hasManual"
-                class="h-1 w-1 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"
+                class="size-1 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"
               />
               <!-- Holiday Dot (Red) -->
               <div
                 v-if="day.isHoliday"
-                class="h-1 w-1 rounded-full bg-red-500 shadow-sm shadow-red-500/50"
+                class="size-1 rounded-full bg-red-500 shadow-sm shadow-red-500/50"
               />
             </div>
 
@@ -175,7 +179,7 @@
                     :key="'commit-' + cIdx"
                     class="text-[9px] leading-tight flex items-start gap-1"
                   >
-                    <div class="h-1 w-1 rounded-full bg-orange-500 mt-1 shrink-0" />
+                    <div class="size-1 rounded-full bg-orange-500 mt-1 shrink-0" />
                     <div class="min-w-0">
                       <div class="truncate">{{ commit.title }}</div>
                     </div>
@@ -195,7 +199,7 @@
                     :key="'jira-' + jIdx"
                     class="text-[9px] leading-tight flex items-start gap-1"
                   >
-                    <div class="h-1 w-1 rounded-full bg-blue-600 mt-1 shrink-0" />
+                    <div class="size-1 rounded-full bg-blue-600 mt-1 shrink-0" />
                     <div class="min-w-0">
                       <div class="truncate">
                         <span class="font-medium text-blue-600 dark:text-blue-400">{{
@@ -220,7 +224,7 @@
                     :key="'event-' + eIdx"
                     class="text-[9px] leading-tight flex items-start gap-1"
                   >
-                    <div class="h-1 w-1 rounded-full bg-violet-500 mt-1 shrink-0" />
+                    <div class="size-1 rounded-full bg-violet-500 mt-1 shrink-0" />
                     <div class="min-w-0">
                       <div class="truncate">{{ ev.summary }}</div>
                     </div>

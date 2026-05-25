@@ -12,8 +12,8 @@
 
         <div class="flex items-center gap-2">
           <!-- Settings Button -->
-          <Button variant="outline" size="sm" class="gap-2" @click="showSettings = true">
-            <Settings class="h-4 w-4" />
+          <Button variant="outline" size="sm" @click="showSettings = true">
+            <Settings data-icon="inline-start" />
             <span class="hidden sm:inline">Settings</span>
           </Button>
           <!-- Import Calendar Button -->
@@ -21,12 +21,13 @@
             variant="outline"
             size="sm"
             :disabled="importingCalendar"
-            class="gap-2 border-border bg-card hover:border-primary/40"
+            class="border-border bg-card hover:border-primary/40"
             @click="triggerCalendarUpload"
           >
             <Upload
-              class="h-4 w-4 text-muted-foreground"
               :class="{ 'animate-pulse': importingCalendar }"
+              class="text-muted-foreground"
+              data-icon="inline-start"
             />
             <span class="hidden sm:inline">Import Calendar</span>
           </Button>
@@ -55,15 +56,15 @@
       <Tabs v-else default-value="daily" class="w-full">
         <TabsList class="grid w-full grid-cols-3">
           <TabsTrigger value="daily" class="gap-1.5">
-            <FileText class="h-3.5 w-3.5" />
+            <FileText class="size-3.5" />
             Daily Report
           </TabsTrigger>
           <TabsTrigger value="monthly" class="gap-1.5">
-            <CalendarDays class="h-3.5 w-3.5" />
+            <CalendarDays class="size-3.5" />
             Monthly Report
           </TabsTrigger>
           <TabsTrigger value="activity" class="gap-1.5">
-            <CalendarRange class="h-3.5 w-3.5" />
+            <CalendarRange class="size-3.5" />
             Activity Calendar
           </TabsTrigger>
         </TabsList>
@@ -86,6 +87,8 @@
     <SettingsModal v-if="showSettings" v-model="showSettings" />
 
     <ManualActivityModal v-if="showManualEntry" v-model="showManualEntry" />
+
+    <JiraExportModal v-if="showExportModal" v-model="showExportModal" />
   </div>
 </template>
 
@@ -100,6 +103,7 @@ import YearlyActivityGrid from '~/components/report/YearlyActivityGrid.vue'
 import { useCoreStore } from '~/stores/core'
 import { useDailyStore } from '~/stores/daily'
 import { useCalendarStore } from '~/stores/calendar'
+import { useJiraStore } from '~/stores/jira'
 import { storeToRefs } from 'pinia'
 
 const YearlyReport = defineAsyncComponent(() => import('~/components/report/YearlyReport.vue'))
@@ -113,6 +117,10 @@ const ManualActivityModal = defineAsyncComponent(
 
 const SettingsModal = defineAsyncComponent(() => import('~/components/report/SettingsModal.vue'))
 
+const JiraExportModal = defineAsyncComponent(
+  () => import('~/components/report/JiraExportModal.vue'),
+)
+
 const coreStore = useCoreStore()
 
 const { fetchSettings } = coreStore
@@ -120,6 +128,9 @@ const { showSettings, viewMode } = storeToRefs(coreStore)
 
 const dailyStore = useDailyStore()
 const { showManualEntry } = storeToRefs(dailyStore)
+
+const jiraStore = useJiraStore()
+const { showExportModal } = storeToRefs(jiraStore)
 
 const calendarStore = useCalendarStore()
 const { importingCalendar } = storeToRefs(calendarStore)
@@ -149,7 +160,7 @@ onMounted(() => {
 
 // ─── Scroll Lock ──────────────────────────────────
 const isLocked = useScrollLock(import.meta.client ? document.body : null)
-watch([showSettings, showManualEntry], ([s, m]) => {
-  isLocked.value = s || m
+watch([showSettings, showManualEntry, showExportModal], ([s, m, j]) => {
+  isLocked.value = s || m || j
 })
 </script>

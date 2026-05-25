@@ -208,3 +208,17 @@ export async function getMonthlyActivityStatus(year: string) {
 
   return { gitlabDates, jiraDates, calendarEvents, dailyReports }
 }
+
+export async function getDailyActivitiesByDates(dates: string[]) {
+  if (!dates || dates.length === 0) return []
+  const db = await getDb()
+  const sorted = [...dates].sort()
+  const rows = await db.query.dailyReports.findMany({
+    where: and(
+      gte(schema.dailyReports.date, sorted[0]!),
+      lte(schema.dailyReports.date, sorted[sorted.length - 1]!),
+    ),
+  })
+  const dateSet = new Set(dates)
+  return rows.filter((r) => dateSet.has(r.date))
+}

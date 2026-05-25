@@ -47,17 +47,20 @@ export async function getDb() {
         const sqlParams = params || []
         if (method === 'run') {
           await sqlite.execute(sql, sqlParams)
-          return { rows: [] }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return { rows: [] as any[] }
         }
 
         const rows = await sqlite.select<Record<string, unknown>[]>(sql, sqlParams)
         const mappedRows = rows.map((row) => Object.values(row))
 
         if (method === 'get') {
-          return { rows: mappedRows[0] }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return { rows: mappedRows[0] as any[] }
         }
 
-        return { rows: mappedRows }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return { rows: mappedRows as any[] }
       },
       { schema },
     )

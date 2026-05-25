@@ -4,27 +4,27 @@
       <Button
         variant="outline"
         size="sm"
-        class="w-[180px] justify-start text-left font-medium gap-2 border-border bg-card hover:border-primary/40"
+        class="w-[180px] justify-start text-left font-medium border-border bg-card hover:border-primary/40"
       >
-        <CalendarIcon class="h-4 w-4 text-muted-foreground shrink-0" />
+        <CalendarIcon class="text-muted-foreground" data-icon="inline-start" />
         {{ dateDisplay }}
       </Button>
     </PopoverTrigger>
     <PopoverContent class="w-64 p-3" align="end">
       <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <Button variant="outline" size="icon" class="h-7 w-7" @click="changeYear(-1)">
-            <ChevronLeft class="h-4 w-4" />
+          <Button variant="outline" size="icon" class="size-7" @click="changeYear(-1)">
+            <ChevronLeft />
           </Button>
           <div class="text-sm font-bold">{{ pickerYear }}</div>
           <Button
             variant="outline"
             size="icon"
-            class="h-7 w-7"
+            class="size-7"
             :disabled="pickerYear >= new Date().getFullYear()"
             @click="changeYear(1)"
           >
-            <ChevronRight class="h-4 w-4" />
+            <ChevronRight />
           </Button>
         </div>
         <div class="grid grid-cols-3 gap-2">
@@ -32,11 +32,8 @@
             v-for="(m, i) in months"
             :key="m"
             size="sm"
-            variant="ghost"
-            class="h-9 w-full text-[10px] font-medium"
-            :class="{
-              'bg-primary text-primary-foreground hover:bg-primary/90': isCurrentMonth(i),
-            }"
+            :variant="isCurrentMonth(i) ? 'default' : 'ghost'"
+            class="w-full text-[10px] font-medium"
             :disabled="isMonthDisabled(i)"
             @click="selectMonth(i)"
           >

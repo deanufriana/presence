@@ -23,4 +23,7 @@ export interface SettingsData {
   dept_head_position: string
   div_head_name: string
   div_head_position: string
+  jira_default_project?: string
+  jira_default_issuetype?: string
+  jira_selected_projects?: string
 }

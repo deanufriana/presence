@@ -4,8 +4,8 @@
       <div class="flex items-center justify-between">
         <div>
           <CardTitle class="flex items-center gap-2 text-base">
-            <div class="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-500/10">
-              <CalendarDays class="h-4 w-4 text-indigo-500" />
+            <div class="flex size-7 items-center justify-center rounded-md bg-indigo-500/10">
+              <CalendarDays class="size-4 text-indigo-500" />
             </div>
             Monthly Report
           </CardTitle>
@@ -21,14 +21,14 @@
             @click="generateAiSummary"
           >
             <div v-if="summarizing" class="absolute inset-0 bg-violet-500/10 animate-pulse" />
-            <Sparkles v-if="!summarizing" class="h-3.5 w-3.5" />
-            <RefreshCw v-else class="h-3.5 w-3.5 animate-spin" />
+            <Sparkles v-if="!summarizing" data-icon="inline-start" />
+            <RefreshCw v-else class="animate-spin" data-icon="inline-start" />
             <span :class="{ 'animate-pulse': summarizing }">
               {{ summarizing ? 'Generating...' : 'AI Generate' }}
             </span>
           </Button>
           <Button variant="outline" size="xs" @click="addMonthlyRow(dateDisplay)">
-            <Plus class="h-3.5 w-3.5" />
+            <Plus data-icon="inline-start" />
             Add Row
           </Button>
 
@@ -39,7 +39,7 @@
             class="border-blue-500/20 hover:border-blue-500/50 hover:bg-blue-500/5 text-blue-600 dark:text-blue-400"
             @click="handleDocxExport"
           >
-            <File class="h-3.5 w-3.5" :class="{ 'animate-bounce': exportingDocx }" />
+            <File :class="{ 'animate-bounce': exportingDocx }" data-icon="inline-start" />
             Export Task Job
           </Button>
 
@@ -50,38 +50,36 @@
             class="border-indigo-500/20 hover:border-indigo-500/50 hover:bg-indigo-500/5 text-indigo-600 dark:text-indigo-400"
             @click="handleBASTExport"
           >
-            <FileText class="h-3.5 w-3.5" :class="{ 'animate-bounce': exportingDocx }" />
+            <FileText :class="{ 'animate-bounce': exportingDocx }" data-icon="inline-start" />
             Export BAST
           </Button>
         </div>
       </div>
       <!-- Monthly Highlights Section -->
-      <div
+      <Alert
         v-if="monthlyHighlights && isAiEnabled"
-        class="px-4 py-3 bg-violet-500/5 border-t border-violet-500/10 animate-in fade-in slide-in-from-top-1 mt-3"
+        class="bg-violet-500/5 border-violet-500/10 mt-3 animate-in fade-in slide-in-from-top-1 relative"
       >
-        <div class="flex items-start gap-3">
-          <Sparkles class="h-4 w-4 text-violet-500 mt-0.5 shrink-0" />
-          <div class="space-y-1 flex-1">
-            <p
-              class="text-xs font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wider"
-            >
-              AI Generated Summary
-            </p>
-            <p class="text-xs leading-relaxed text-muted-foreground whitespace-pre-line">
-              {{ monthlyHighlights }}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            class="h-5 w-5 ml-auto text-muted-foreground hover:text-foreground shrink-0"
-            @click="monthlyHighlights = ''"
-          >
-            <X class="h-3 w-3" />
-          </Button>
-        </div>
-      </div>
+        <Sparkles class="text-violet-500" data-icon="inline-start" />
+        <AlertTitle
+          class="text-violet-700 dark:text-violet-300 font-semibold uppercase tracking-wider text-xs"
+        >
+          AI Generated Summary
+        </AlertTitle>
+        <AlertDescription
+          class="text-xs leading-relaxed text-muted-foreground whitespace-pre-line pr-6"
+        >
+          {{ monthlyHighlights }}
+        </AlertDescription>
+        <Button
+          variant="ghost"
+          size="icon"
+          class="absolute right-2 top-2 size-5 text-muted-foreground hover:text-foreground shrink-0"
+          @click="monthlyHighlights = ''"
+        >
+          <X />
+        </Button>
+      </Alert>
     </CardHeader>
     <CardContent class="p-0">
       <Timeline
@@ -108,10 +106,9 @@
           <div class="space-y-4">
             <!-- Project / Description -->
             <div class="relative group">
-              <textarea
+              <Textarea
                 v-model="row.project"
-                rows="3"
-                class="w-full px-4 py-2.5 bg-muted/20 rounded-xl border border-transparent focus:border-indigo-500/30 focus:bg-card outline-none transition-all text-sm leading-relaxed"
+                class="w-full bg-muted/20 rounded-xl border-transparent focus-visible:border-indigo-500/30 min-h-[80px]"
                 placeholder="Feature / improvement description..."
               />
 
@@ -119,15 +116,17 @@
               <div
                 class="absolute right-2 top-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200"
               >
-                <button
+                <Button
                   v-if="row.project"
-                  class="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
+                  variant="ghost"
+                  size="icon"
+                  class="size-7 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
                   :title="copiedRows['row-' + index] ? 'Copied!' : 'Copy description'"
                   @click.stop="copyRow(row.project, 'row-' + index)"
                 >
-                  <Check v-if="copiedRows['row-' + index]" class="h-3.5 w-3.5 text-emerald-500" />
-                  <Copy v-else class="h-3.5 w-3.5" />
-                </button>
+                  <Check v-if="copiedRows['row-' + index]" class="text-emerald-500" />
+                  <Copy v-else />
+                </Button>
               </div>
 
               <!-- Sources Badge -->
@@ -139,13 +138,13 @@
                         variant="secondary"
                         class="h-6 px-2 flex items-center gap-1.5 text-[9px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20 cursor-help rounded-full"
                       >
-                        <CalendarDays class="h-3 w-3" />
+                        <CalendarDays class="size-3" />
                         {{ row.sources.length }} sources
                       </Badge>
                     </TooltipTrigger>
                     <TooltipContent side="left" class="p-3 text-[10px] max-w-[240px]">
                       <p class="font-bold mb-2 flex items-center gap-1.5 text-indigo-500">
-                        <Sparkles class="h-3 w-3" />
+                        <Sparkles class="size-3" />
                         Summarized from:
                       </p>
                       <div class="flex flex-wrap gap-1.5">
@@ -164,23 +163,21 @@
             </div>
 
             <!-- Metadata Inputs -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div class="space-y-1">
-                <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1"
-                  >Progress</label
+            <FieldGroup class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Field>
+                <FieldLabel class="text-[10px] font-bold text-muted-foreground uppercase ml-1"
+                  >Progress</FieldLabel
                 >
-                <div class="relative">
-                  <input
-                    v-model="row.progres"
-                    class="w-full h-9 px-3 bg-muted/20 rounded-lg border border-transparent focus:border-indigo-500/30 focus:bg-card outline-none transition-all text-xs font-bold"
-                    placeholder="100%"
-                  >
-                </div>
-              </div>
+                <Input
+                  v-model="row.progres"
+                  class="h-9 bg-muted/20 border-transparent focus-visible:border-indigo-500/30 text-xs font-bold"
+                  placeholder="100%"
+                />
+              </Field>
 
-              <div class="space-y-1">
-                <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1"
-                  >Done</label
+              <Field>
+                <FieldLabel class="text-[10px] font-bold text-muted-foreground uppercase ml-1"
+                  >Done</FieldLabel
                 >
                 <Select v-model="row.done">
                   <SelectTrigger
@@ -194,11 +191,11 @@
                     <SelectItem value="Pending">Pending</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </Field>
 
-              <div class="space-y-1">
-                <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1"
-                  >Job Status</label
+              <Field>
+                <FieldLabel class="text-[10px] font-bold text-muted-foreground uppercase ml-1"
+                  >Job Status</FieldLabel
                 >
                 <Select v-model="row.status">
                   <SelectTrigger
@@ -212,19 +209,31 @@
                     <SelectItem value="Continuing (Daily)"> Continuing (Daily) </SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-            </div>
+              </Field>
+            </FieldGroup>
           </div>
         </template>
 
-        <template #actions="{ index }">
-          <button
-            class="h-9 w-9 flex items-center justify-center rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200"
+        <template #actions="{ item: row, index }">
+          <Button
+            variant="ghost"
+            size="icon"
+            class="size-9 rounded-xl text-blue-500 bg-blue-500/5 hover:bg-blue-500/20 hover:text-blue-600 transition-all duration-200"
+            title="Push to Jira"
+            @click="pushRowToJira(row)"
+          >
+            <Trello />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            class="size-9 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200"
             title="Remove row"
             @click="removeMonthlyRow(index)"
           >
-            <Trash2 class="h-4 w-4" />
-          </button>
+            <Trash2 />
+          </Button>
         </template>
       </Timeline>
     </CardContent>
@@ -243,11 +252,16 @@ import {
   Trash2,
   File,
   FileText,
+  Trello,
 } from 'lucide-vue-next'
 import { useDocxExport } from '~/composables/useDocxExport'
 import { useToast } from '~/composables/use-toast'
 import { Button } from '~/components/ui/button'
 import { Badge } from '~/components/ui/badge'
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
+import { Field, FieldGroup, FieldLabel } from '~/components/ui/field'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~/components/ui/card'
 import {
@@ -262,10 +276,17 @@ import { storeToRefs } from 'pinia'
 import { useCoreStore } from '~/stores/core'
 import { useMonthlyStore } from '~/stores/monthly'
 import { useDailyStore } from '~/stores/daily'
+import { useJiraStore } from '~/stores/jira'
+import type { MonthlyReportRow } from '~/types/report'
 
 const coreStore = useCoreStore()
 const monthlyStore = useMonthlyStore()
 const dailyStore = useDailyStore()
+const jiraStore = useJiraStore()
+
+const pushRowToJira = (row: MonthlyReportRow) => {
+  jiraStore.triggerRowJiraExport(row, selectedDate.value)
+}
 
 const { isAiEnabled, selectedDate, dateDisplay, formatMonth } = storeToRefs(coreStore)
 const { monthlyRows, monthlyHighlights, summarizing, isLoading } = storeToRefs(monthlyStore)
