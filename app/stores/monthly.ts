@@ -91,7 +91,7 @@ export const useMonthlyStore = defineStore('monthly', () => {
       const jiraPrompt = getJiraExportPrompt(activities, rows, monthlySummary)
       const jiraRaw = await generateSummary(jiraPrompt, { max_tokens: 8192, temperature: 0.2 })
 
-      const { stripMarkdownCodeBlock, extractProjectKey } = await import('~/utils/format')
+      const { stripMarkdownCodeBlock } = await import('~/utils/format')
       const clean = stripMarkdownCodeBlock(jiraRaw)
 
       const jiraData = JSON.parse(clean) as {
@@ -104,14 +104,13 @@ export const useMonthlyStore = defineStore('monthly', () => {
 
       for (const item of jiraData) {
         if (!item.project) continue
-        const projectKey = extractProjectKey(item.project)
         const childTasks = (item.childTasks || []).map((ct) => ({
           title: ct.title || '',
           description: ct.description || '',
         }))
         await upsertJiraExportData({
           month: core.selectedDate,
-          project: projectKey,
+          project: item.project,
           description: item.description || null,
           childTasks: JSON.stringify(childTasks),
         })

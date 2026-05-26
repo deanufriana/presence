@@ -65,14 +65,7 @@
           </div>
           <div class="flex flex-col sm:flex-row gap-2 justify-center pt-2">
             <Button size="sm" variant="outline" @click="closeModal">Close Dialog</Button>
-            <Button
-              as="a"
-              :href="successIssue.webUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="gradient"
-              size="xs"
-            >
+            <Button variant="gradient" size="xs" @click="openJiraUrl">
               View in Jira
               <ExternalLink data-icon="inline-end" />
             </Button>
@@ -196,7 +189,7 @@
                 >
                 <Input
                   v-model="customParentKey"
-                  placeholder="e.g. PROJ-123"
+                  placeholder="e.g. PROJ-123 or Epic Key"
                   class="h-9 text-xs font-mono uppercase"
                 />
               </Field>
@@ -210,6 +203,7 @@
                 v-model="issueSummary"
                 placeholder="Summary title of the issue"
                 class="h-9 text-xs"
+                maxlength="254"
               />
             </Field>
 
@@ -319,12 +313,17 @@ import {
   SelectLabel,
 } from '~/components/ui/select'
 import type { JiraChildTask } from '~/types/report'
-import type { JiraConfig as JiraApiConfig } from '~/utils/jira'
+import type { JiraConfig as JiraApiConfig, JiraIssueType } from '~/utils/jira'
 import { storeToRefs } from 'pinia'
 import { useJiraStore } from '~/stores/jira'
 import { useCoreStore } from '~/stores/core'
 import { useToast } from '~/composables/use-toast'
-import { getJiraConfig, createJiraIssue, buildAdfRowDescription } from '~/utils/jira'
+import {
+  getJiraConfig,
+  createJiraIssue,
+  buildAdfRowDescription,
+  getJiraIssueTypesForProject,
+} from '~/utils/jira'
 import { generateSummary, parseAiJsonResponse } from '~/utils/ai'
 import { generateId, parseProjectText } from '~/utils/format'
 import { getJiraGroupSubtasksPrompt, getJiraParentDescriptionPrompt } from '~/utils/prompts'
@@ -351,7 +350,15 @@ const {
 } = storeToRefs(jiraStore)
 const exportRowActivities = computed(() => jiraStore.exportRowActivities || [])
 
-const subtaskTypes = computed(() => (jiraStore.cachedIssueTypes || []).filter((t) => t.subtask))
+const projectIssueTypes = ref<JiraIssueType[]>([])
+const loadingIssueTypes = ref(false)
+
+const subtaskTypes = computed(() =>
+  (projectIssueTypes.value.length
+    ? projectIssueTypes.value
+    : jiraStore.cachedIssueTypes || []
+  ).filter((t) => t.subtask),
+)
 const selectedSubtaskIds = ref<string[]>([])
 const displayActivities = ref<JiraChildTask[]>([])
 const myselfAccount = computed(() => jiraStore.cachedMyself)
@@ -370,7 +377,10 @@ const projects = computed(() => {
 
 const issueTypes = computed(() => {
   const seen = new Set<string>()
-  return (jiraStore.cachedIssueTypes || []).filter((t) => {
+  const typesSource = projectIssueTypes.value.length
+    ? projectIssueTypes.value
+    : jiraStore.cachedIssueTypes || []
+  return typesSource.filter((t) => {
     if (t.subtask || seen.has(t.name)) return false
     seen.add(t.name)
     return true
@@ -389,6 +399,89 @@ const isDescriptionLoading = ref(false)
 const successIssue = ref<{ key: string; webUrl: string } | null>(null)
 let jiraConfigData: JiraApiConfig | null = null
 
+async function loadProjectIssueTypes(projectKey: string) {
+  if (!projectKey || !jiraConfigData) {
+    projectIssueTypes.value = []
+    return
+  }
+
+  loadingIssueTypes.value = true
+  try {
+    const proj = projects.value.find((p) => p.key === projectKey)
+    if (proj) {
+      const types = await getJiraIssueTypesForProject(jiraConfigData, proj.id)
+      projectIssueTypes.value = types
+
+      // Auto select issue type if previous selected is no longer valid, or select default
+      const defaultType = coreStore.settings.jira_default_issuetype
+      const currentValid = projectIssueTypes.value.some(
+        (t) => t.id === selectedIssueTypeId.value && !t.subtask,
+      )
+      if (!currentValid) {
+        if (
+          defaultType &&
+          projectIssueTypes.value.some((t) => t.id === defaultType && !t.subtask)
+        ) {
+          selectedIssueTypeId.value = defaultType
+        } else {
+          const taskType = projectIssueTypes.value.find(
+            (t) =>
+              !t.subtask && (t.name.toLowerCase() === 'task' || t.name.toLowerCase() === 'story'),
+          )
+          if (taskType) {
+            selectedIssueTypeId.value = taskType.id
+          } else {
+            const firstStandard = projectIssueTypes.value.find((t) => !t.subtask)
+            selectedIssueTypeId.value = firstStandard ? firstStandard.id : ''
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load project issue types:', err)
+  } finally {
+    loadingIssueTypes.value = false
+  }
+}
+
+function isActivityRelated(activity: string, projectKey: string): boolean {
+  if (!projectKey) return true
+
+  const cleanActivity = activity.trim().toLowerCase()
+  const cleanKey = projectKey.trim().toLowerCase()
+
+  // 1. If it starts with the current project key (e.g. "[presence]" or "presence:")
+  if (
+    cleanActivity.startsWith(`[${cleanKey}`) ||
+    cleanActivity.startsWith(`${cleanKey}:`) ||
+    cleanActivity.startsWith(`${cleanKey} `)
+  ) {
+    return true
+  }
+
+  // 2. If it contains the project key in bracket format anywhere
+  const bracketRegex = new RegExp(`\\[${cleanKey}(/.*)?\\]`, 'i')
+  if (bracketRegex.test(activity)) {
+    return true
+  }
+
+  // 3. If it has a bracket prefix of a DIFFERENT project key, filter it out
+  const anyBracketMatch = activity.match(/^\[([^\]]+)\]/)
+  if (anyBracketMatch && anyBracketMatch[1]) {
+    const foundKey = anyBracketMatch[1].toLowerCase().trim()
+    if (foundKey !== cleanKey && foundKey.length > 1) {
+      return false
+    }
+  }
+
+  // 4. Default to true for generic tasks (like "meeting", "rapat", "review") that don't have other project brackets
+  return true
+}
+
+watch(selectedProjectKey, (newKey) => {
+  loadProjectIssueTypes(newKey)
+})
+
 async function loadJiraConfig() {
   loadingConfig.value = true
   configError.value = false
@@ -404,7 +497,8 @@ async function loadJiraConfig() {
     jiraConfigData = config
 
     // Use store's pre-extracted project key; parse summary from bracket prefix
-    issueSummary.value = parseProjectText(exportRow.value?.project || '').summary
+    const parsedSummary = parseProjectText(exportRow.value?.project || '').summary
+    issueSummary.value = parsedSummary.substring(0, 250)
 
     // Load projects, myself, and issue types using Pinia caching action
     await jiraStore.loadJiraMetadata(config)
@@ -434,6 +528,9 @@ async function loadJiraConfig() {
       }
     }
 
+    // Load issue types for this project
+    await loadProjectIssueTypes(selectedProjectKey.value)
+
     // Pre-fill description from stored Jira export data
     issueDescription.value = exportDescription.value || ''
 
@@ -446,7 +543,10 @@ async function loadJiraConfig() {
       }))
       selectedSubtaskIds.value = displayActivities.value.map((t) => t.id || '').filter(Boolean)
     } else {
-      displayActivities.value = (exportRowActivities.value || []).map((a) => ({
+      const filteredRaw = (exportRowActivities.value || []).filter((a) =>
+        isActivityRelated(a, exportProjectKey.value),
+      )
+      displayActivities.value = filteredRaw.map((a) => ({
         id: generateId(),
         title: a,
         description: '',
@@ -529,14 +629,14 @@ async function submitJiraIssue() {
     const payload: Parameters<typeof createJiraIssue>[1] = {
       fields: {
         project: { key: selectedProjectKey.value },
-        summary: issueSummary.value.trim(),
+        summary: issueSummary.value.trim().slice(0, 254),
         issuetype: { id: selectedIssueTypeId.value },
         description: adfDescription,
       },
     }
 
     if (myselfAccount.value?.accountId) {
-      payload.fields.assignee = { id: myselfAccount.value.accountId }
+      payload.fields.assignee = { accountId: myselfAccount.value.accountId }
     }
 
     // If parent is selected, inject parent field
@@ -562,7 +662,7 @@ async function submitJiraIssue() {
           try {
             const fields: Record<string, unknown> = {
               project: { key: selectedProjectKey.value },
-              summary: childTask.title,
+              summary: childTask.title.trim().slice(0, 254),
               issuetype: { id: subtaskTypeId },
               parent: { key: res.key },
             }
@@ -579,7 +679,7 @@ async function submitJiraIssue() {
               }
             }
             if (myselfAccount.value?.accountId) {
-              fields.assignee = { id: myselfAccount.value.accountId }
+              fields.assignee = { accountId: myselfAccount.value.accountId }
             }
             await createJiraIssue(jiraConfigData, {
               fields: fields as Parameters<typeof createJiraIssue>[1]['fields'],
@@ -677,12 +777,12 @@ async function groupSubtasksWithAI() {
 }
 
 async function saveJiraExportData() {
-  if (!exportPeriod.value || !exportProjectKey.value) return
+  if (!exportPeriod.value || !exportRow.value?.project) return
   try {
     const { upsertJiraExportData } = await import('~/queries/jiraExport')
     await upsertJiraExportData({
       month: exportPeriod.value,
-      project: exportProjectKey.value,
+      project: exportRow.value.project,
       description: issueDescription.value.trim() || null,
       childTasks: JSON.stringify(displayActivities.value.filter((t) => t.title.trim())),
     })
@@ -710,6 +810,18 @@ async function generateParentDescription() {
     error(errMsg || 'Failed to generate description')
   } finally {
     isDescriptionLoading.value = false
+  }
+}
+
+async function openJiraUrl() {
+  if (successIssue.value?.webUrl) {
+    try {
+      const { invoke } = await import('@tauri-apps/api/core')
+      await invoke('open_url', { url: successIssue.value.webUrl })
+    } catch (err) {
+      console.error('Failed to open Jira URL:', err)
+      error('Failed to open link in browser')
+    }
   }
 }
 

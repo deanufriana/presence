@@ -39,11 +39,11 @@
         <div class="flex items-start gap-2.5">
           <Checkbox
             :id="'subtask-' + idx"
-            :checked="selectedIds.includes(act.id || '')"
+            :model-value="selectedIds.includes(act.id || '')"
             class="mt-1"
-            @update:checked="
-              (checked: boolean) => {
-                if (act.id) $emit('toggle', act.id, checked)
+            @update:model-value="
+              (checked: boolean | 'indeterminate') => {
+                if (act.id) $emit('toggle', act.id, checked === true)
               }
             "
           />

@@ -7,6 +7,15 @@ import type { Holiday } from '~/types/holiday'
 export function useDocxExport() {
   const exportingDocx = ref(false)
 
+  const cleanMarkdown = (text: string): string => {
+    if (!text) return '-'
+    return text
+      .replace(/```[a-zA-Z]*\s*/gi, '')
+      .replace(/```\s*/g, '')
+      .replace(/`([^`]+)`/g, '$1')
+      .trim()
+  }
+
   const getWorkingDays = (year: number, month: number) => {
     const calendarStore = useCalendarStore()
     const workingDays: Date[] = []
@@ -373,10 +382,10 @@ export function useDocxExport() {
                           row.month || format(rowDate, 'MMMM', { locale: idLocale }),
                           AlignmentType.CENTER,
                         ),
-                        createBASTDataCell(row.project || '-', AlignmentType.LEFT),
+                        createBASTDataCell(cleanMarkdown(row.project), AlignmentType.LEFT),
                         createBASTDataCell('Deliver', AlignmentType.CENTER),
                         createBASTDataCell(row.done || 'Done', AlignmentType.CENTER),
-                        createBASTDataCell(row.status || '-', AlignmentType.LEFT),
+                        createBASTDataCell(cleanMarkdown(row.status), AlignmentType.LEFT),
                       ],
                     })
                   }),
@@ -822,10 +831,10 @@ export function useDocxExport() {
                       new TableRow({
                         children: [
                           createDataCell(row.month || monthName, AlignmentType.LEFT),
-                          createDataCell(row.project, AlignmentType.LEFT),
+                          createDataCell(cleanMarkdown(row.project), AlignmentType.LEFT),
                           createDataCell(row.progres, AlignmentType.LEFT),
                           createDataCell(row.done, AlignmentType.LEFT),
-                          createDataCell(row.status, AlignmentType.LEFT),
+                          createDataCell(cleanMarkdown(row.status), AlignmentType.LEFT),
                         ],
                       }),
                   ),

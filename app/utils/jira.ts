@@ -84,6 +84,7 @@ export async function fetchJira<T = unknown>(
 
   if (options.body) {
     headers['Content-Type'] = 'application/json'
+    console.log(`[Jira API Request Payload] ${method} ${url.toString()}:`, options.body)
   }
 
   const response = await fetch(url.toString(), {
@@ -93,8 +94,38 @@ export async function fetchJira<T = unknown>(
   })
 
   if (!response.ok) {
+    let errorDetails = ''
+    try {
+      const responseText = await response.text()
+      console.error(
+        `[Jira API Error Response] ${method} ${url.toString()} (${response.status}):`,
+        responseText,
+      )
+
+      const errorJson = JSON.parse(responseText) as {
+        errorMessages?: string[]
+        errors?: Record<string, string>
+      }
+      if (errorJson) {
+        const messages: string[] = []
+        if (errorJson.errorMessages && errorJson.errorMessages.length > 0) {
+          messages.push(...errorJson.errorMessages)
+        }
+        if (errorJson.errors && typeof errorJson.errors === 'object') {
+          Object.entries(errorJson.errors).forEach(([field, msg]) => {
+            messages.push(`${field}: ${msg}`)
+          })
+        }
+        if (messages.length > 0) {
+          errorDetails = `: ${messages.join(', ')}`
+        }
+      }
+    } catch (parseErr) {
+      console.error('Failed to parse Jira error response:', parseErr)
+    }
+
     throw new JiraApiError(
-      `Jira API error (${response.status})`,
+      `Jira API error (${response.status})${errorDetails}`,
       response.status,
       response.statusText,
     )
@@ -109,6 +140,15 @@ export async function getJiraProjects(config: JiraConfig): Promise<JiraProject[]
 
 export async function getJiraIssueTypes(config: JiraConfig): Promise<JiraIssueType[]> {
   return await fetchJira<JiraIssueType[]>('issuetype', config)
+}
+
+export async function getJiraIssueTypesForProject(
+  config: JiraConfig,
+  projectId: string,
+): Promise<JiraIssueType[]> {
+  return await fetchJira<JiraIssueType[]>('issuetype/project', config, {
+    query: { projectId },
+  })
 }
 
 export interface JiraMyself {
@@ -129,7 +169,7 @@ export async function createJiraIssue(
       issuetype: { id: string }
       parent?: { key: string }
       description?: unknown
-      assignee?: { id: string }
+      assignee?: { accountId: string }
     }
   },
 ): Promise<{ id: string; key: string; self: string }> {

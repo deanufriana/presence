@@ -94,7 +94,7 @@ export const useJiraStore = defineStore('jira', () => {
     // Load pre-generated Jira export data from DB using stable project key
     try {
       const { getJiraExportData } = await import('~/queries/jiraExport')
-      const saved = await getJiraExportData(period, exportProjectKey.value)
+      const saved = await getJiraExportData(period, row.project || '')
       if (saved) {
         exportDescription.value = saved.description || ''
         if (saved.childTasks) {

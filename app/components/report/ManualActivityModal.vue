@@ -20,9 +20,9 @@
                 <Field orientation="horizontal" class="flex items-center gap-3">
                   <Checkbox
                     id="isHoliday"
-                    :checked="isManualHoliday"
+                    :model-value="isManualHoliday"
                     class="border-red-500 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
-                    @update:checked="isManualHoliday = $event"
+                    @update:model-value="isManualHoliday = $event === true"
                   />
                   <FieldLabel
                     for="isHoliday"
