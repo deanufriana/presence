@@ -52,3 +52,14 @@ pnpm-debug.log*
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Python Virtual Environment
+.venv/
+
+# Antigravity CLI
+.antigravitycli/
+
+# Graphify Cache (do not commit local AST parser cache)
+graphify-out/cache/
+
+

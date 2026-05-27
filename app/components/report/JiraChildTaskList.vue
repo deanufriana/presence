@@ -65,7 +65,7 @@
               <Textarea
                 :model-value="act.description"
                 placeholder="Task description (optional)"
-                class="text-[10px] min-h-[36px] resize-none"
+                class="text-[10px] min-h-9 resize-none"
                 @update:model-value="$emit('change-description', act.id || '', String($event))"
               />
             </div>
