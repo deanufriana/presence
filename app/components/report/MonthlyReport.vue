@@ -293,12 +293,12 @@ const { monthlyRows, monthlyHighlights, summarizing, isLoading } = storeToRefs(m
 const { dailyTable } = storeToRefs(dailyStore)
 
 const { generateAiSummary, addMonthlyRow, removeMonthlyRow, fetchMonthlyReport } = monthlyStore
-const { exportToDocx, exportBAST, exportingDocx } = useDocxExport()
+const { exportTaskJob, exportBAST, exportingDocx } = useDocxExport()
 const { success, error } = useToast()
 
 const handleDocxExport = async () => {
   try {
-    await exportToDocx(monthlyRows.value, selectedDate.value, coreStore.settings)
+    await exportTaskJob(monthlyRows.value, selectedDate.value, coreStore.settings)
     success('Monthly report exported to Word!')
   } catch {
     error('Failed to export Word document')

@@ -13,10 +13,14 @@ Bahasa & Gaya:
 
 Aturan Pengelompokan & Format (WAJIB):
 1. Gunakan format Markdown.
-2. Kelompokkan berdasarkan proyek/aplikasi. Gunakan tag [Project: Nama Proyek] yang ada pada aktivitas sebagai referensi utama. Jika nama proyek tidak teridentifikasi, masukkan ke **Project Lainnya**.
-3. Urutkan proyek dari volume aktivitas tertinggi ke terendah.
-4. Judul proyek wajib menggunakan format tebal: **Nama Proyek**
-5. Di bawah tiap proyek, gunakan bullet "-" dengan MAKSIMAL 3 bullet per proyek. Pilih 3 pencapaian yang paling berdampak/penting.
+2. Kelompokkan berdasarkan proyek/aplikasi. Gunakan tag [Project: Nama Proyek] yang ada pada aktivitas sebagai referensi utama. Jika nama proyek tidak teridentifikasi, kelompokkan aktivitas tersebut secara logis ke dalam kategori rekayasa perangkat lunak standar (format tebal) seperti:
+   - **Refactoring & Tech Debt** (untuk refactoring, clean code, perbaikan kualitas kode, pembaruan dependency/library, perapihan struktur)
+   - **Bug Fixes & Maintenance** (untuk perbaikan bug, hotfix, investigasi isu, pemeliharaan sistem)
+   - **DevOps & Infrastructure** (untuk setup CI/CD, docker, deployment, configuration)
+   - **General Tasks & Coordination** (untuk pekerjaan operasional umum, meeting koordinasi rutin, atau monitoring)
+3. Urutkan kelompok proyek/kategori dari volume aktivitas tertinggi ke terendah.
+4. Judul proyek/kategori wajib menggunakan format tebal: **Nama Proyek/Kategori**
+5. Di bawah tiap proyek/kategori, gunakan bullet "-" dengan MAKSIMAL 3 bullet per proyek/kategori. Pilih 3 pencapaian yang paling berdampak/penting.
 6. Gunakan tepat 1 kalimat per bullet.
 7. Setiap bullet WAJIB diawali dengan daftar tanggal sumber dari aktivitas aslinya dalam kurung siku, contoh: \`[2024-04-01, 2024-04-05] Deskripsi pekerjaan...\`
 
@@ -41,7 +45,7 @@ Aturan Label Status (WAJIB):
 - [2024-04-05] Melakukan optimasi pada query database di repository Core untuk mempercepat proses upload data. [Status: Project Enhance]
 - [2024-04-08, 2024-04-15] Rapat koordinasi mingguan terkait sinkronisasi data antar layanan di lingkungan staging. [Status: Continuing (Daily)]
 
-**Project Lainnya**
+**Bug Fixes & Maintenance**
 - [2024-04-10] Memperbaiki bug minor pada antarmuka dashboard pengguna di bagian widget statistik. [Status: Project Enhance]
 </example>
 

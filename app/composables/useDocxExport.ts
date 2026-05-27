@@ -579,7 +579,7 @@ export function useDocxExport() {
     }
   }
 
-  async function exportToDocx(
+  async function exportTaskJob(
     monthlyRows: MonthlyReportRow[],
     selectedDateStr: string,
     settings: SettingsData,
@@ -826,15 +826,35 @@ export function useDocxExport() {
                     ],
                   }),
                   ...monthlyRows.map(
-                    (row) =>
+                    (row, idx) =>
                       new TableRow({
-                        children: [
-                          createDataCell(row.month || monthName, AlignmentType.LEFT),
-                          createDataCell(cleanMarkdown(row.project), AlignmentType.LEFT),
-                          createDataCell(row.progres, AlignmentType.LEFT),
-                          createDataCell(row.done, AlignmentType.LEFT),
-                          createDataCell(cleanMarkdown(row.status), AlignmentType.LEFT),
-                        ],
+                        children:
+                          idx === 0
+                            ? [
+                                new TableCell({
+                                  width: { size: 15, type: WidthType.PERCENTAGE },
+                                  rowSpan: monthlyRows.length,
+                                  children: [
+                                    new Paragraph({
+                                      alignment: AlignmentType.LEFT,
+                                      children: [new TextRun({ text: monthName, size: 24 })],
+                                    }),
+                                  ],
+                                  verticalAlign: VerticalAlign.CENTER,
+                                  borders: tableBorders,
+                                  margins: { left: 100, right: 100, top: 100, bottom: 100 },
+                                }),
+                                createDataCell(cleanMarkdown(row.project), AlignmentType.LEFT),
+                                createDataCell(row.progres, AlignmentType.LEFT),
+                                createDataCell(row.done, AlignmentType.LEFT),
+                                createDataCell(cleanMarkdown(row.status), AlignmentType.LEFT),
+                              ]
+                            : [
+                                createDataCell(cleanMarkdown(row.project), AlignmentType.LEFT),
+                                createDataCell(row.progres, AlignmentType.LEFT),
+                                createDataCell(row.done, AlignmentType.LEFT),
+                                createDataCell(cleanMarkdown(row.status), AlignmentType.LEFT),
+                              ],
                       }),
                   ),
                 ],
@@ -885,7 +905,7 @@ export function useDocxExport() {
 
       const filePath = await save({
         filters: [{ name: 'Word Document', extensions: ['docx'] }],
-        defaultPath: `Form Task Job - ${settings.user_name}.docx`,
+        defaultPath: `Form Task Job - ${settings.user_name} - ${monthName}.docx`,
       })
 
       if (filePath) {
@@ -902,7 +922,7 @@ export function useDocxExport() {
   }
 
   return {
-    exportToDocx,
+    exportTaskJob,
     exportBAST,
     exportingDocx,
   }

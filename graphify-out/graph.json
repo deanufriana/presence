@@ -403,7 +403,7 @@
       "label": "getSetting()",
       "file_type": "code",
       "source_file": "app/queries/settings.ts",
-      "source_location": "L54",
+      "source_location": "L53",
       "id": "queries_settings_getsetting",
       "community": 7,
       "norm_label": "getsetting()"
@@ -889,7 +889,7 @@
       "label": "getDailyPrompt()",
       "file_type": "code",
       "source_file": "app/utils/prompts.ts",
-      "source_location": "L53",
+      "source_location": "L57",
       "id": "utils_prompts_getdailyprompt",
       "community": 2,
       "norm_label": "getdailyprompt()"
@@ -898,7 +898,7 @@
       "label": "getYearlyPrompt()",
       "file_type": "code",
       "source_file": "app/utils/prompts.ts",
-      "source_location": "L93",
+      "source_location": "L97",
       "id": "utils_prompts_getyearlyprompt",
       "community": 2,
       "norm_label": "getyearlyprompt()"
@@ -907,7 +907,7 @@
       "label": "getJiraExportPrompt()",
       "file_type": "code",
       "source_file": "app/utils/prompts.ts",
-      "source_location": "L147",
+      "source_location": "L151",
       "id": "utils_prompts_getjiraexportprompt",
       "community": 2,
       "norm_label": "getjiraexportprompt()"
@@ -916,7 +916,7 @@
       "label": "getJiraGroupSubtasksPrompt()",
       "file_type": "code",
       "source_file": "app/utils/prompts.ts",
-      "source_location": "L194",
+      "source_location": "L198",
       "id": "utils_prompts_getjiragroupsubtasksprompt",
       "community": 2,
       "norm_label": "getjiragroupsubtasksprompt()"
@@ -925,7 +925,7 @@
       "label": "getJiraParentDescriptionPrompt()",
       "file_type": "code",
       "source_file": "app/utils/prompts.ts",
-      "source_location": "L217",
+      "source_location": "L220",
       "id": "utils_prompts_getjiraparentdescriptionprompt",
       "community": 2,
       "norm_label": "getjiraparentdescriptionprompt()"
@@ -1051,7 +1051,7 @@
       "label": "parseAiJsonResponse()",
       "file_type": "code",
       "source_file": "app/utils/ai.ts",
-      "source_location": "L216",
+      "source_location": "L215",
       "id": "utils_ai_parseaijsonresponse",
       "community": 1,
       "norm_label": "parseaijsonresponse()"
@@ -15401,5 +15401,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "1cce4771af307c4ba974442d7da66a77c7993818"
+  "built_at_commit": "5ec2ff617d8856e44325ec0861affa92cc84bed6"
 }
