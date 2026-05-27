@@ -5,17 +5,25 @@ import { fetch } from '@tauri-apps/plugin-http'
 import { stripMarkdownCodeBlock } from './format'
 
 export interface AiOptions {
+  signal?: AbortSignal
   max_tokens?: number
   temperature?: number
   think?: boolean
+  provider?: string
+  model?: string
+  apiKey?: string
+  ollamaUrl?: string
 }
 
 export async function generateSummary(prompt: string, options: AiOptions = {}) {
-  const db = await getDb()
-  const providerSetting = await db.query.settings.findFirst({
-    where: eq(schema.settings.key, 'ai_provider'),
-  })
-  const provider = providerSetting?.value || 'gemini'
+  let provider = options.provider
+  if (!provider) {
+    const db = await getDb()
+    const providerSetting = await db.query.settings.findFirst({
+      where: eq(schema.settings.key, 'ai_provider'),
+    })
+    provider = providerSetting?.value || 'gemini'
+  }
 
   if (provider === 'gemini') {
     return await generateGemini(prompt, options)
@@ -31,22 +39,34 @@ export async function generateSummary(prompt: string, options: AiOptions = {}) {
 }
 
 async function generateGemini(prompt: string, options: AiOptions) {
-  const db = await getDb()
-  const apiKey = await db.query.settings.findFirst({
-    where: eq(schema.settings.key, 'gemini_api_key'),
-  })
-  if (!apiKey?.value) throw new Error('Gemini API Key not set')
+  let apiKey = options.apiKey
+  if (!apiKey) {
+    const db = await getDb()
+    const apiKeySetting = await db.query.settings.findFirst({
+      where: eq(schema.settings.key, 'gemini_api_key'),
+    })
+    apiKey = apiKeySetting?.value
+  }
+  if (!apiKey) throw new Error('Gemini API Key not set')
 
-  const modelSetting = await db.query.settings.findFirst({
-    where: eq(schema.settings.key, 'ai_model'),
-  })
-  const model = modelSetting?.value || 'gemini-2.0-flash'
+  let model = options.model
+  if (!model) {
+    const db = await getDb()
+    const modelSetting = await db.query.settings.findFirst({
+      where: eq(schema.settings.key, 'ai_model'),
+    })
+    model = modelSetting?.value || 'gemini-2.0-flash'
+  }
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.value}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey,
+      },
+      signal: options.signal,
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
@@ -64,23 +84,32 @@ async function generateGemini(prompt: string, options: AiOptions) {
 }
 
 async function generateOpenAi(prompt: string, options: AiOptions) {
-  const db = await getDb()
-  const apiKey = await db.query.settings.findFirst({
-    where: eq(schema.settings.key, 'openai_api_key'),
-  })
-  if (!apiKey?.value) throw new Error('OpenAI API Key not set')
+  let apiKey = options.apiKey
+  if (!apiKey) {
+    const db = await getDb()
+    const apiKeySetting = await db.query.settings.findFirst({
+      where: eq(schema.settings.key, 'openai_api_key'),
+    })
+    apiKey = apiKeySetting?.value
+  }
+  if (!apiKey) throw new Error('OpenAI API Key not set')
 
-  const modelSetting = await db.query.settings.findFirst({
-    where: eq(schema.settings.key, 'ai_model'),
-  })
-  const model = modelSetting?.value || 'gpt-4o'
+  let model = options.model
+  if (!model) {
+    const db = await getDb()
+    const modelSetting = await db.query.settings.findFirst({
+      where: eq(schema.settings.key, 'ai_model'),
+    })
+    model = modelSetting?.value || 'gpt-4o'
+  }
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey.value}`,
+      Authorization: `Bearer ${apiKey}`,
     },
+    signal: options.signal,
     body: JSON.stringify({
       model,
       messages: [{ role: 'user', content: prompt }],
@@ -94,23 +123,32 @@ async function generateOpenAi(prompt: string, options: AiOptions) {
 }
 
 async function generateDeepSeek(prompt: string, options: AiOptions) {
-  const db = await getDb()
-  const apiKey = await db.query.settings.findFirst({
-    where: eq(schema.settings.key, 'deepseek_api_key'),
-  })
-  if (!apiKey?.value) throw new Error('DeepSeek API Key not set')
+  let apiKey = options.apiKey
+  if (!apiKey) {
+    const db = await getDb()
+    const apiKeySetting = await db.query.settings.findFirst({
+      where: eq(schema.settings.key, 'deepseek_api_key'),
+    })
+    apiKey = apiKeySetting?.value
+  }
+  if (!apiKey) throw new Error('DeepSeek API Key not set')
 
-  const modelSetting = await db.query.settings.findFirst({
-    where: eq(schema.settings.key, 'ai_model'),
-  })
-  const model = modelSetting?.value || 'deepseek-chat'
+  let model = options.model
+  if (!model) {
+    const db = await getDb()
+    const modelSetting = await db.query.settings.findFirst({
+      where: eq(schema.settings.key, 'ai_model'),
+    })
+    model = modelSetting?.value || 'deepseek-chat'
+  }
 
   const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey.value}`,
+      Authorization: `Bearer ${apiKey}`,
     },
+    signal: options.signal,
     body: JSON.stringify({
       model,
       messages: [{ role: 'user', content: prompt }],
@@ -124,20 +162,28 @@ async function generateDeepSeek(prompt: string, options: AiOptions) {
 }
 
 async function generateOllama(prompt: string, options: AiOptions) {
-  const db = await getDb()
-  const urlSetting = await db.query.settings.findFirst({
-    where: eq(schema.settings.key, 'ollama_url'),
-  })
-  const modelSetting = await db.query.settings.findFirst({
-    where: eq(schema.settings.key, 'ai_model'),
-  })
+  let baseUrl = options.ollamaUrl
+  if (!baseUrl) {
+    const db = await getDb()
+    const urlSetting = await db.query.settings.findFirst({
+      where: eq(schema.settings.key, 'ollama_url'),
+    })
+    baseUrl = urlSetting?.value || 'http://localhost:11434'
+  }
 
-  const baseUrl = urlSetting?.value || 'http://localhost:11434'
-  const model = modelSetting?.value || 'gemma:latest'
+  let model = options.model
+  if (!model) {
+    const db = await getDb()
+    const modelSetting = await db.query.settings.findFirst({
+      where: eq(schema.settings.key, 'ai_model'),
+    })
+    model = modelSetting?.value || 'gemma:latest'
+  }
 
   const response = await fetch(`${baseUrl}/api/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal: options.signal,
     body: JSON.stringify({
       model,
       prompt,
@@ -160,7 +206,6 @@ async function generateOllama(prompt: string, options: AiOptions) {
 }
 
 export async function fetchOllamaModels(baseUrl: string) {
-  const { fetch } = await import('@tauri-apps/plugin-http')
   const response = await fetch(`${baseUrl}/api/tags`)
   if (!response.ok) throw new Error('Failed to fetch Ollama models')
   const data = (await response.json()) as { models?: OllamaModel[] }

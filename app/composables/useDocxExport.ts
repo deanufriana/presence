@@ -278,7 +278,7 @@ export function useDocxExport() {
                 children: [
                   new TextRun({ text: 'Nama', size: 24 }),
                   new TextRun({ text: '\t : \t', size: 24 }),
-                  new TextRun({ text: settings.div_head_name || 'Ida Wahyuni Yanuarti', size: 24 }),
+                  new TextRun({ text: settings.div_head_name || '', size: 24 }),
                 ],
               }),
               new Paragraph({
@@ -529,7 +529,7 @@ export function useDocxExport() {
                             alignment: AlignmentType.CENTER,
                             children: [
                               new TextRun({
-                                text: settings.div_head_name || 'Ida Wahyuni Yanuarti',
+                                text: settings.div_head_name || '',
                                 bold: true,
                                 size: 24,
                               }),
@@ -539,8 +539,7 @@ export function useDocxExport() {
                             alignment: AlignmentType.CENTER,
                             children: [
                               new TextRun({
-                                text:
-                                  settings.div_head_position || 'Kepala Divisi Teknologi Informasi',
+                                text: settings.div_head_position || '',
                                 size: 20,
                               }),
                             ],
@@ -866,9 +865,9 @@ export function useDocxExport() {
                   }),
                   new TableRow({
                     children: [
-                      createSignatureNameCell(settings.team_leader_name || 'Adhel Ekonofian'),
-                      createSignatureNameCell(settings.dept_head_name || 'Septri Nur Ithmam'),
-                      createSignatureNameCell(settings.div_head_name || 'Ida Wahyuni Yanuarti'),
+                      createSignatureNameCell(settings.team_leader_name || ''),
+                      createSignatureNameCell(settings.dept_head_name || ''),
+                      createSignatureNameCell(settings.div_head_name || ''),
                     ],
                   }),
                 ],

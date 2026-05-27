@@ -84,7 +84,9 @@ export async function fetchJira<T = unknown>(
 
   if (options.body) {
     headers['Content-Type'] = 'application/json'
-    console.log(`[Jira API Request Payload] ${method} ${url.toString()}:`, options.body)
+    if (import.meta.dev) {
+      console.log(`[Jira API Request Payload] ${method} ${url.toString()}:`, options.body)
+    }
   }
 
   const response = await fetch(url.toString(), {

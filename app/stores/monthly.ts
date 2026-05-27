@@ -31,6 +31,14 @@ export const useMonthlyStore = defineStore('monthly', () => {
   }
 
   async function generateAiSummary() {
+    const provider = core.settings.ai_provider
+    const apiKey = core.activeApiKey
+
+    if (provider !== 'ollama' && (!apiKey || !apiKey.trim())) {
+      error(`API key for '${provider}' is not configured. Please set it in Settings first.`)
+      return
+    }
+
     summarizing.value = true
     const loadingToastId = loading('Generating monthly report with AI...')
     try {
@@ -50,7 +58,14 @@ export const useMonthlyStore = defineStore('monthly', () => {
       }
 
       const prompt = getMonthlyPrompt(activities)
-      const rawContent = await generateSummary(prompt, { max_tokens: 3000, think: true })
+      const rawContent = await generateSummary(prompt, {
+        max_tokens: 3000,
+        think: true,
+        provider: core.settings.ai_provider,
+        model: core.settings.ai_model,
+        apiKey: core.activeApiKey,
+        ollamaUrl: core.settings.ollama_url,
+      })
 
       const rows = parseMonthlyMarkdown(rawContent)
       const report = await upsertMonthlyReport({
@@ -89,7 +104,14 @@ export const useMonthlyStore = defineStore('monthly', () => {
       const { upsertJiraExportData } = await import('~/queries/jiraExport')
 
       const jiraPrompt = getJiraExportPrompt(activities, rows, monthlySummary)
-      const jiraRaw = await generateSummary(jiraPrompt, { max_tokens: 8192, temperature: 0.2 })
+      const jiraRaw = await generateSummary(jiraPrompt, {
+        max_tokens: 8192,
+        temperature: 0.2,
+        provider: core.settings.ai_provider,
+        model: core.settings.ai_model,
+        apiKey: core.activeApiKey,
+        ollamaUrl: core.settings.ollama_url,
+      })
 
       const { stripMarkdownCodeBlock } = await import('~/utils/format')
       const clean = stripMarkdownCodeBlock(jiraRaw)

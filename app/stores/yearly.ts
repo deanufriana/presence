@@ -48,6 +48,14 @@ export const useYearlyStore = defineStore('yearly', () => {
   }
 
   async function generateAiSummary() {
+    const provider = core.settings.ai_provider
+    const apiKey = core.activeApiKey
+
+    if (provider !== 'ollama' && (!apiKey || !apiKey.trim())) {
+      error(`API key for '${provider}' is not configured. Please set it in Settings first.`)
+      return
+    }
+
     summarizing.value = true
     const loadingToastId = loading('Generating yearly report with AI...')
     try {
@@ -58,7 +66,14 @@ export const useYearlyStore = defineStore('yearly', () => {
 
       const summaries = await getAllMonthlySummaries(currentYear.value)
       const prompt = getYearlyPrompt(summaries)
-      const rawContent = await generateSummary(prompt, { max_tokens: 4000, think: true })
+      const rawContent = await generateSummary(prompt, {
+        max_tokens: 4000,
+        think: true,
+        provider: core.settings.ai_provider,
+        model: core.settings.ai_model,
+        apiKey: core.activeApiKey,
+        ollamaUrl: core.settings.ollama_url,
+      })
 
       const rows = parseYearlyMarkdown(rawContent)
       const report = await upsertYearlyReport({

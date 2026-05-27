@@ -55,6 +55,28 @@
           </CardContent>
         </Card>
 
+        <!-- Time In & Time Out Section -->
+        <div class="grid grid-cols-2 gap-4">
+          <Field class="space-y-2">
+            <FieldLabel
+              for="timeIn"
+              class="text-[10px] uppercase font-bold text-muted-foreground tracking-wider"
+            >
+              Time In
+            </FieldLabel>
+            <Input id="timeIn" v-model="manualMasukText" type="time" class="h-9 bg-background" />
+          </Field>
+          <Field class="space-y-2">
+            <FieldLabel
+              for="timeOut"
+              class="text-[10px] uppercase font-bold text-muted-foreground tracking-wider"
+            >
+              Time Out
+            </FieldLabel>
+            <Input id="timeOut" v-model="manualPulangText" type="time" class="h-9 bg-background" />
+          </Field>
+        </div>
+
         <!-- Activity Description Section -->
         <Field class="space-y-2">
           <FieldLabel
@@ -112,8 +134,14 @@ defineProps<{
 
 const dailyStore = useDailyStore()
 const { saveManualActivity } = dailyStore
-const { selectedDayForEntry, manualActivityText, manualHolidayName, isManualHoliday } =
-  storeToRefs(dailyStore)
+const {
+  selectedDayForEntry,
+  manualActivityText,
+  manualHolidayName,
+  isManualHoliday,
+  manualMasukText,
+  manualPulangText,
+} = storeToRefs(dailyStore)
 
 defineEmits<{
   'update:modelValue': [value: boolean]

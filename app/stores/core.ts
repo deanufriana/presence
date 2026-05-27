@@ -58,6 +58,14 @@ export const useCoreStore = defineStore('core', () => {
       ),
   )
 
+  const activeApiKey = computed(() => {
+    const provider = settings.value.ai_provider
+    if (provider === 'gemini') return settings.value.gemini_api_key
+    if (provider === 'openai') return settings.value.openai_api_key
+    if (provider === 'deepseek') return settings.value.deepseek_api_key
+    return undefined
+  })
+
   const dateDisplay = computed(() => {
     try {
       const d = parse(selectedDate.value, 'yyyy-MM', new Date())
@@ -211,6 +219,7 @@ export const useCoreStore = defineStore('core', () => {
     formatMonth,
     settings,
     isAiEnabled,
+    activeApiKey,
     dateDisplay,
     selectedProjectIds,
     selectedJiraProjects,

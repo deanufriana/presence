@@ -193,9 +193,9 @@ ${rows.map((r) => `- Project: ${r.project} | Sources: ${(r.sources || []).join('
 
 export const getJiraGroupSubtasksPrompt = (
   issueSummary: string,
-  subtasks: { title: string; description?: string }[],
+  dailyTasks: { title: string; description?: string }[],
 ) => {
-  const currentTasks = subtasks.map((t) => t.title).join('\n')
+  const currentTasks = dailyTasks.map((t) => t.title).join('\n')
   return `Anda adalah manajer proyek profesional dan ahli Jira.
 Pengguna mengekspor baris laporan aktivitas bulanan ke Jira sebagai parent task.
 Ringkasan Parent Task: "${issueSummary}"

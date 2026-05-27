@@ -3,6 +3,9 @@ import { useCoreStore } from '~/stores/core'
 import { useToast } from '~/composables/use-toast'
 import type { ReportRow } from '~/types/report'
 
+const MIN_ACTIVITY_LENGTH_TO_SUMMARIZE = 10
+const MIN_ACTIVITY_LENGTH_FOR_ALL = 5
+
 export const useDailyStore = defineStore('daily', () => {
   const core = useCoreStore()
   const { success, error } = useToast()
@@ -11,12 +14,14 @@ export const useDailyStore = defineStore('daily', () => {
   const summarizingRows = ref<Record<string, boolean>>({})
   const summarizingAll = ref(false)
   const shouldStopSummarizing = ref(false)
-  // let currentAbortController: AbortController | null = null
+  let currentAbortController: AbortController | null = null
   const syncingRows = ref<Record<string, boolean>>({})
 
   const showManualEntry = ref(false)
   const selectedDayForEntry = ref<{ date: string; dayNum: number } | null>(null)
   const manualActivityText = ref('')
+  const manualMasukText = ref('')
+  const manualPulangText = ref('')
   const manualHolidayName = ref('')
   const isManualHoliday = ref(false)
   const isLoading = ref(false)
@@ -105,8 +110,17 @@ export const useDailyStore = defineStore('daily', () => {
     }
   }
 
-  async function summarizeRow(row: ReportRow) {
-    if (!row.aktivitas || row.aktivitas.length < 10) return
+  async function summarizeRow(row: ReportRow, signal?: AbortSignal) {
+    if (!row.aktivitas || row.aktivitas.length < MIN_ACTIVITY_LENGTH_TO_SUMMARIZE) return
+
+    const provider = core.settings.ai_provider
+    const apiKey = core.activeApiKey
+
+    if (provider !== 'ollama' && (!apiKey || !apiKey.trim())) {
+      error(`API key for '${provider}' is not configured. Please set it in Settings first.`)
+      return
+    }
+
     summarizingRows.value[row.date] = true
     const activitiesList = row.aktivitas
       .split(/\n|;/)
@@ -118,7 +132,13 @@ export const useDailyStore = defineStore('daily', () => {
       const { getDailyPrompt } = await import('~/utils/prompts')
 
       const prompt = getDailyPrompt(activitiesList)
-      const summary = await generateSummary(prompt, {})
+      const summary = await generateSummary(prompt, {
+        signal,
+        provider: core.settings.ai_provider,
+        model: core.settings.ai_model,
+        apiKey,
+        ollamaUrl: core.settings.ollama_url,
+      })
 
       if (summary) {
         row.aktivitas = summary
@@ -126,8 +146,12 @@ export const useDailyStore = defineStore('daily', () => {
         success(`Summary generated for ${row.date}`)
       }
     } catch (err: unknown) {
-      console.error('Failed to summarize row:', err)
-      error('Failed to generate summary')
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        console.log(`Summarization aborted for ${row.date}`)
+      } else {
+        console.error('Failed to summarize row:', err)
+        error('Failed to generate summary')
+      }
     } finally {
       summarizingRows.value[row.date] = false
     }
@@ -136,21 +160,28 @@ export const useDailyStore = defineStore('daily', () => {
   async function summarizeAll() {
     if (summarizingAll.value) {
       shouldStopSummarizing.value = true
+      if (currentAbortController) {
+        currentAbortController.abort()
+      }
       return
     }
 
     summarizingAll.value = true
     shouldStopSummarizing.value = false
+    currentAbortController = new AbortController()
 
     const rowsToProcess = dailyTable.value.filter(
-      (row) => row.aktivitas && row.aktivitas.length > 5 && !summarizingRows.value[row.date],
+      (row) =>
+        row.aktivitas &&
+        row.aktivitas.length > MIN_ACTIVITY_LENGTH_FOR_ALL &&
+        !summarizingRows.value[row.date],
     )
 
     async function processSequentially(index: number) {
       if (index >= rowsToProcess.length || shouldStopSummarizing.value) return
       const row = rowsToProcess[index]
       if (row) {
-        await summarizeRow(row)
+        await summarizeRow(row, currentAbortController?.signal)
         await new Promise((resolve) => setTimeout(resolve, 500))
         await processSequentially(index + 1)
       }
@@ -168,6 +199,7 @@ export const useDailyStore = defineStore('daily', () => {
     } finally {
       summarizingAll.value = false
       shouldStopSummarizing.value = false
+      currentAbortController = null
     }
   }
 
@@ -193,6 +225,8 @@ export const useDailyStore = defineStore('daily', () => {
 
     const row = dailyTable.value.find((r) => r.date === day.date)
     manualActivityText.value = row?.aktivitas || ''
+    manualMasukText.value = row?.masuk || ''
+    manualPulangText.value = row?.pulang || ''
 
     const { useCalendarStore } = await import('~/stores/calendar')
     const calendarStore = useCalendarStore()
@@ -224,10 +258,10 @@ export const useDailyStore = defineStore('daily', () => {
     }
   }
 
-  const saveActivity = async (date: string, aktivitas: string) => {
+  const saveActivity = async (date: string, aktivitas: string, masuk?: string, pulang?: string) => {
     try {
       const { upsertDailyReport } = await import('~/utils/reports')
-      const report = await upsertDailyReport({ date, activities: [aktivitas] })
+      const report = await upsertDailyReport({ date, activities: [aktivitas], masuk, pulang })
 
       if (report) {
         const rowIndex = dailyTable.value.findIndex((r) => r.date === date)
@@ -255,7 +289,12 @@ export const useDailyStore = defineStore('daily', () => {
   const saveManualActivity = async () => {
     if (!selectedDayForEntry.value) return
     await saveManualHoliday()
-    await saveActivity(selectedDayForEntry.value.date, manualActivityText.value)
+    await saveActivity(
+      selectedDayForEntry.value.date,
+      manualActivityText.value,
+      manualMasukText.value || undefined,
+      manualPulangText.value || undefined,
+    )
     showManualEntry.value = false
     success(`Data updated for ${selectedDayForEntry.value.date}`)
   }
@@ -311,6 +350,8 @@ export const useDailyStore = defineStore('daily', () => {
     showManualEntry,
     selectedDayForEntry,
     manualActivityText,
+    manualMasukText,
+    manualPulangText,
     manualHolidayName,
     isManualHoliday,
     showConfirmSync,

@@ -21,10 +21,25 @@ import type {
 
 export { getDailyReports, getMonthlyReport, getYearlyReport, getAllMonthlySummaries }
 
-export async function upsertDailyReport(data: { date: string; activities: string[] }) {
+export async function upsertDailyReport(data: {
+  date: string
+  activities: string[]
+  masuk?: string
+  pulang?: string
+}) {
+  const { getDb, schema } = await import('~/db')
+  const { eq } = await import('drizzle-orm')
+  const db = await getDb()
+  const existing = await db.query.dailyReports.findFirst({
+    where: eq(schema.dailyReports.date, data.date),
+  })
+
+  const masuk = data.masuk || existing?.masuk || getRandomTime('07:30', '08:00')
+  const pulang = data.pulang || existing?.pulang || getRandomTime('17:00', '17:30')
+
   const result = {
-    masuk: getRandomTime('07:30', '08:00'),
-    pulang: getRandomTime('17:00', '17:30'),
+    masuk,
+    pulang,
     ti: 'TI',
     aktivitas: data.activities
       .map((a) => (a.trim().startsWith('-') ? a.trim() : `- ${a.trim()}`))

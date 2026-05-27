@@ -730,13 +730,28 @@ async function groupSubtasksWithAI() {
   isAILoading.value = true
 
   try {
-    const parentSummary = issueSummary.value || exportRow.value?.project || ''
-    const selectedTasks = displayActivities.value.filter((t) =>
-      selectedSubtaskIds.value.includes(t.id || ''),
-    )
-    const prompt = getJiraGroupSubtasksPrompt(parentSummary, selectedTasks)
+    const provider = coreStore.settings.ai_provider
+    const apiKey = coreStore.activeApiKey
 
-    const response = await generateSummary(prompt, { temperature: 0.2 })
+    if (provider !== 'ollama' && (!apiKey || !apiKey.trim())) {
+      error(`API key for '${provider}' is not configured. Please set it in Settings first.`)
+      isAILoading.value = false
+      return
+    }
+
+    const parentSummary = issueSummary.value || exportRow.value?.project || ''
+    const rawActivities = (exportRowActivities.value || [])
+      .filter((a) => isActivityRelated(a, exportProjectKey.value))
+      .map((a) => ({ title: a }))
+    const prompt = getJiraGroupSubtasksPrompt(parentSummary, rawActivities)
+
+    const response = await generateSummary(prompt, {
+      temperature: 0.2,
+      provider: coreStore.settings.ai_provider,
+      model: coreStore.settings.ai_model,
+      apiKey,
+      ollamaUrl: coreStore.settings.ollama_url,
+    })
 
     const parsed = parseAiJsonResponse<JiraChildTask>(
       response,
@@ -797,12 +812,27 @@ async function generateParentDescription() {
   isDescriptionLoading.value = true
 
   try {
+    const provider = coreStore.settings.ai_provider
+    const apiKey = coreStore.activeApiKey
+
+    if (provider !== 'ollama' && (!apiKey || !apiKey.trim())) {
+      error(`API key for '${provider}' is not configured. Please set it in Settings first.`)
+      isDescriptionLoading.value = false
+      return
+    }
+
     const prompt = getJiraParentDescriptionPrompt(
       issueSummary.value.trim(),
       displayActivities.value,
     )
 
-    const response = await generateSummary(prompt, { temperature: 0.3 })
+    const response = await generateSummary(prompt, {
+      temperature: 0.3,
+      provider: coreStore.settings.ai_provider,
+      model: coreStore.settings.ai_model,
+      apiKey,
+      ollamaUrl: coreStore.settings.ollama_url,
+    })
     issueDescription.value = response.trim()
     success('Description generated!')
   } catch (err: unknown) {
