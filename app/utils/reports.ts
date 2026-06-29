@@ -11,13 +11,10 @@ import {
 import { getGitLabCache, formatGitLabActivity } from './gitlab'
 import { getJiraCache, formatJiraActivity } from './jira'
 import { getCalendarCache, formatCalendarActivity } from './calendar'
-import type {
-  MonthlyReportRow,
-  YearlyReportRow,
-  GitLabEvent,
-  CalendarEvent,
-  JiraEvent,
-} from '~/types/report'
+import type { MonthlyReportRow, YearlyReportRow } from '~/types/report'
+import type { GitLabEvent } from '~/types/gitlab'
+import type { CalendarEvent } from '~/types/calendar'
+import type { JiraEvent } from '~/types/jira'
 
 export { getDailyReports, getMonthlyReport, getYearlyReport, getAllMonthlySummaries }
 
@@ -137,15 +134,17 @@ export async function getYearlyActivities(year: string) {
   return months
 }
 
-function getRandomTime(start: string, end: string) {
-  const [sH, sM] = (start || '').split(':').map(Number)
-  const [eH, eM] = (end || '').split(':').map(Number)
-  const startMin = (sH || 0) * 60 + (sM || 0)
-  const endMin = (eH || 0) * 60 + (eM || 0)
+function getRandomTime(start = '07:30', end = '17:30') {
+  const [sH = 0, sM = 0] = start.split(':').map(Number)
+  const [eH = 0, eM = 0] = end.split(':').map(Number)
+  const startMin = sH * 60 + sM
+  const endMin = eH * 60 + eM
   const randMin = Math.floor(Math.random() * (endMin - startMin + 1)) + startMin
   const h = Math.floor(randMin / 60)
-  const m = randMin % 60
-  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
+    .toString()
+    .padStart(2, '0')
+  const m = (randMin % 60).toString().padStart(2, '0')
+  return `${h}:${m}`
 }
 
 export function parseMonthlyMarkdown(markdown: string) {

@@ -324,8 +324,8 @@ import {
   buildAdfRowDescription,
   getJiraIssueTypesForProject,
 } from '~/utils/jira'
+import { parseProjectText } from '~/utils/format'
 import { generateSummary, parseAiJsonResponse } from '~/utils/ai'
-import { generateId, parseProjectText } from '~/utils/format'
 import { getJiraGroupSubtasksPrompt, getJiraParentDescriptionPrompt } from '~/utils/prompts'
 
 const props = defineProps<{
@@ -537,7 +537,7 @@ async function loadJiraConfig() {
     // Pre-fill child tasks from stored Jira export data, fallback to raw activities
     if (exportChildTasks.value?.length) {
       displayActivities.value = exportChildTasks.value.map((t) => ({
-        id: t.id || generateId(),
+        id: t.id || crypto.randomUUID(),
         title: t.title,
         description: t.description || '',
       }))
@@ -547,7 +547,7 @@ async function loadJiraConfig() {
         isActivityRelated(a, exportProjectKey.value),
       )
       displayActivities.value = filteredRaw.map((a) => ({
-        id: generateId(),
+        id: crypto.randomUUID(),
         title: a,
         description: '',
       }))
@@ -757,11 +757,11 @@ async function groupSubtasksWithAI() {
       response,
       (item) => {
         if (typeof item === 'string') {
-          return { id: generateId(), title: String(item).trim(), description: '' }
+          return { id: crypto.randomUUID(), title: String(item).trim(), description: '' }
         }
         if (item && typeof item === 'object' && 'title' in (item as Record<string, unknown>)) {
           return {
-            id: generateId(),
+            id: crypto.randomUUID(),
             title: String((item as Record<string, unknown>).title).trim(),
             description: String((item as Record<string, unknown>).description || '').trim(),
           }
@@ -770,7 +770,7 @@ async function groupSubtasksWithAI() {
       },
       (line) => {
         const title = line.replace(/^[-*•\d.\s]+/, '').trim()
-        return title.length > 2 ? { id: generateId(), title, description: '' } : null
+        return title.length > 2 ? { id: crypto.randomUUID(), title, description: '' } : null
       },
     )
 

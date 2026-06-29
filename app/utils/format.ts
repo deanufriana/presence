@@ -45,20 +45,3 @@ export function stripMarkdownCodeBlock(text: string): string {
 
   return clean
 }
-
-export function parseActivityLines(text: string): string[] {
-  return text
-    .split('\n')
-    .map((line) => line.trim())
-    .map((line) => line.replace(/^[-*•]\s*/, ''))
-    .map((line) => line.trim())
-    .filter((line) => line.length > 2)
-}
-
-export function generateId(): string {
-  try {
-    return crypto.randomUUID()
-  } catch {
-    return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-  }
-}

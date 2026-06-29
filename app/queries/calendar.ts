@@ -16,22 +16,6 @@ export async function deleteCalendarEventsByMonth(month: string) {
     .where(sql`${schema.calendarEvents.date} LIKE ${month + '%'}`)
 }
 
-export async function insertCalendarEvent(event: {
-  date: string
-  summary: string
-  startTime?: string
-  endTime?: string
-}) {
-  const db = await getDb()
-  await db.insert(schema.calendarEvents).values({
-    date: event.date,
-    summary: event.summary,
-    startTime: event.startTime,
-    endTime: event.endTime,
-    updatedAt: new Date(),
-  })
-}
-
 export async function insertCalendarEvents(
   events: {
     date: string

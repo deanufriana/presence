@@ -1,6 +1,6 @@
 import { getDb, schema } from '~/db'
 import { eq, sql } from 'drizzle-orm'
-import type { SettingsData } from '~/types/report'
+import type { SettingsData } from '~/types/settings'
 
 export async function fetchAllSettings(): Promise<Partial<SettingsData>> {
   const db = await getDb()
@@ -11,21 +11,6 @@ export async function fetchAllSettings(): Promise<Partial<SettingsData>> {
     ;(data as Record<string, string>)[s.key] = s.value
   })
   return data
-}
-
-export async function upsertSetting(key: string, value: string) {
-  const db = await getDb()
-  await db
-    .insert(schema.settings)
-    .values({
-      key,
-      value,
-      updatedAt: new Date(),
-    })
-    .onConflictDoUpdate({
-      target: schema.settings.key,
-      set: { value, updatedAt: new Date() },
-    })
 }
 
 export async function upsertSettingsBatch(settings: Record<string, string>) {

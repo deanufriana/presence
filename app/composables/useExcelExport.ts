@@ -1,6 +1,7 @@
 import { save } from '@tauri-apps/plugin-dialog'
 import { writeFile } from '@tauri-apps/plugin-fs'
-import type { ReportRow, SettingsData } from '~/types/report'
+import type { ReportRow } from '~/types/report'
+import type { SettingsData } from '~/types/settings'
 
 export function useExcelExport() {
   const exporting = ref(false)

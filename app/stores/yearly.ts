@@ -68,7 +68,6 @@ export const useYearlyStore = defineStore('yearly', () => {
       const prompt = getYearlyPrompt(summaries)
       const rawContent = await generateSummary(prompt, {
         max_tokens: 4000,
-        think: true,
         provider: core.settings.ai_provider,
         model: core.settings.ai_model,
         apiKey: core.activeApiKey,

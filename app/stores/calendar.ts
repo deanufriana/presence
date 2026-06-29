@@ -6,7 +6,10 @@ import { useCoreStore } from '~/stores/core'
 import { useGitlabStore } from '~/stores/gitlab'
 import { useDailyStore } from '~/stores/daily'
 import { useJiraStore } from '~/stores/jira'
-import type { CalendarCache, Holiday, GitLabEvent, CalendarEvent, JiraEvent } from '~/types/report'
+import type { CalendarCache, CalendarEvent } from '~/types/calendar'
+import type { Holiday } from '~/types/holiday'
+import type { GitLabEvent } from '~/types/gitlab'
+import type { JiraEvent } from '~/types/jira'
 
 export const useCalendarStore = defineStore('calendar', () => {
   const core = useCoreStore()

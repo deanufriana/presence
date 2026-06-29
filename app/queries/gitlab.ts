@@ -1,6 +1,6 @@
 import { getDb, schema } from '~/db'
 import { gte, lte, and } from 'drizzle-orm'
-import type { GitLabEvent } from '~/types/report'
+import type { GitLabEvent } from '~/types/gitlab'
 
 export async function getGitLabCommitsByPeriod(firstDay: Date, lastDay: Date) {
   const db = await getDb()

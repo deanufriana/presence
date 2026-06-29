@@ -1,4 +1,4 @@
-import type { CalendarEvent } from '~/types/report'
+import type { CalendarEvent } from '~/types/calendar'
 
 /**
  * Simple ICS parser to extract event summaries grouped by date.

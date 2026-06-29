@@ -60,7 +60,6 @@ export const useMonthlyStore = defineStore('monthly', () => {
       const prompt = getMonthlyPrompt(activities)
       const rawContent = await generateSummary(prompt, {
         max_tokens: 3000,
-        think: true,
         provider: core.settings.ai_provider,
         model: core.settings.ai_model,
         apiKey: core.activeApiKey,

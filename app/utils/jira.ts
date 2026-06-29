@@ -1,5 +1,7 @@
 import { fetch } from '@tauri-apps/plugin-http'
-import type { JiraEvent, MonthlyReportRow, SettingsData } from '~/types/report'
+import type { MonthlyReportRow } from '~/types/report'
+import type { JiraEvent } from '~/types/jira'
+import type { SettingsData } from '~/types/settings'
 import { getSetting } from '~/queries/settings'
 import { getJiraActivitiesByPeriod, upsertJiraActivity } from '~/queries/jira'
 

@@ -1,6 +1,6 @@
 import { getCalendarEventsByMonth, getHolidaysByMonth, upsertHoliday } from '~/queries/calendar'
 
-import type { CalendarEvent } from '~/types/report'
+import type { CalendarEvent } from '~/types/calendar'
 
 export async function getCalendarCache(month: string) {
   const events = await getCalendarEventsByMonth(month)

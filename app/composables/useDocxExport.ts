@@ -1,7 +1,8 @@
 import { format, parse, getDaysInMonth, isWeekend } from 'date-fns'
 import { id as idLocale } from 'date-fns/locale'
 import { useCalendarStore } from '~/stores/calendar'
-import type { MonthlyReportRow, SettingsData } from '~/types/report'
+import type { MonthlyReportRow } from '~/types/report'
+import type { SettingsData } from '~/types/settings'
 import type { Holiday } from '~/types/holiday'
 
 export function useDocxExport() {

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import type { JiraCache, JiraEvent, MonthlyReportRow, JiraChildTask } from '~/types/report'
+import type { MonthlyReportRow, JiraChildTask } from '~/types/report'
+import type { JiraCache, JiraEvent } from '~/types/jira'
 import type { JiraProject, JiraIssueType, JiraMyself, JiraConfig } from '~/utils/jira'
 
 export const useJiraStore = defineStore('jira', () => {

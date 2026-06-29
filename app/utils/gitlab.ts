@@ -1,5 +1,5 @@
 import { fetch } from '@tauri-apps/plugin-http'
-import type { GitLabEvent } from '~/types/report'
+import type { GitLabEvent } from '~/types/gitlab'
 import { getSetting } from '~/queries/settings'
 import { getGitLabCommitsByPeriod, upsertGitLabCommit } from '~/queries/gitlab'
 
@@ -8,21 +8,21 @@ export interface GitLabConfig {
   url: string
 }
 
-export interface RawGitLabUser {
+interface RawGitLabUser {
   id: number
   username: string
   email: string
   name: string
 }
 
-export interface RawGitLabProject {
+interface RawGitLabProject {
   id: number
   name: string
   path_with_namespace: string
   default_branch?: string
 }
 
-export interface RawGitLabCommit {
+interface RawGitLabCommit {
   id: string
   short_id: string
   title: string
@@ -37,7 +37,7 @@ export interface RawGitLabCommit {
   created_at: string
 }
 
-export interface RawGitLabRef {
+interface RawGitLabRef {
   name: string
   type: string
 }

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { format, addMonths, subMonths, addYears, subYears, parse } from 'date-fns'
 import { useToast } from '~/composables/use-toast'
-import type { SettingsData } from '~/types/report'
+import type { SettingsData } from '~/types/settings'
 import { useGitlabStore } from '~/stores/gitlab'
 import { useJiraStore } from '~/stores/jira'
 import { useCalendarStore } from '~/stores/calendar'
@@ -12,8 +12,6 @@ export const useCoreStore = defineStore('core', () => {
   const selectedDate = ref(format(new Date(), 'yyyy-MM'))
   const showSettings = ref(false)
   const saving = ref(false)
-  const initialLoading = ref(true)
-  const isInitialized = ref(false)
   const pending = ref(false)
   const viewMode = ref<'monthly' | 'yearly'>('monthly')
   const selectedProjectIds = ref<number[]>([])
@@ -213,8 +211,6 @@ export const useCoreStore = defineStore('core', () => {
     selectedDate,
     showSettings,
     saving,
-    initialLoading,
-    isInitialized,
     pending,
     formatMonth,
     settings,

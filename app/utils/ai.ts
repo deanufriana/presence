@@ -8,7 +8,6 @@ export interface AiOptions {
   signal?: AbortSignal
   max_tokens?: number
   temperature?: number
-  think?: boolean
   provider?: string
   model?: string
   apiKey?: string
@@ -78,9 +77,16 @@ async function generateGemini(prompt: string, options: AiOptions) {
   )
 
   const data = (await response.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[]
+    candidates?: {
+      content?: { parts?: { text?: string; thought?: boolean }[] }
+    }[]
   }
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+  const parts = data.candidates?.[0]?.content?.parts || []
+  return parts
+    .filter((p) => !p.thought)
+    .map((p) => p.text || '')
+    .join('')
+    .trim()
 }
 
 async function generateOpenAi(prompt: string, options: AiOptions) {
@@ -157,7 +163,9 @@ async function generateDeepSeek(prompt: string, options: AiOptions) {
     }),
   })
 
-  const data = (await response.json()) as { choices?: { message?: { content?: string } }[] }
+  const data = (await response.json()) as {
+    choices?: { message?: { content?: string; reasoning_content?: string } }[]
+  }
   return data.choices?.[0]?.message?.content || ''
 }
 
@@ -198,7 +206,7 @@ async function generateOllama(prompt: string, options: AiOptions) {
   const data = (await response.json()) as { response?: string }
   let responseText = data.response || ''
 
-  if (options.think && responseText.includes('</think>')) {
+  if (responseText.includes('</think>')) {
     responseText = responseText.split('</think>').pop()?.trim() || responseText
   }
 

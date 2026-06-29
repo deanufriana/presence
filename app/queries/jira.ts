@@ -1,6 +1,6 @@
 import { getDb, schema } from '~/db'
 import { gte, lte, and } from 'drizzle-orm'
-import type { JiraEvent } from '~/types/report'
+import type { JiraEvent } from '~/types/jira'
 
 export async function getJiraActivitiesByPeriod(firstDay: Date, lastDay: Date) {
   const db = await getDb()
