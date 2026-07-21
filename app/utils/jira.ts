@@ -395,5 +395,5 @@ export async function getJiraCache(dateStr: string) {
 
 export function formatJiraActivity(ev: JiraEvent): string {
   const status = ev.status || 'Update'
-  return `[${ev.project_name}] ${status}: ${ev.summary}`
+  return `[Jira: ${ev.key}] [${ev.project_name}] ${status}: ${ev.summary}`
 }

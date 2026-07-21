@@ -1,8 +1,8 @@
-export const getMonthlyPrompt = (activities: string[]) => `
+export const getMonthlyPrompt = (activities: string[], totalWorkingDays?: number) => `
 Kamu adalah Senior Technical Report Writer yang ahli dalam merangkum pekerjaan software engineering.
 
 Tugas:
-Buat ringkasan BULANAN dari daftar aktivitas yang diberikan secara profesional.
+Buat ringkasan BULANAN dari daftar aktivitas yang diberikan secara profesional. Total hari kerja efektif bulan ini adalah ${totalWorkingDays ? `${totalWorkingDays} Mandays` : 'sekitar 20-22 Mandays'}.
 
 <instructions>
 Bahasa & Gaya:
@@ -24,16 +24,18 @@ Aturan Pengelompokan & Format (WAJIB):
 6. Gunakan tepat 1 kalimat per bullet.
 7. Setiap bullet WAJIB diawali dengan daftar tanggal sumber dari aktivitas aslinya dalam kurung siku, contoh: \`[2024-04-01, 2024-04-05] Deskripsi pekerjaan...\`
 
-Aturan Konten & Sintesis:
+ Aturan Konten & Sintesis:
 8. Fokus pada nilai bisnis dan dampak teknis dari setiap pencapaian (misal: meningkatkan efisiensi, menjamin keamanan data).
 9. JANGAN menghapus detail spesifik mengenai lokasi atau bagian aplikasi yang dikerjakan (misal: "pada modul autentikasi", "di sistem reporting"). Detail "di mana" implementasi dilakukan sangat penting.
 10. Gabungkan aktivitas/commit yang serupa atau yang terjadi pada tanggal yang sama menjadi 1 bullet umum yang komprehensif tanpa menghilangkan konteks teknis utamanya.
 11. Ringkas log aktivitas meeting (misal: "Meeting from... with discuss about...") menjadi satu ringkasan koordinasi/diskusi teknis yang relevan dengan proyek.
 12. DILARANG halusinasi; ekstrak data murni dari daftar aktivitas yang diberikan.
 13. JANGAN menyertakan nama branch (misal: feature/api, develop) ke dalam ringkasan.
+14. Jika aktivitas mengandung referensi tiket Jira (format \`[Jira: KEY-123]\`), WAJIB sertakan KEY tiket Jira tersebut dalam bullet yang bersangkutan. Contoh: \`[2024-04-01, 2024-04-05] Mengembangkan modul autentikasi pada aplikasi NotiFi (Jira: NOTIFI-456). [Status: Project]\`
+15. Perhatikan total hari kerja efektif bulan ini (${totalWorkingDays || 20} Mandays). Pastikan setiap bullet mencantumkan tanggal sumber yang akurat dari aktivitas asli sehingga distribusi beban kerja (Mandays) per proyek dapat terwakili secara logis.
 
 Aturan Label Status (WAJIB):
-14. Setiap bullet WAJIB diakhiri dengan salah satu dari 3 label status berikut (tulis persis seperti ini):
+16. Setiap bullet WAJIB diakhiri dengan salah satu dari 3 label status berikut (tulis persis seperti ini):
     - [Status: Project] -> Untuk pekerjaan fitur baru/pengembangan proyek utama.
     - [Status: Project Enhance] -> Untuk improvement, refactoring kode, optimasi, atau perbaikan.
     - [Status: Continuing (Daily)] -> Untuk monitoring, support, operasional, aktivitas berulang harian, atau meeting rutin/koordinasi.
@@ -72,7 +74,7 @@ Aturan Output & Format (WAJIB):
 3. Batasi maksimal 6 bullet secara keseluruhan.
 4. Urutkan dari dampak terbesar ke terkecil (Prioritas: Rilis Fitur/Proyek > Perbaikan Bug > Meeting/Operasional).
 
-Aturan Konten & Sintesis:
+ Aturan Konten & Sintesis:
 5. WAJIB menyebutkan nama proyek dan modul/fitur spesifik pada setiap poin. Gunakan informasi dari tag [Project: Nama Proyek] yang tersedia. JANGAN menghapus detail mengenai "di mana" implementasi dilakukan.
 6. Awali kalimat dengan kata kerja profesional (misal: Mengimplementasi, Mengoptimasi, Mengintegrasi, Menyelesaikan, Memvalidasi, Memfasilitasi).
 7. Gabungkan aktivitas sejenis menjadi satu poin yang menyoroti progres signifikan serta dampaknya, namun tetap pertahankan detail lokasi kerjanya.
@@ -80,6 +82,7 @@ Aturan Konten & Sintesis:
    - Meeting mengenai [topic] pada jam [start] - [end].
 9. DILARANG halusinasi; ekstrak data murni dari daftar aktivitas yang diberikan.
 10. JANGAN menyertakan nama branch (misal: feature/api, develop) ke dalam ringkasan.
+11. Jika aktivitas mengandung referensi tiket Jira (format \`[Jira: KEY-123]\`), WAJIB sertakan KEY tiket Jira tersebut dalam bullet yang bersangkutan. Contoh: \`- Mengimplementasi fitur notifikasi pada modul Scheduler untuk pengiriman pesan terjadwal (Jira: NOTIFI-456).\`
 </instructions>
 
 <example>

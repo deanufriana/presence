@@ -9,7 +9,7 @@
       "source_file": "tailwind.config.js",
       "source_location": "L1",
       "id": "tailwind_config_js",
-      "community": 37,
+      "community": 44,
       "norm_label": "tailwind.config.js"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "app/app.vue",
       "source_location": "L1",
       "id": "app_app_vue",
-      "community": 0,
+      "community": 1,
       "norm_label": "app.vue"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "app/types/holiday.ts",
       "source_location": "L1",
       "id": "app_types_holiday_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "holiday.ts"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "app/types/report.ts",
       "source_location": "L1",
       "id": "app_types_report_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "report.ts"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "app/types/ollama.ts",
       "source_location": "L1",
       "id": "app_types_ollama_ts",
-      "community": 1,
+      "community": 0,
       "norm_label": "ollama.ts"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "app/types/jira.ts",
       "source_location": "L1",
       "id": "app_types_jira_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "jira.ts"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "app/types/settings.ts",
       "source_location": "L1",
       "id": "app_types_settings_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "settings.ts"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "app/types/calendar.ts",
       "source_location": "L1",
       "id": "app_types_calendar_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "calendar.ts"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "app/types/gitlab.ts",
       "source_location": "L1",
       "id": "app_types_gitlab_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "gitlab.ts"
     },
     {
@@ -135,16 +135,16 @@
       "source_file": "app/composables/useDocxExport.ts",
       "source_location": "L1",
       "id": "app_composables_usedocxexport_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "usedocxexport.ts"
     },
     {
       "label": "useDocxExport()",
       "file_type": "code",
       "source_file": "app/composables/useDocxExport.ts",
-      "source_location": "L7",
+      "source_location": "L8",
       "id": "composables_usedocxexport_usedocxexport",
-      "community": 0,
+      "community": 1,
       "norm_label": "usedocxexport()"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "app/composables/use-toast.ts",
       "source_location": "L1",
       "id": "app_composables_use_toast_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "use-toast.ts"
     },
     {
@@ -162,7 +162,7 @@
       "source_file": "app/composables/use-toast.ts",
       "source_location": "L14",
       "id": "composables_use_toast_usetoast",
-      "community": 0,
+      "community": 1,
       "norm_label": "usetoast()"
     },
     {
@@ -171,16 +171,16 @@
       "source_file": "app/composables/useExcelExport.ts",
       "source_location": "L1",
       "id": "app_composables_useexcelexport_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "useexcelexport.ts"
     },
     {
       "label": "useExcelExport()",
       "file_type": "code",
       "source_file": "app/composables/useExcelExport.ts",
-      "source_location": "L5",
+      "source_location": "L9",
       "id": "composables_useexcelexport_useexcelexport",
-      "community": 0,
+      "community": 1,
       "norm_label": "useexcelexport()"
     },
     {
@@ -189,7 +189,7 @@
       "source_file": "app/composables/useDarkMode.ts",
       "source_location": "L1",
       "id": "app_composables_usedarkmode_ts",
-      "community": 38,
+      "community": 37,
       "norm_label": "usedarkmode.ts"
     },
     {
@@ -198,7 +198,7 @@
       "source_file": "app/composables/useDarkMode.ts",
       "source_location": "L3",
       "id": "composables_usedarkmode_usedarkmode",
-      "community": 38,
+      "community": 37,
       "norm_label": "usedarkmode()"
     },
     {
@@ -207,7 +207,7 @@
       "source_file": "app/queries/jiraExport.ts",
       "source_location": "L1",
       "id": "app_queries_jiraexport_ts",
-      "community": 2,
+      "community": 0,
       "norm_label": "jiraexport.ts"
     },
     {
@@ -216,7 +216,7 @@
       "source_file": "app/queries/jiraExport.ts",
       "source_location": "L4",
       "id": "queries_jiraexport_getjiraexportdata",
-      "community": 2,
+      "community": 0,
       "norm_label": "getjiraexportdata()"
     },
     {
@@ -225,7 +225,7 @@
       "source_file": "app/queries/jiraExport.ts",
       "source_location": "L11",
       "id": "queries_jiraexport_upsertjiraexportdata",
-      "community": 2,
+      "community": 0,
       "norm_label": "upsertjiraexportdata()"
     },
     {
@@ -234,7 +234,7 @@
       "source_file": "app/queries/jira.ts",
       "source_location": "L1",
       "id": "app_queries_jira_ts",
-      "community": 1,
+      "community": 0,
       "norm_label": "jira.ts"
     },
     {
@@ -243,7 +243,7 @@
       "source_file": "app/queries/jira.ts",
       "source_location": "L5",
       "id": "queries_jira_getjiraactivitiesbyperiod",
-      "community": 1,
+      "community": 0,
       "norm_label": "getjiraactivitiesbyperiod()"
     },
     {
@@ -261,7 +261,7 @@
       "source_file": "app/queries/jira.ts",
       "source_location": "L46",
       "id": "queries_jira_getjiraactivitiesbydates",
-      "community": 1,
+      "community": 0,
       "norm_label": "getjiraactivitiesbydates()"
     },
     {
@@ -270,7 +270,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L1",
       "id": "app_queries_reports_ts",
-      "community": 1,
+      "community": 0,
       "norm_label": "reports.ts"
     },
     {
@@ -279,7 +279,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L5",
       "id": "queries_reports_getdailyreports",
-      "community": 1,
+      "community": 0,
       "norm_label": "getdailyreports()"
     },
     {
@@ -288,7 +288,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L13",
       "id": "queries_reports_getmonthlyreport",
-      "community": 1,
+      "community": 0,
       "norm_label": "getmonthlyreport()"
     },
     {
@@ -297,7 +297,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L34",
       "id": "queries_reports_upsertdailyreport",
-      "community": 1,
+      "community": 0,
       "norm_label": "upsertdailyreport()"
     },
     {
@@ -306,7 +306,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L62",
       "id": "queries_reports_deletedailyreport",
-      "community": 1,
+      "community": 0,
       "norm_label": "deletedailyreport()"
     },
     {
@@ -315,7 +315,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L67",
       "id": "queries_reports_upsertmonthlyreport",
-      "community": 1,
+      "community": 0,
       "norm_label": "upsertmonthlyreport()"
     },
     {
@@ -324,7 +324,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L109",
       "id": "queries_reports_getyearlyreport",
-      "community": 1,
+      "community": 0,
       "norm_label": "getyearlyreport()"
     },
     {
@@ -333,7 +333,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L127",
       "id": "queries_reports_upsertyearlyreport",
-      "community": 1,
+      "community": 0,
       "norm_label": "upsertyearlyreport()"
     },
     {
@@ -342,7 +342,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L166",
       "id": "queries_reports_getallmonthlysummaries",
-      "community": 1,
+      "community": 0,
       "norm_label": "getallmonthlysummaries()"
     },
     {
@@ -351,7 +351,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L179",
       "id": "queries_reports_getmonthlyactivitystatus",
-      "community": 1,
+      "community": 0,
       "norm_label": "getmonthlyactivitystatus()"
     },
     {
@@ -360,7 +360,7 @@
       "source_file": "app/queries/reports.ts",
       "source_location": "L212",
       "id": "queries_reports_getdailyactivitiesbydates",
-      "community": 1,
+      "community": 0,
       "norm_label": "getdailyactivitiesbydates()"
     },
     {
@@ -369,7 +369,7 @@
       "source_file": "app/queries/settings.ts",
       "source_location": "L1",
       "id": "app_queries_settings_ts",
-      "community": 1,
+      "community": 0,
       "norm_label": "settings.ts"
     },
     {
@@ -378,34 +378,25 @@
       "source_file": "app/queries/settings.ts",
       "source_location": "L5",
       "id": "queries_settings_fetchallsettings",
-      "community": 1,
+      "community": 0,
       "norm_label": "fetchallsettings()"
-    },
-    {
-      "label": "upsertSetting()",
-      "file_type": "code",
-      "source_file": "app/queries/settings.ts",
-      "source_location": "L16",
-      "id": "queries_settings_upsertsetting",
-      "community": 1,
-      "norm_label": "upsertsetting()"
     },
     {
       "label": "upsertSettingsBatch()",
       "file_type": "code",
       "source_file": "app/queries/settings.ts",
-      "source_location": "L31",
+      "source_location": "L16",
       "id": "queries_settings_upsertsettingsbatch",
-      "community": 1,
+      "community": 0,
       "norm_label": "upsertsettingsbatch()"
     },
     {
       "label": "getSetting()",
       "file_type": "code",
       "source_file": "app/queries/settings.ts",
-      "source_location": "L53",
+      "source_location": "L38",
       "id": "queries_settings_getsetting",
-      "community": 7,
+      "community": 6,
       "norm_label": "getsetting()"
     },
     {
@@ -414,7 +405,7 @@
       "source_file": "app/queries/calendar.ts",
       "source_location": "L1",
       "id": "app_queries_calendar_ts",
-      "community": 1,
+      "community": 0,
       "norm_label": "calendar.ts"
     },
     {
@@ -423,7 +414,7 @@
       "source_file": "app/queries/calendar.ts",
       "source_location": "L4",
       "id": "queries_calendar_getcalendareventsbymonth",
-      "community": 1,
+      "community": 0,
       "norm_label": "getcalendareventsbymonth()"
     },
     {
@@ -432,61 +423,52 @@
       "source_file": "app/queries/calendar.ts",
       "source_location": "L12",
       "id": "queries_calendar_deletecalendareventsbymonth",
-      "community": 1,
+      "community": 0,
       "norm_label": "deletecalendareventsbymonth()"
-    },
-    {
-      "label": "insertCalendarEvent()",
-      "file_type": "code",
-      "source_file": "app/queries/calendar.ts",
-      "source_location": "L19",
-      "id": "queries_calendar_insertcalendarevent",
-      "community": 1,
-      "norm_label": "insertcalendarevent()"
     },
     {
       "label": "insertCalendarEvents()",
       "file_type": "code",
       "source_file": "app/queries/calendar.ts",
-      "source_location": "L35",
+      "source_location": "L19",
       "id": "queries_calendar_insertcalendarevents",
-      "community": 1,
+      "community": 0,
       "norm_label": "insertcalendarevents()"
     },
     {
       "label": "getHolidaysByMonth()",
       "file_type": "code",
       "source_file": "app/queries/calendar.ts",
-      "source_location": "L53",
+      "source_location": "L37",
       "id": "queries_calendar_getholidaysbymonth",
-      "community": 1,
+      "community": 0,
       "norm_label": "getholidaysbymonth()"
     },
     {
       "label": "upsertHoliday()",
       "file_type": "code",
       "source_file": "app/queries/calendar.ts",
-      "source_location": "L60",
+      "source_location": "L44",
       "id": "queries_calendar_upsertholiday",
-      "community": 1,
+      "community": 0,
       "norm_label": "upsertholiday()"
     },
     {
       "label": "upsertManualHoliday()",
       "file_type": "code",
       "source_file": "app/queries/calendar.ts",
-      "source_location": "L84",
+      "source_location": "L68",
       "id": "queries_calendar_upsertmanualholiday",
-      "community": 1,
+      "community": 0,
       "norm_label": "upsertmanualholiday()"
     },
     {
       "label": "deleteHolidayByDate()",
       "file_type": "code",
       "source_file": "app/queries/calendar.ts",
-      "source_location": "L102",
+      "source_location": "L86",
       "id": "queries_calendar_deleteholidaybydate",
-      "community": 1,
+      "community": 0,
       "norm_label": "deleteholidaybydate()"
     },
     {
@@ -495,7 +477,7 @@
       "source_file": "app/queries/gitlab.ts",
       "source_location": "L1",
       "id": "app_queries_gitlab_ts",
-      "community": 7,
+      "community": 6,
       "norm_label": "gitlab.ts"
     },
     {
@@ -504,7 +486,7 @@
       "source_file": "app/queries/gitlab.ts",
       "source_location": "L5",
       "id": "queries_gitlab_getgitlabcommitsbyperiod",
-      "community": 7,
+      "community": 6,
       "norm_label": "getgitlabcommitsbyperiod()"
     },
     {
@@ -513,7 +495,7 @@
       "source_file": "app/queries/gitlab.ts",
       "source_location": "L16",
       "id": "queries_gitlab_upsertgitlabcommit",
-      "community": 7,
+      "community": 6,
       "norm_label": "upsertgitlabcommit()"
     },
     {
@@ -522,7 +504,7 @@
       "source_file": "app/stores/monthly.ts",
       "source_location": "L1",
       "id": "app_stores_monthly_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "monthly.ts"
     },
     {
@@ -531,7 +513,7 @@
       "source_file": "app/stores/daily.ts",
       "source_location": "L1",
       "id": "app_stores_daily_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "daily.ts"
     },
     {
@@ -540,7 +522,7 @@
       "source_file": "app/stores/jira.ts",
       "source_location": "L1",
       "id": "app_stores_jira_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "jira.ts"
     },
     {
@@ -549,7 +531,7 @@
       "source_file": "app/stores/yearly.ts",
       "source_location": "L1",
       "id": "app_stores_yearly_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "yearly.ts"
     },
     {
@@ -558,7 +540,7 @@
       "source_file": "app/stores/calendar.ts",
       "source_location": "L1",
       "id": "app_stores_calendar_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "calendar.ts"
     },
     {
@@ -567,7 +549,7 @@
       "source_file": "app/stores/core.ts",
       "source_location": "L1",
       "id": "app_stores_core_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "core.ts"
     },
     {
@@ -576,7 +558,7 @@
       "source_file": "app/stores/gitlab.ts",
       "source_location": "L1",
       "id": "app_stores_gitlab_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "gitlab.ts"
     },
     {
@@ -585,7 +567,7 @@
       "source_file": "app/utils/ics.ts",
       "source_location": "L1",
       "id": "app_utils_ics_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "ics.ts"
     },
     {
@@ -594,7 +576,7 @@
       "source_file": "app/utils/ics.ts",
       "source_location": "L6",
       "id": "utils_ics_parseics",
-      "community": 0,
+      "community": 1,
       "norm_label": "parseics()"
     },
     {
@@ -603,7 +585,7 @@
       "source_file": "app/utils/dates.ts",
       "source_location": "L1",
       "id": "app_utils_dates_ts",
-      "community": 7,
+      "community": 6,
       "norm_label": "dates.ts"
     },
     {
@@ -612,8 +594,17 @@
       "source_file": "app/utils/dates.ts",
       "source_location": "L3",
       "id": "utils_dates_getmonthrange",
-      "community": 7,
+      "community": 6,
       "norm_label": "getmonthrange()"
+    },
+    {
+      "label": "getWorkingDaysInMonth()",
+      "file_type": "code",
+      "source_file": "app/utils/dates.ts",
+      "source_location": "L15",
+      "id": "utils_dates_getworkingdaysinmonth",
+      "community": 6,
+      "norm_label": "getworkingdaysinmonth()"
     },
     {
       "label": "jira.ts",
@@ -621,32 +612,32 @@
       "source_file": "app/utils/jira.ts",
       "source_location": "L1",
       "id": "app_utils_jira_ts",
-      "community": 0,
+      "community": 1,
       "norm_label": "jira.ts"
     },
     {
       "label": "JiraApiError",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L12",
+      "source_location": "L14",
       "id": "utils_jira_jiraapierror",
-      "community": 0,
+      "community": 1,
       "norm_label": "jiraapierror"
     },
     {
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L13",
+      "source_location": "L15",
       "id": "utils_jira_jiraapierror_constructor",
-      "community": 0,
+      "community": 1,
       "norm_label": ".constructor()"
     },
     {
       "label": "getJiraConfig()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L35",
+      "source_location": "L37",
       "id": "utils_jira_getjiraconfig",
       "community": 2,
       "norm_label": "getjiraconfig()"
@@ -655,34 +646,34 @@
       "label": "fetchJira()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L60",
+      "source_location": "L62",
       "id": "utils_jira_fetchjira",
-      "community": 0,
+      "community": 1,
       "norm_label": "fetchjira()"
     },
     {
       "label": "getJiraProjects()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L139",
+      "source_location": "L141",
       "id": "utils_jira_getjiraprojects",
-      "community": 0,
+      "community": 1,
       "norm_label": "getjiraprojects()"
     },
     {
       "label": "getJiraIssueTypes()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L143",
+      "source_location": "L145",
       "id": "utils_jira_getjiraissuetypes",
-      "community": 0,
+      "community": 1,
       "norm_label": "getjiraissuetypes()"
     },
     {
       "label": "getJiraIssueTypesForProject()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L147",
+      "source_location": "L149",
       "id": "utils_jira_getjiraissuetypesforproject",
       "community": 2,
       "norm_label": "getjiraissuetypesforproject()"
@@ -691,54 +682,54 @@
       "label": "getJiraMyself()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L161",
+      "source_location": "L163",
       "id": "utils_jira_getjiramyself",
-      "community": 0,
+      "community": 1,
       "norm_label": "getjiramyself()"
     },
     {
       "label": "createJiraIssue()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L165",
+      "source_location": "L167",
       "id": "utils_jira_createjiraissue",
-      "community": 0,
+      "community": 2,
       "norm_label": "createjiraissue()"
     },
     {
       "label": "buildAdfRowDescription()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L184",
+      "source_location": "L186",
       "id": "utils_jira_buildadfrowdescription",
-      "community": 0,
+      "community": 2,
       "norm_label": "buildadfrowdescription()"
     },
     {
       "label": "syncJiraActivities()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L335",
+      "source_location": "L337",
       "id": "utils_jira_syncjiraactivities",
-      "community": 7,
+      "community": 6,
       "norm_label": "syncjiraactivities()"
     },
     {
       "label": "getJiraCache()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L373",
+      "source_location": "L375",
       "id": "utils_jira_getjiracache",
-      "community": 7,
+      "community": 6,
       "norm_label": "getjiracache()"
     },
     {
       "label": "formatJiraActivity()",
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
-      "source_location": "L394",
+      "source_location": "L396",
       "id": "utils_jira_formatjiraactivity",
-      "community": 0,
+      "community": 1,
       "norm_label": "formatjiraactivity()"
     },
     {
@@ -747,79 +738,79 @@
       "source_file": "app/utils/reports.ts",
       "source_location": "L1",
       "id": "app_utils_reports_ts",
-      "community": 1,
+      "community": 0,
       "norm_label": "reports.ts"
     },
     {
       "label": "upsertDailyReport()",
       "file_type": "code",
       "source_file": "app/utils/reports.ts",
-      "source_location": "L24",
+      "source_location": "L21",
       "id": "utils_reports_upsertdailyreport",
-      "community": 1,
+      "community": 0,
       "norm_label": "upsertdailyreport()"
     },
     {
       "label": "upsertMonthlyReport()",
       "file_type": "code",
       "source_file": "app/utils/reports.ts",
-      "source_location": "L52",
+      "source_location": "L49",
       "id": "utils_reports_upsertmonthlyreport",
-      "community": 1,
+      "community": 0,
       "norm_label": "upsertmonthlyreport()"
     },
     {
       "label": "upsertYearlyReport()",
       "file_type": "code",
       "source_file": "app/utils/reports.ts",
-      "source_location": "L60",
+      "source_location": "L57",
       "id": "utils_reports_upsertyearlyreport",
-      "community": 1,
+      "community": 0,
       "norm_label": "upsertyearlyreport()"
     },
     {
       "label": "fetchAndGroupActivities()",
       "file_type": "code",
       "source_file": "app/utils/reports.ts",
-      "source_location": "L68",
+      "source_location": "L65",
       "id": "utils_reports_fetchandgroupactivities",
-      "community": 7,
+      "community": 6,
       "norm_label": "fetchandgroupactivities()"
     },
     {
       "label": "getYearlyActivities()",
       "file_type": "code",
       "source_file": "app/utils/reports.ts",
-      "source_location": "L113",
+      "source_location": "L110",
       "id": "utils_reports_getyearlyactivities",
-      "community": 1,
+      "community": 0,
       "norm_label": "getyearlyactivities()"
     },
     {
       "label": "getRandomTime()",
       "file_type": "code",
       "source_file": "app/utils/reports.ts",
-      "source_location": "L140",
+      "source_location": "L137",
       "id": "utils_reports_getrandomtime",
-      "community": 1,
+      "community": 0,
       "norm_label": "getrandomtime()"
     },
     {
       "label": "parseMonthlyMarkdown()",
       "file_type": "code",
       "source_file": "app/utils/reports.ts",
-      "source_location": "L151",
+      "source_location": "L150",
       "id": "utils_reports_parsemonthlymarkdown",
-      "community": 1,
+      "community": 0,
       "norm_label": "parsemonthlymarkdown()"
     },
     {
       "label": "parseYearlyMarkdown()",
       "file_type": "code",
       "source_file": "app/utils/reports.ts",
-      "source_location": "L189",
+      "source_location": "L188",
       "id": "utils_reports_parseyearlymarkdown",
-      "community": 1,
+      "community": 0,
       "norm_label": "parseyearlymarkdown()"
     },
     {
@@ -828,7 +819,7 @@
       "source_file": "app/utils/calendar.ts",
       "source_location": "L1",
       "id": "app_utils_calendar_ts",
-      "community": 1,
+      "community": 0,
       "norm_label": "calendar.ts"
     },
     {
@@ -837,7 +828,7 @@
       "source_file": "app/utils/calendar.ts",
       "source_location": "L5",
       "id": "utils_calendar_getcalendarcache",
-      "community": 1,
+      "community": 0,
       "norm_label": "getcalendarcache()"
     },
     {
@@ -846,7 +837,7 @@
       "source_file": "app/utils/calendar.ts",
       "source_location": "L12",
       "id": "utils_calendar_upsertcalendarcache",
-      "community": 1,
+      "community": 0,
       "norm_label": "upsertcalendarcache()"
     },
     {
@@ -855,7 +846,7 @@
       "source_file": "app/utils/calendar.ts",
       "source_location": "L29",
       "id": "utils_calendar_fetchholidays",
-      "community": 1,
+      "community": 0,
       "norm_label": "fetchholidays()"
     },
     {
@@ -864,7 +855,7 @@
       "source_file": "app/utils/calendar.ts",
       "source_location": "L61",
       "id": "utils_calendar_formatcalendaractivity",
-      "community": 1,
+      "community": 0,
       "norm_label": "formatcalendaractivity()"
     },
     {
@@ -889,7 +880,7 @@
       "label": "getDailyPrompt()",
       "file_type": "code",
       "source_file": "app/utils/prompts.ts",
-      "source_location": "L57",
+      "source_location": "L59",
       "id": "utils_prompts_getdailyprompt",
       "community": 2,
       "norm_label": "getdailyprompt()"
@@ -898,7 +889,7 @@
       "label": "getYearlyPrompt()",
       "file_type": "code",
       "source_file": "app/utils/prompts.ts",
-      "source_location": "L97",
+      "source_location": "L100",
       "id": "utils_prompts_getyearlyprompt",
       "community": 2,
       "norm_label": "getyearlyprompt()"
@@ -907,7 +898,7 @@
       "label": "getJiraExportPrompt()",
       "file_type": "code",
       "source_file": "app/utils/prompts.ts",
-      "source_location": "L151",
+      "source_location": "L154",
       "id": "utils_prompts_getjiraexportprompt",
       "community": 2,
       "norm_label": "getjiraexportprompt()"
@@ -916,16 +907,16 @@
       "label": "getJiraGroupSubtasksPrompt()",
       "file_type": "code",
       "source_file": "app/utils/prompts.ts",
-      "source_location": "L198",
+      "source_location": "L201",
       "id": "utils_prompts_getjiragroupsubtasksprompt",
-      "community": 2,
+      "community": 0,
       "norm_label": "getjiragroupsubtasksprompt()"
     },
     {
       "label": "getJiraParentDescriptionPrompt()",
       "file_type": "code",
       "source_file": "app/utils/prompts.ts",
-      "source_location": "L220",
+      "source_location": "L223",
       "id": "utils_prompts_getjiraparentdescriptionprompt",
       "community": 2,
       "norm_label": "getjiraparentdescriptionprompt()"
@@ -936,7 +927,7 @@
       "source_file": "app/utils/format.ts",
       "source_location": "L1",
       "id": "app_utils_format_ts",
-      "community": 1,
+      "community": 2,
       "norm_label": "format.ts"
     },
     {
@@ -945,7 +936,7 @@
       "source_file": "app/utils/format.ts",
       "source_location": "L1",
       "id": "utils_format_extractprojectkey",
-      "community": 1,
+      "community": 2,
       "norm_label": "extractprojectkey()"
     },
     {
@@ -963,26 +954,8 @@
       "source_file": "app/utils/format.ts",
       "source_location": "L16",
       "id": "utils_format_stripmarkdowncodeblock",
-      "community": 1,
+      "community": 0,
       "norm_label": "stripmarkdowncodeblock()"
-    },
-    {
-      "label": "parseActivityLines()",
-      "file_type": "code",
-      "source_file": "app/utils/format.ts",
-      "source_location": "L49",
-      "id": "utils_format_parseactivitylines",
-      "community": 1,
-      "norm_label": "parseactivitylines()"
-    },
-    {
-      "label": "generateId()",
-      "file_type": "code",
-      "source_file": "app/utils/format.ts",
-      "source_location": "L58",
-      "id": "utils_format_generateid",
-      "community": 1,
-      "norm_label": "generateid()"
     },
     {
       "label": "ai.ts",
@@ -990,70 +963,70 @@
       "source_file": "app/utils/ai.ts",
       "source_location": "L1",
       "id": "app_utils_ai_ts",
-      "community": 1,
+      "community": 0,
       "norm_label": "ai.ts"
     },
     {
       "label": "generateSummary()",
       "file_type": "code",
       "source_file": "app/utils/ai.ts",
-      "source_location": "L18",
+      "source_location": "L17",
       "id": "utils_ai_generatesummary",
-      "community": 1,
+      "community": 0,
       "norm_label": "generatesummary()"
     },
     {
       "label": "generateGemini()",
       "file_type": "code",
       "source_file": "app/utils/ai.ts",
-      "source_location": "L41",
+      "source_location": "L40",
       "id": "utils_ai_generategemini",
-      "community": 1,
+      "community": 0,
       "norm_label": "generategemini()"
     },
     {
       "label": "generateOpenAi()",
       "file_type": "code",
       "source_file": "app/utils/ai.ts",
-      "source_location": "L86",
+      "source_location": "L92",
       "id": "utils_ai_generateopenai",
-      "community": 1,
+      "community": 0,
       "norm_label": "generateopenai()"
     },
     {
       "label": "generateDeepSeek()",
       "file_type": "code",
       "source_file": "app/utils/ai.ts",
-      "source_location": "L125",
+      "source_location": "L131",
       "id": "utils_ai_generatedeepseek",
-      "community": 1,
+      "community": 0,
       "norm_label": "generatedeepseek()"
     },
     {
       "label": "generateOllama()",
       "file_type": "code",
       "source_file": "app/utils/ai.ts",
-      "source_location": "L164",
+      "source_location": "L172",
       "id": "utils_ai_generateollama",
-      "community": 1,
+      "community": 0,
       "norm_label": "generateollama()"
     },
     {
       "label": "fetchOllamaModels()",
       "file_type": "code",
       "source_file": "app/utils/ai.ts",
-      "source_location": "L208",
+      "source_location": "L216",
       "id": "utils_ai_fetchollamamodels",
-      "community": 1,
+      "community": 0,
       "norm_label": "fetchollamamodels()"
     },
     {
       "label": "parseAiJsonResponse()",
       "file_type": "code",
       "source_file": "app/utils/ai.ts",
-      "source_location": "L215",
+      "source_location": "L223",
       "id": "utils_ai_parseaijsonresponse",
-      "community": 1,
+      "community": 0,
       "norm_label": "parseaijsonresponse()"
     },
     {
@@ -1062,7 +1035,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L1",
       "id": "app_utils_gitlab_ts",
-      "community": 7,
+      "community": 6,
       "norm_label": "gitlab.ts"
     },
     {
@@ -1071,7 +1044,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L45",
       "id": "utils_gitlab_getgitlabconfig",
-      "community": 7,
+      "community": 6,
       "norm_label": "getgitlabconfig()"
     },
     {
@@ -1080,7 +1053,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L55",
       "id": "utils_gitlab_fetchgitlab",
-      "community": 7,
+      "community": 6,
       "norm_label": "fetchgitlab()"
     },
     {
@@ -1089,7 +1062,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L78",
       "id": "utils_gitlab_getgitlabuser",
-      "community": 7,
+      "community": 6,
       "norm_label": "getgitlabuser()"
     },
     {
@@ -1098,7 +1071,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L82",
       "id": "utils_gitlab_getgitlabprojects",
-      "community": 7,
+      "community": 6,
       "norm_label": "getgitlabprojects()"
     },
     {
@@ -1107,7 +1080,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L91",
       "id": "utils_gitlab_getprojectdetails",
-      "community": 7,
+      "community": 6,
       "norm_label": "getprojectdetails()"
     },
     {
@@ -1116,7 +1089,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L95",
       "id": "utils_gitlab_getprojectcommits",
-      "community": 7,
+      "community": 6,
       "norm_label": "getprojectcommits()"
     },
     {
@@ -1125,7 +1098,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L105",
       "id": "utils_gitlab_getcommitrefs",
-      "community": 7,
+      "community": 6,
       "norm_label": "getcommitrefs()"
     },
     {
@@ -1134,7 +1107,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L111",
       "id": "utils_gitlab_syncgitlabevents",
-      "community": 7,
+      "community": 6,
       "norm_label": "syncgitlabevents()"
     },
     {
@@ -1143,7 +1116,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L182",
       "id": "utils_gitlab_getgitlabcache",
-      "community": 7,
+      "community": 6,
       "norm_label": "getgitlabcache()"
     },
     {
@@ -1152,7 +1125,7 @@
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L212",
       "id": "utils_gitlab_formatgitlabactivity",
-      "community": 7,
+      "community": 6,
       "norm_label": "formatgitlabactivity()"
     },
     {
@@ -1161,7 +1134,7 @@
       "source_file": "app/utils/index.ts",
       "source_location": "L1",
       "id": "app_utils_index_ts",
-      "community": 39,
+      "community": 38,
       "norm_label": "index.ts"
     },
     {
@@ -1170,7 +1143,7 @@
       "source_file": "app/utils/index.ts",
       "source_location": "L4",
       "id": "utils_index_cn",
-      "community": 39,
+      "community": 38,
       "norm_label": "cn()"
     },
     {
@@ -1593,7 +1566,7 @@
       "source_file": "app/components/ui/separator/index.ts",
       "source_location": "L1",
       "id": "app_components_ui_separator_index_ts",
-      "community": 40,
+      "community": 39,
       "norm_label": "index.ts"
     },
     {
@@ -1602,7 +1575,7 @@
       "source_file": "app/components/ui/separator/Separator.vue",
       "source_location": "L1",
       "id": "app_components_ui_separator_separator_vue",
-      "community": 40,
+      "community": 39,
       "norm_label": "separator.vue"
     },
     {
@@ -1656,7 +1629,7 @@
       "source_file": "app/components/ui/label/Label.vue",
       "source_location": "L1",
       "id": "app_components_ui_label_label_vue",
-      "community": 41,
+      "community": 40,
       "norm_label": "label.vue"
     },
     {
@@ -1665,7 +1638,7 @@
       "source_file": "app/components/ui/label/index.ts",
       "source_location": "L1",
       "id": "app_components_ui_label_index_ts",
-      "community": 41,
+      "community": 40,
       "norm_label": "index.ts"
     },
     {
@@ -2043,7 +2016,7 @@
       "source_file": "app/components/ui/timeline/Timeline.vue",
       "source_location": "L1",
       "id": "app_components_ui_timeline_timeline_vue",
-      "community": 42,
+      "community": 41,
       "norm_label": "timeline.vue"
     },
     {
@@ -2052,7 +2025,7 @@
       "source_file": "app/components/ui/timeline/index.ts",
       "source_location": "L1",
       "id": "app_components_ui_timeline_index_ts",
-      "community": 42,
+      "community": 41,
       "norm_label": "index.ts"
     },
     {
@@ -2079,7 +2052,7 @@
       "source_file": "app/components/ui/data-table/DataTable.vue",
       "source_location": "L1",
       "id": "app_components_ui_data_table_datatable_vue",
-      "community": 43,
+      "community": 42,
       "norm_label": "datatable.vue"
     },
     {
@@ -2088,7 +2061,7 @@
       "source_file": "app/components/ui/data-table/index.ts",
       "source_location": "L1",
       "id": "app_components_ui_data_table_index_ts",
-      "community": 43,
+      "community": 42,
       "norm_label": "index.ts"
     },
     {
@@ -2142,7 +2115,7 @@
       "source_file": "app/components/report/JiraExportModal.vue",
       "source_location": "L596",
       "id": "report_jiraexportmodal_submitjiraissue",
-      "community": 0,
+      "community": 2,
       "norm_label": "submitjiraissue()"
     },
     {
@@ -2178,7 +2151,7 @@
       "source_file": "app/components/report/JiraExportModal.vue",
       "source_location": "L728",
       "id": "report_jiraexportmodal_groupsubtaskswithai",
-      "community": 2,
+      "community": 0,
       "norm_label": "groupsubtaskswithai()"
     },
     {
@@ -2187,7 +2160,7 @@
       "source_file": "app/components/report/JiraExportModal.vue",
       "source_location": "L794",
       "id": "report_jiraexportmodal_savejiraexportdata",
-      "community": 2,
+      "community": 0,
       "norm_label": "savejiraexportdata()"
     },
     {
@@ -2232,7 +2205,7 @@
       "source_file": "app/components/report/DailyReportRow.vue",
       "source_location": "L1",
       "id": "app_components_report_dailyreportrow_vue",
-      "community": 35,
+      "community": 36,
       "norm_label": "dailyreportrow.vue"
     },
     {
@@ -2245,39 +2218,30 @@
       "norm_label": "yearlyreport.vue"
     },
     {
-      "label": "ConfirmModal.vue",
-      "file_type": "code",
-      "source_file": "app/components/report/ConfirmModal.vue",
-      "source_location": "L1",
-      "id": "app_components_report_confirmmodal_vue",
-      "community": 51,
-      "norm_label": "confirmmodal.vue"
-    },
-    {
       "label": "MonthlyReport.vue",
       "file_type": "code",
       "source_file": "app/components/report/MonthlyReport.vue",
       "source_location": "L1",
       "id": "app_components_report_monthlyreport_vue",
-      "community": 36,
+      "community": 35,
       "norm_label": "monthlyreport.vue"
     },
     {
       "label": "handleBASTExport()",
       "file_type": "code",
       "source_file": "app/components/report/MonthlyReport.vue",
-      "source_location": "L308",
+      "source_location": "L309",
       "id": "report_monthlyreport_handlebastexport",
-      "community": 36,
+      "community": 35,
       "norm_label": "handlebastexport()"
     },
     {
       "label": "copyRow()",
       "file_type": "code",
       "source_file": "app/components/report/MonthlyReport.vue",
-      "source_location": "L319",
+      "source_location": "L320",
       "id": "report_monthlyreport_copyrow",
-      "community": 36,
+      "community": 35,
       "norm_label": "copyrow()"
     },
     {
@@ -2286,7 +2250,7 @@
       "source_file": "app/components/report/SyncConfirmModal.vue",
       "source_location": "L1",
       "id": "app_components_report_syncconfirmmodal_vue",
-      "community": 52,
+      "community": 51,
       "norm_label": "syncconfirmmodal.vue"
     },
     {
@@ -2295,7 +2259,7 @@
       "source_file": "app/components/report/ActivityCalendar.vue",
       "source_location": "L1",
       "id": "app_components_report_activitycalendar_vue",
-      "community": 53,
+      "community": 52,
       "norm_label": "activitycalendar.vue"
     },
     {
@@ -2349,7 +2313,7 @@
       "source_file": "app/components/report/ManualActivityModal.vue",
       "source_location": "L1",
       "id": "app_components_report_manualactivitymodal_vue",
-      "community": 54,
+      "community": 53,
       "norm_label": "manualactivitymodal.vue"
     },
     {
@@ -2367,7 +2331,7 @@
       "source_file": "app/components/report/SettingsModal.vue",
       "source_location": "L1",
       "id": "app_components_report_settingsmodal_vue",
-      "community": 55,
+      "community": 54,
       "norm_label": "settingsmodal.vue"
     },
     {
@@ -2421,7 +2385,7 @@
       "source_file": "app/layouts/default.vue",
       "source_location": "L1",
       "id": "app_layouts_default_vue",
-      "community": 56,
+      "community": 55,
       "norm_label": "default.vue"
     },
     {
@@ -2439,7 +2403,7 @@
       "source_file": "app/db/index.ts",
       "source_location": "L1",
       "id": "app_db_index_ts",
-      "community": 1,
+      "community": 0,
       "norm_label": "index.ts"
     },
     {
@@ -2448,7 +2412,7 @@
       "source_file": "app/db/index.ts",
       "source_location": "L10",
       "id": "db_index_getdb",
-      "community": 1,
+      "community": 0,
       "norm_label": "getdb()"
     },
     {
@@ -2511,7 +2475,7 @@
       "source_file": "src-tauri/build.rs",
       "source_location": "L1",
       "id": "src_tauri_build_rs",
-      "community": 44,
+      "community": 43,
       "norm_label": "build.rs"
     },
     {
@@ -2520,7 +2484,7 @@
       "source_file": "src-tauri/build.rs",
       "source_location": "L1",
       "id": "src_tauri_build_main",
-      "community": 44,
+      "community": 43,
       "norm_label": "main()"
     },
     {
@@ -2569,11 +2533,56 @@
       "norm_label": "main()"
     },
     {
+      "label": "upsertSetting()",
+      "file_type": "code",
+      "source_file": "app/queries/settings.ts",
+      "source_location": "L16",
+      "community": 0,
+      "norm_label": "upsertsetting()",
+      "id": "queries_settings_upsertsetting"
+    },
+    {
+      "label": "insertCalendarEvent()",
+      "file_type": "code",
+      "source_file": "app/queries/calendar.ts",
+      "source_location": "L19",
+      "community": 0,
+      "norm_label": "insertcalendarevent()",
+      "id": "queries_calendar_insertcalendarevent"
+    },
+    {
+      "label": "parseActivityLines()",
+      "file_type": "code",
+      "source_file": "app/utils/format.ts",
+      "source_location": "L49",
+      "community": 2,
+      "norm_label": "parseactivitylines()",
+      "id": "utils_format_parseactivitylines"
+    },
+    {
+      "label": "generateId()",
+      "file_type": "code",
+      "source_file": "app/utils/format.ts",
+      "source_location": "L58",
+      "community": 2,
+      "norm_label": "generateid()",
+      "id": "utils_format_generateid"
+    },
+    {
+      "label": "ConfirmModal.vue",
+      "file_type": "code",
+      "source_file": "app/components/report/ConfirmModal.vue",
+      "source_location": "L1",
+      "community": 56,
+      "norm_label": "confirmmodal.vue",
+      "id": "app_components_report_confirmmodal_vue"
+    },
+    {
       "label": "animate",
       "file_type": "code",
       "source_file": "tailwind.config.js",
       "source_location": "L1",
-      "community": 37,
+      "community": 44,
       "norm_label": "animate",
       "id": "presence_tailwind_config_animate"
     },
@@ -3301,7 +3310,7 @@
       "file_type": "code",
       "source_file": "app/app.vue",
       "source_location": "L14",
-      "community": 0,
+      "community": 1,
       "norm_label": "{ success }",
       "id": "app_app_success"
     },
@@ -3310,7 +3319,7 @@
       "file_type": "code",
       "source_file": "app/types/holiday.ts",
       "source_location": "L1",
-      "community": 0,
+      "community": 1,
       "norm_label": "holiday",
       "id": "types_holiday_holiday"
     },
@@ -3319,7 +3328,7 @@
       "file_type": "code",
       "source_file": "app/types/report.ts",
       "source_location": "L4",
-      "community": 0,
+      "community": 1,
       "norm_label": "reportrow",
       "id": "types_report_reportrow"
     },
@@ -3328,7 +3337,7 @@
       "file_type": "code",
       "source_file": "app/types/report.ts",
       "source_location": "L12",
-      "community": 0,
+      "community": 1,
       "norm_label": "reportresponse",
       "id": "types_report_reportresponse"
     },
@@ -3337,7 +3346,7 @@
       "file_type": "code",
       "source_file": "app/types/report.ts",
       "source_location": "L32",
-      "community": 0,
+      "community": 1,
       "norm_label": "monthlyreportrow",
       "id": "types_report_monthlyreportrow"
     },
@@ -3346,7 +3355,7 @@
       "file_type": "code",
       "source_file": "app/types/report.ts",
       "source_location": "L41",
-      "community": 1,
+      "community": 0,
       "norm_label": "yearlyreportrow",
       "id": "types_report_yearlyreportrow"
     },
@@ -3364,7 +3373,7 @@
       "file_type": "code",
       "source_file": "app/types/report.ts",
       "source_location": "L56",
-      "community": 0,
+      "community": 1,
       "norm_label": "jiraexportdata",
       "id": "types_report_jiraexportdata"
     },
@@ -3373,7 +3382,7 @@
       "file_type": "code",
       "source_file": "app/types/report.ts",
       "source_location": "L66",
-      "community": 0,
+      "community": 1,
       "norm_label": "yearlyactivitymonth",
       "id": "types_report_yearlyactivitymonth"
     },
@@ -3382,7 +3391,7 @@
       "file_type": "code",
       "source_file": "app/types/ollama.ts",
       "source_location": "L1",
-      "community": 1,
+      "community": 0,
       "norm_label": "ollamamodel",
       "id": "types_ollama_ollamamodel"
     },
@@ -3391,7 +3400,7 @@
       "file_type": "code",
       "source_file": "app/types/ollama.ts",
       "source_location": "L16",
-      "community": 1,
+      "community": 0,
       "norm_label": "ollamamodelsresponse",
       "id": "types_ollama_ollamamodelsresponse"
     },
@@ -3400,7 +3409,7 @@
       "file_type": "code",
       "source_file": "app/types/jira.ts",
       "source_location": "L1",
-      "community": 0,
+      "community": 1,
       "norm_label": "jiraevent",
       "id": "types_jira_jiraevent"
     },
@@ -3409,7 +3418,7 @@
       "file_type": "code",
       "source_file": "app/types/jira.ts",
       "source_location": "L13",
-      "community": 0,
+      "community": 1,
       "norm_label": "jiracache",
       "id": "types_jira_jiracache"
     },
@@ -3418,7 +3427,7 @@
       "file_type": "code",
       "source_file": "app/types/settings.ts",
       "source_location": "L1",
-      "community": 0,
+      "community": 1,
       "norm_label": "settingsdata",
       "id": "types_settings_settingsdata"
     },
@@ -3427,7 +3436,7 @@
       "file_type": "code",
       "source_file": "app/types/calendar.ts",
       "source_location": "L5",
-      "community": 0,
+      "community": 1,
       "norm_label": "calendarevent",
       "id": "types_calendar_calendarevent"
     },
@@ -3436,7 +3445,7 @@
       "file_type": "code",
       "source_file": "app/types/calendar.ts",
       "source_location": "L14",
-      "community": 0,
+      "community": 1,
       "norm_label": "calendarcache",
       "id": "types_calendar_calendarcache"
     },
@@ -3445,7 +3454,7 @@
       "file_type": "code",
       "source_file": "app/types/calendar.ts",
       "source_location": "L21",
-      "community": 0,
+      "community": 1,
       "norm_label": "calendarday",
       "id": "types_calendar_calendarday"
     },
@@ -3454,7 +3463,7 @@
       "file_type": "code",
       "source_file": "app/types/gitlab.ts",
       "source_location": "L1",
-      "community": 0,
+      "community": 1,
       "norm_label": "gitlabevent",
       "id": "types_gitlab_gitlabevent"
     },
@@ -3463,7 +3472,7 @@
       "file_type": "code",
       "source_file": "app/types/gitlab.ts",
       "source_location": "L28",
-      "community": 0,
+      "community": 1,
       "norm_label": "gitlabcache",
       "id": "types_gitlab_gitlabcache"
     },
@@ -3472,7 +3481,7 @@
       "file_type": "code",
       "source_file": "app/composables/use-toast.ts",
       "source_location": "L3",
-      "community": 0,
+      "community": 1,
       "norm_label": "toastprops",
       "id": "composables_use_toast_toastprops"
     },
@@ -3481,7 +3490,7 @@
       "file_type": "code",
       "source_file": "app/composables/use-toast.ts",
       "source_location": "L12",
-      "community": 0,
+      "community": 1,
       "norm_label": "toasts",
       "id": "composables_use_toast_toasts"
     },
@@ -3490,7 +3499,7 @@
       "file_type": "code",
       "source_file": "app/stores/monthly.ts",
       "source_location": "L7",
-      "community": 0,
+      "community": 1,
       "norm_label": "usemonthlystore",
       "id": "stores_monthly_usemonthlystore"
     },
@@ -3499,7 +3508,7 @@
       "file_type": "code",
       "source_file": "app/stores/daily.ts",
       "source_location": "L6",
-      "community": 0,
+      "community": 1,
       "norm_label": "usedailystore",
       "id": "stores_daily_usedailystore"
     },
@@ -3508,7 +3517,7 @@
       "file_type": "code",
       "source_file": "app/stores/jira.ts",
       "source_location": "L5",
-      "community": 0,
+      "community": 1,
       "norm_label": "usejirastore",
       "id": "stores_jira_usejirastore"
     },
@@ -3517,7 +3526,7 @@
       "file_type": "code",
       "source_file": "app/stores/yearly.ts",
       "source_location": "L7",
-      "community": 0,
+      "community": 1,
       "norm_label": "useyearlystore",
       "id": "stores_yearly_useyearlystore"
     },
@@ -3526,7 +3535,7 @@
       "file_type": "code",
       "source_file": "app/stores/calendar.ts",
       "source_location": "L11",
-      "community": 0,
+      "community": 1,
       "norm_label": "usecalendarstore",
       "id": "stores_calendar_usecalendarstore"
     },
@@ -3535,7 +3544,7 @@
       "file_type": "code",
       "source_file": "app/stores/core.ts",
       "source_location": "L10",
-      "community": 0,
+      "community": 1,
       "norm_label": "usecorestore",
       "id": "stores_core_usecorestore"
     },
@@ -3544,7 +3553,7 @@
       "file_type": "code",
       "source_file": "app/stores/gitlab.ts",
       "source_location": "L6",
-      "community": 0,
+      "community": 1,
       "norm_label": "usegitlabstore",
       "id": "stores_gitlab_usegitlabstore"
     },
@@ -3553,7 +3562,7 @@
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
       "source_location": "L6",
-      "community": 0,
+      "community": 1,
       "norm_label": "jiraconfig",
       "id": "utils_jira_jiraconfig"
     },
@@ -3562,7 +3571,7 @@
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
       "source_location": "L23",
-      "community": 0,
+      "community": 1,
       "norm_label": "jiraissue",
       "id": "utils_jira_jiraissue"
     },
@@ -3571,7 +3580,7 @@
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
       "source_location": "L47",
-      "community": 0,
+      "community": 1,
       "norm_label": "jiraproject",
       "id": "utils_jira_jiraproject"
     },
@@ -3580,7 +3589,7 @@
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
       "source_location": "L53",
-      "community": 0,
+      "community": 1,
       "norm_label": "jiraissuetype",
       "id": "utils_jira_jiraissuetype"
     },
@@ -3589,7 +3598,7 @@
       "file_type": "code",
       "source_file": "app/utils/jira.ts",
       "source_location": "L154",
-      "community": 0,
+      "community": 1,
       "norm_label": "jiramyself",
       "id": "utils_jira_jiramyself"
     },
@@ -3598,7 +3607,7 @@
       "file_type": "code",
       "source_file": "app/utils/ai.ts",
       "source_location": "L7",
-      "community": 1,
+      "community": 0,
       "norm_label": "aioptions",
       "id": "utils_ai_aioptions"
     },
@@ -3607,7 +3616,7 @@
       "file_type": "code",
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L6",
-      "community": 7,
+      "community": 6,
       "norm_label": "gitlabconfig",
       "id": "utils_gitlab_gitlabconfig"
     },
@@ -3616,7 +3625,7 @@
       "file_type": "code",
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L11",
-      "community": 7,
+      "community": 6,
       "norm_label": "rawgitlabuser",
       "id": "utils_gitlab_rawgitlabuser"
     },
@@ -3625,7 +3634,7 @@
       "file_type": "code",
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L18",
-      "community": 7,
+      "community": 6,
       "norm_label": "rawgitlabproject",
       "id": "utils_gitlab_rawgitlabproject"
     },
@@ -3634,7 +3643,7 @@
       "file_type": "code",
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L25",
-      "community": 7,
+      "community": 6,
       "norm_label": "rawgitlabcommit",
       "id": "utils_gitlab_rawgitlabcommit"
     },
@@ -3643,7 +3652,7 @@
       "file_type": "code",
       "source_file": "app/utils/gitlab.ts",
       "source_location": "L40",
-      "community": 7,
+      "community": 6,
       "norm_label": "rawgitlabref",
       "id": "utils_gitlab_rawgitlabref"
     },
@@ -3814,7 +3823,7 @@
       "file_type": "code",
       "source_file": "app/components/report/DailyReportRow.vue",
       "source_location": "L135",
-      "community": 35,
+      "community": 36,
       "norm_label": "currenttexts",
       "id": "report_dailyreportrow_currenttexts"
     },
@@ -3823,7 +3832,7 @@
       "file_type": "code",
       "source_file": "app/components/report/DailyReportRow.vue",
       "source_location": "L151",
-      "community": 35,
+      "community": 36,
       "norm_label": "updatedrow",
       "id": "report_dailyreportrow_updatedrow"
     },
@@ -5587,7 +5596,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L1",
-      "community": 6,
+      "community": 7,
       "norm_label": "cli.md",
       "id": "agents_skills_shadcn_vue_cli_md"
     },
@@ -5596,7 +5605,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L1",
-      "community": 6,
+      "community": 7,
       "norm_label": "shadcn-vue cli reference",
       "id": "shadcn_vue_cli_shadcn_vue_cli_reference"
     },
@@ -5605,7 +5614,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L8",
-      "community": 6,
+      "community": 7,
       "norm_label": "contents",
       "id": "shadcn_vue_cli_contents"
     },
@@ -5614,7 +5623,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L17",
-      "community": 6,
+      "community": 7,
       "norm_label": "commands",
       "id": "shadcn_vue_cli_commands"
     },
@@ -5623,7 +5632,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L19",
-      "community": 6,
+      "community": 7,
       "norm_label": "`init` \u2014 initialize or create a project",
       "id": "shadcn_vue_cli_init_initialize_or_create_a_project"
     },
@@ -5632,7 +5641,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L21",
-      "community": 6,
+      "community": 7,
       "norm_label": "code:bash (npx shadcn-vue@latest init [components...] [options])",
       "id": "shadcn_vue_cli_codeblock_1"
     },
@@ -5641,7 +5650,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L42",
-      "community": 6,
+      "community": 7,
       "norm_label": "`apply` \u2014 apply a preset to an existing project",
       "id": "shadcn_vue_cli_apply_apply_a_preset_to_an_existing_project"
     },
@@ -5650,7 +5659,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L44",
-      "community": 6,
+      "community": 7,
       "norm_label": "code:bash (npx shadcn-vue@latest apply [preset] [options])",
       "id": "shadcn_vue_cli_codeblock_2"
     },
@@ -5659,7 +5668,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L60",
-      "community": 6,
+      "community": 7,
       "norm_label": "`add` \u2014 add components",
       "id": "shadcn_vue_cli_add_add_components"
     },
@@ -5668,7 +5677,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L64",
-      "community": 6,
+      "community": 7,
       "norm_label": "code:bash (npx shadcn-vue@latest add [components...] [options])",
       "id": "shadcn_vue_cli_codeblock_3"
     },
@@ -5677,7 +5686,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L79",
-      "community": 6,
+      "community": 7,
       "norm_label": "smart merge from upstream",
       "id": "shadcn_vue_cli_smart_merge_from_upstream"
     },
@@ -5686,7 +5695,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L83",
-      "community": 6,
+      "community": 7,
       "norm_label": "`search` \u2014 search registries",
       "id": "shadcn_vue_cli_search_search_registries"
     },
@@ -5695,7 +5704,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L85",
-      "community": 6,
+      "community": 7,
       "norm_label": "code:bash (npx shadcn-vue@latest search <registries...> [options])",
       "id": "shadcn_vue_cli_codeblock_4"
     },
@@ -5704,7 +5713,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L98",
-      "community": 6,
+      "community": 7,
       "norm_label": "`view` \u2014 view item details",
       "id": "shadcn_vue_cli_view_view_item_details"
     },
@@ -5713,7 +5722,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L100",
-      "community": 6,
+      "community": 7,
       "norm_label": "code:bash (npx shadcn-vue@latest view <items...> [options])",
       "id": "shadcn_vue_cli_codeblock_5"
     },
@@ -5722,7 +5731,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L106",
-      "community": 6,
+      "community": 7,
       "norm_label": "`docs` \u2014 get component documentation urls",
       "id": "shadcn_vue_cli_docs_get_component_documentation_urls"
     },
@@ -5731,7 +5740,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L108",
-      "community": 6,
+      "community": 7,
       "norm_label": "code:bash (npx shadcn-vue@latest docs <components...> [options])",
       "id": "shadcn_vue_cli_codeblock_6"
     },
@@ -5740,7 +5749,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L116",
-      "community": 6,
+      "community": 7,
       "norm_label": "code:text (input)",
       "id": "shadcn_vue_cli_codeblock_7"
     },
@@ -5749,7 +5758,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L128",
-      "community": 6,
+      "community": 7,
       "norm_label": "`diff` \u2014 check for updates",
       "id": "shadcn_vue_cli_diff_check_for_updates"
     },
@@ -5758,7 +5767,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L132",
-      "community": 6,
+      "community": 7,
       "norm_label": "`info` \u2014 project information",
       "id": "shadcn_vue_cli_info_project_information"
     },
@@ -5767,7 +5776,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L134",
-      "community": 6,
+      "community": 7,
       "norm_label": "code:bash (npx shadcn-vue@latest info [options])",
       "id": "shadcn_vue_cli_codeblock_8"
     },
@@ -5776,7 +5785,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L180",
-      "community": 6,
+      "community": 7,
       "norm_label": "`build` \u2014 build a custom registry",
       "id": "shadcn_vue_cli_build_build_a_custom_registry"
     },
@@ -5785,7 +5794,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L182",
-      "community": 6,
+      "community": 7,
       "norm_label": "code:bash (npx shadcn-vue@latest build [registry] [options])",
       "id": "shadcn_vue_cli_codeblock_9"
     },
@@ -5794,7 +5803,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L195",
-      "community": 6,
+      "community": 7,
       "norm_label": "templates",
       "id": "shadcn_vue_cli_templates"
     },
@@ -5803,7 +5812,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L206",
-      "community": 6,
+      "community": 7,
       "norm_label": "presets",
       "id": "shadcn_vue_cli_presets"
     },
@@ -5812,7 +5821,7 @@
       "file_type": "document",
       "source_file": ".agents/skills/shadcn-vue/cli.md",
       "source_location": "L217",
-      "community": 6,
+      "community": 7,
       "norm_label": "switching presets",
       "id": "shadcn_vue_cli_switching_presets"
     },
@@ -7774,16 +7783,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/queries/settings.ts",
-      "source_location": "L16",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "app_queries_settings_ts",
-      "target": "queries_settings_upsertsetting"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/queries/settings.ts",
       "source_location": "L31",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -7799,6 +7798,16 @@
       "confidence_score": 1.0,
       "source": "app_queries_settings_ts",
       "target": "queries_settings_getsetting"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/queries/settings.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "app_queries_settings_ts",
+      "target": "queries_settings_upsertsetting"
     },
     {
       "relation": "imports",
@@ -7864,17 +7873,6 @@
       "source_location": "L6",
       "weight": 1.0,
       "source": "queries_settings_fetchallsettings",
-      "target": "db_index_getdb"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/queries/settings.ts",
-      "source_location": "L17",
-      "weight": 1.0,
-      "source": "queries_settings_upsertsetting",
       "target": "db_index_getdb"
     },
     {
@@ -7978,16 +7976,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/queries/calendar.ts",
-      "source_location": "L19",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "app_queries_calendar_ts",
-      "target": "queries_calendar_insertcalendarevent"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/queries/calendar.ts",
       "source_location": "L35",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -8033,6 +8021,16 @@
       "confidence_score": 1.0,
       "source": "app_queries_calendar_ts",
       "target": "queries_calendar_deleteholidaybydate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/queries/calendar.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "app_queries_calendar_ts",
+      "target": "queries_calendar_insertcalendarevent"
     },
     {
       "relation": "imports_from",
@@ -8132,17 +8130,6 @@
       "weight": 1.0,
       "source": "utils_calendar_upsertcalendarcache",
       "target": "queries_calendar_deletecalendareventsbymonth"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/queries/calendar.ts",
-      "source_location": "L25",
-      "weight": 1.0,
-      "source": "queries_calendar_insertcalendarevent",
-      "target": "db_index_getdb"
     },
     {
       "relation": "calls",
@@ -9023,6 +9010,16 @@
       "confidence_score": 1.0,
       "source": "app_utils_dates_ts",
       "target": "utils_dates_getmonthrange"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/utils/dates.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "app_utils_dates_ts",
+      "target": "utils_dates_getworkingdaysinmonth"
     },
     {
       "relation": "imports_from",
@@ -12248,6 +12245,28 @@
       "target": "db_index_getdb"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/queries/settings.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "queries_settings_upsertsetting",
+      "target": "db_index_getdb"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/queries/calendar.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "queries_calendar_insertcalendarevent",
+      "target": "db_index_getdb"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/pages/index.vue",
@@ -15401,5 +15420,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5ec2ff617d8856e44325ec0861affa92cc84bed6"
+  "built_at_commit": "43944ecf3672852e7b681468e6c0d79c71077ccb"
 }

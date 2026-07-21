@@ -57,7 +57,12 @@ export const useMonthlyStore = defineStore('monthly', () => {
         return
       }
 
-      const prompt = getMonthlyPrompt(activities)
+      const { useCalendarStore } = await import('~/stores/calendar')
+      const { getWorkingDaysInMonth } = await import('~/utils/dates')
+      const calendarStore = useCalendarStore()
+      const totalWorkingDays = getWorkingDaysInMonth(core.selectedDate, calendarStore.holidays)
+
+      const prompt = getMonthlyPrompt(activities, totalWorkingDays)
       const rawContent = await generateSummary(prompt, {
         max_tokens: 3000,
         provider: core.settings.ai_provider,

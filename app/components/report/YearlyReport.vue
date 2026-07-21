@@ -36,11 +36,11 @@
           <Button
             variant="outline"
             size="xs"
-            :disabled="!yearlyRows.length || exportingDocx"
+            :disabled="!yearlyRows.length || exportingExcel || exportingDocx"
             class="border-orange-500/20 hover:border-orange-500/50 hover:bg-orange-500/5 text-orange-600 dark:text-orange-400"
             @click="handleBastExport"
           >
-            <File :class="{ 'animate-bounce': exportingDocx }" data-icon="inline-start" />
+            <File :class="{ 'animate-bounce': exportingExcel }" data-icon="inline-start" />
             Export BAST
           </Button>
         </div>
@@ -191,12 +191,13 @@ const columns = [
 
 const { generateAiSummary, addYearlyRow, removeYearlyRow, fetchYearlyData } = yearlyStore
 
-const { exportBAST, exportingDocx } = useDocxExport()
+const { exportingDocx } = useDocxExport()
+const { exportBASTToExcel, exporting: exportingExcel } = useExcelExport()
 const { success, error } = useToast()
 
 const handleBastExport = async () => {
   try {
-    // Map yearly rows to what exportBAST expects (MonthlyReportRow)
+    // Map yearly rows to what exportBASTToExcel expects (MonthlyReportRow)
     const mappedRows = yearlyRows.value.map((r) => ({
       month: r.month,
       project: r.task,
@@ -205,8 +206,8 @@ const handleBastExport = async () => {
       status: r.keterangan,
     }))
 
-    await exportBAST(mappedRows, selectedDate.value, coreStore.settings)
-    success('BAST document exported to Word!')
+    await exportBASTToExcel(mappedRows, selectedDate.value, coreStore.settings)
+    success('BAST document exported to Excel!')
   } catch {
     error('Failed to export BAST document')
   }

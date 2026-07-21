@@ -562,9 +562,10 @@ export function useDocxExport() {
       const { save } = await import('@tauri-apps/plugin-dialog')
       const { writeFile } = await import('@tauri-apps/plugin-fs')
 
+      const userName = settings.user_name || 'Devi Adi Nufriana'
       const filePath = await save({
         filters: [{ name: 'Word Document', extensions: ['docx'] }],
-        defaultPath: `BAST PEKERJA IT PROJECT - ${settings.user_name} ${monthName} ${yearName}.docx`,
+        defaultPath: `BAST - ${userName} - ${monthName}.docx`,
       })
 
       if (filePath) {

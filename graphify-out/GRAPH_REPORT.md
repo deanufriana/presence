@@ -1,19 +1,19 @@
-# Graph Report - presence (2026-05-27)
+# Graph Report - presence (2026-07-21)
 
 ## Corpus Check
 
-- 164 files · ~180,940 words
+- 163 files · ~182,140 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
 
-- 692 nodes · 879 edges · 32 communities detected
+- 693 nodes · 880 edges · 32 communities detected
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 16 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
 
-- Built from commit: `5ec2ff61`
+- Built from commit: `43944ecf`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -47,8 +47,8 @@
 - [[_COMMUNITY_Community 31|Community 31]]
 - [[_COMMUNITY_Community 32|Community 32]]
 - [[_COMMUNITY_Community 34|Community 34]]
-- [[_COMMUNITY_Community 35|Community 35]]
-- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 44|Community 44]]
 - [[_COMMUNITY_Community 45|Community 45]]
 - [[_COMMUNITY_Community 46|Community 46]]
 
@@ -69,31 +69,31 @@
 
 - `loadJiraConfig()` --calls--> `parseProjectText()` [INFERRED]
   app/components/report/JiraExportModal.vue → app/utils/format.ts
-- `groupSubtasksWithAI()` --calls--> `generateSummary()` [INFERRED]
-  app/components/report/JiraExportModal.vue → app/utils/ai.ts
 - `generateParentDescription()` --calls--> `generateSummary()` [INFERRED]
   app/components/report/JiraExportModal.vue → app/utils/ai.ts
-- `getJiraExportData()` --calls--> `getDb()` [EXTRACTED]
-  app/queries/jiraExport.ts → app/db/index.ts
-- `upsertJiraExportData()` --calls--> `getDb()` [EXTRACTED]
-  app/queries/jiraExport.ts → app/db/index.ts
+- `saveJiraExportData()` --calls--> `upsertJiraExportData()` [INFERRED]
+  app/components/report/JiraExportModal.vue → app/queries/jiraExport.ts
+- `getJiraCache()` --calls--> `getJiraActivitiesByPeriod()` [EXTRACTED]
+  app/utils/jira.ts → app/queries/jira.ts
+- `syncJiraActivities()` --calls--> `upsertJiraActivity()` [EXTRACTED]
+  app/utils/jira.ts → app/queries/jira.ts
 
 ## Communities (57 total, 8 thin omitted)
 
 ### Community 0 - "Community 0"
 
 Cohesion: 0.07
-Nodes (37): { success }, ToastProps, toasts, useToast(), upsertJiraActivity(), submitJiraIssue(), useCalendarStore, useCoreStore (+29 more)
+Nodes (48): getDb(), deleteCalendarEventsByMonth(), deleteHolidayByDate(), getCalendarEventsByMonth(), getHolidaysByMonth(), insertCalendarEvent(), insertCalendarEvents(), upsertHoliday() (+40 more)
 
 ### Community 1 - "Community 1"
 
-Cohesion: 0.07
-Nodes (42): getDb(), deleteCalendarEventsByMonth(), deleteHolidayByDate(), getCalendarEventsByMonth(), getHolidaysByMonth(), insertCalendarEvent(), insertCalendarEvents(), upsertHoliday() (+34 more)
+Cohesion: 0.08
+Nodes (33): { success }, ToastProps, toasts, useToast(), useCalendarStore, useCoreStore, useDailyStore, useGitlabStore (+25 more)
 
 ### Community 2 - "Community 2"
 
-Cohesion: 0.06
-Nodes (28): getJiraExportData(), upsertJiraExportData(), closeModal(), configError, creating, customParentKey, generateParentDescription(), groupSubtasksWithAI() (+20 more)
+Cohesion: 0.05
+Nodes (26): closeModal(), configError, creating, customParentKey, generateParentDescription(), isAILoading, isDescriptionLoading, issueDescription (+18 more)
 
 ### Community 3 - "Community 3"
 
@@ -112,13 +112,13 @@ Nodes (22): ActivityCalendar, calendarStore, coreStore, dailyStore, { importingC
 
 ### Community 6 - "Community 6"
 
-Cohesion: 0.08
-Nodes (25): `add` — Add components, `apply` — Apply a preset to an existing project, `build` — Build a custom registry, code:bash (npx shadcn-vue@latest init [components...] [options]), code:bash (npx shadcn-vue@latest apply [preset] [options]), code:bash (npx shadcn-vue@latest add [components...] [options]), code:bash (npx shadcn-vue@latest search <registries...> [options]), code:bash (npx shadcn-vue@latest view <items...> [options]) (+17 more)
+Cohesion: 0.13
+Nodes (18): getGitLabCommitsByPeriod(), upsertGitLabCommit(), getSetting(), getMonthRange(), fetchGitLab(), formatGitLabActivity(), getGitLabCache(), getGitLabConfig() (+10 more)
 
 ### Community 7 - "Community 7"
 
-Cohesion: 0.13
-Nodes (18): getGitLabCommitsByPeriod(), upsertGitLabCommit(), getSetting(), getMonthRange(), fetchGitLab(), formatGitLabActivity(), getGitLabCache(), getGitLabConfig() (+10 more)
+Cohesion: 0.08
+Nodes (25): `add` — Add components, `apply` — Apply a preset to an existing project, `build` — Build a custom registry, code:bash (npx shadcn-vue@latest init [components...] [options]), code:bash (npx shadcn-vue@latest apply [preset] [options]), code:bash (npx shadcn-vue@latest add [components...] [options]), code:bash (npx shadcn-vue@latest search <registries...> [options]), code:bash (npx shadcn-vue@latest view <items...> [options]) (+17 more)
 
 ### Community 8 - "Community 8"
 
@@ -210,17 +210,17 @@ Nodes (4): id, name, projectResources, resources
 
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getDb()` connect `Community 1` to `Community 0`, `Community 2`, `Community 7`?**
+- **Why does `getDb()` connect `Community 0` to `Community 6`?**
   _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **Why does `generateSummary()` connect `Community 1` to `Community 2`?**
+- **Why does `generateSummary()` connect `Community 0` to `Community 2`?**
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **What connects `animate`, `name`, `private` to the rest of the system?**
   _289 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.07 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.07 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.06 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._

@@ -46,11 +46,11 @@
           <Button
             variant="outline"
             size="xs"
-            :disabled="!monthlyRows.length || exportingDocx"
+            :disabled="!monthlyRows.length || exportingExcel || exportingDocx"
             class="border-indigo-500/20 hover:border-indigo-500/50 hover:bg-indigo-500/5 text-indigo-600 dark:text-indigo-400"
             @click="handleBASTExport"
           >
-            <FileText :class="{ 'animate-bounce': exportingDocx }" data-icon="inline-start" />
+            <FileText :class="{ 'animate-bounce': exportingExcel }" data-icon="inline-start" />
             Export BAST
           </Button>
         </div>
@@ -293,7 +293,8 @@ const { monthlyRows, monthlyHighlights, summarizing, isLoading } = storeToRefs(m
 const { dailyTable } = storeToRefs(dailyStore)
 
 const { generateAiSummary, addMonthlyRow, removeMonthlyRow, fetchMonthlyReport } = monthlyStore
-const { exportTaskJob, exportBAST, exportingDocx } = useDocxExport()
+const { exportTaskJob, exportingDocx } = useDocxExport()
+const { exportBASTToExcel, exporting: exportingExcel } = useExcelExport()
 const { success, error } = useToast()
 
 const handleDocxExport = async () => {
@@ -307,8 +308,8 @@ const handleDocxExport = async () => {
 
 const handleBASTExport = async () => {
   try {
-    await exportBAST(monthlyRows.value, selectedDate.value, coreStore.settings)
-    success('BAST exported to Word!')
+    await exportBASTToExcel(monthlyRows.value, selectedDate.value, coreStore.settings)
+    success('BAST exported to Excel!')
   } catch {
     error('Failed to export BAST document')
   }
