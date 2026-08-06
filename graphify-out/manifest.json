@@ -1,898 +1,1162 @@
 {
-  "/Users/deanufriana/Project/brilife/presence/tailwind.config.js": {
+  "tailwind.config.js": {
     "mtime": 1777119776.4398847,
-    "hash": "eef1dfccfe6a2fe008ca3f94e8cb3b48"
+    "ast_hash": "eef1dfccfe6a2fe008ca3f94e8cb3b48",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/nuxt.config.ts": {
+  "nuxt.config.ts": {
     "mtime": 1777538217.2431316,
-    "hash": "13431aa6c01bfa9e53123aa29a3057a6"
+    "ast_hash": "13431aa6c01bfa9e53123aa29a3057a6",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/playwright.config.ts": {
+  "playwright.config.ts": {
     "mtime": 1777538217.2437658,
-    "hash": "eeeef31d9357a1c395a17945fd041d04"
+    "ast_hash": "eeeef31d9357a1c395a17945fd041d04",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/drizzle.config.ts": {
+  "drizzle.config.ts": {
     "mtime": 1777538217.2428496,
-    "hash": "ceba692de801979883e5a7e55169d6b9"
+    "ast_hash": "ceba692de801979883e5a7e55169d6b9",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/eslint.config.mjs": {
+  "eslint.config.mjs": {
     "mtime": 1777428352.3412547,
-    "hash": "331c9b3e23c73148f8d97a17a01b59c3"
+    "ast_hash": "331c9b3e23c73148f8d97a17a01b59c3",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/app.vue": {
+  "app/app.vue": {
     "mtime": 1782732220.6501415,
-    "hash": "a68714c505a30c2296934c27fc6c705e"
+    "ast_hash": "a68714c505a30c2296934c27fc6c705e",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/types/holiday.ts": {
+  "app/types/holiday.ts": {
     "mtime": 1777538217.239846,
-    "hash": "15960d7321a6f9f810c33a6a5023f573"
+    "ast_hash": "15960d7321a6f9f810c33a6a5023f573",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/types/report.ts": {
+  "app/types/report.ts": {
     "mtime": 1782734216.3923428,
-    "hash": "38ef58d45a110f4db4df636cbe64118c"
+    "ast_hash": "38ef58d45a110f4db4df636cbe64118c",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/types/ollama.ts": {
+  "app/types/ollama.ts": {
     "mtime": 1777433835.316601,
-    "hash": "9dc3b5f8a1f2c7c53c6469147deafb9f"
+    "ast_hash": "9dc3b5f8a1f2c7c53c6469147deafb9f",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/types/jira.ts": {
+  "app/types/jira.ts": {
     "mtime": 1777538217.2401462,
-    "hash": "8f87117b175f3776e472caf4c133e76e"
+    "ast_hash": "8f87117b175f3776e472caf4c133e76e",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/types/settings.ts": {
+  "app/types/settings.ts": {
     "mtime": 1779685022.663654,
-    "hash": "16cf65e4a9fac576d0b2b9e8af97e1b6"
+    "ast_hash": "16cf65e4a9fac576d0b2b9e8af97e1b6",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/types/calendar.ts": {
+  "app/types/calendar.ts": {
     "mtime": 1777433835.3160243,
-    "hash": "358c59856c6c7bd41436d87b0444029c"
+    "ast_hash": "358c59856c6c7bd41436d87b0444029c",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/types/gitlab.ts": {
+  "app/types/gitlab.ts": {
     "mtime": 1777433835.3161414,
-    "hash": "af14e03178bbaca413f7b935aad79858"
+    "ast_hash": "af14e03178bbaca413f7b935aad79858",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/composables/useDocxExport.ts": {
+  "app/composables/useDocxExport.ts": {
     "mtime": 1784616444.0049925,
-    "hash": "42252db121cc102695f36cba611d93ac"
+    "ast_hash": "42252db121cc102695f36cba611d93ac",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/composables/use-toast.ts": {
+  "app/composables/use-toast.ts": {
     "mtime": 1777433941.850585,
-    "hash": "8c3adba42a82cafa1ef9a5feea24f448"
+    "ast_hash": "8c3adba42a82cafa1ef9a5feea24f448",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/composables/useExcelExport.ts": {
-    "mtime": 1784618579.9525363,
-    "hash": "2eae060b27549015419c41876ad5dda1"
+  "app/composables/useExcelExport.ts": {
+    "mtime": 1784618949.3468902,
+    "ast_hash": "24bcdb3ee471d4c7e76d1e3c03423c80",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/composables/useDarkMode.ts": {
+  "app/composables/useDarkMode.ts": {
     "mtime": 1782734216.2658129,
-    "hash": "2bfa6fb4e519656613a92e7aad2ef694"
+    "ast_hash": "2bfa6fb4e519656613a92e7aad2ef694",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/queries/jiraExport.ts": {
+  "app/queries/jiraExport.ts": {
     "mtime": 1779697754.0769188,
-    "hash": "f9aee178714eb7d155503f7874dba27b"
+    "ast_hash": "f9aee178714eb7d155503f7874dba27b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/queries/jira.ts": {
+  "app/queries/jira.ts": {
     "mtime": 1782732198.3333125,
-    "hash": "c07460694a217d96f242204a67f852f5"
+    "ast_hash": "c07460694a217d96f242204a67f852f5",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/queries/reports.ts": {
+  "app/queries/reports.ts": {
     "mtime": 1779874549.210479,
-    "hash": "beca1f2ea7d93c797d03f421527737f6"
+    "ast_hash": "beca1f2ea7d93c797d03f421527737f6",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/queries/settings.ts": {
+  "app/queries/settings.ts": {
     "mtime": 1782732199.0679557,
-    "hash": "3aad29028ea14732dd121724ba941c01"
+    "ast_hash": "3aad29028ea14732dd121724ba941c01",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/queries/calendar.ts": {
+  "app/queries/calendar.ts": {
     "mtime": 1782732166.1974137,
-    "hash": "1248d79b102f93d8b1d6f568177fe9c4"
+    "ast_hash": "1248d79b102f93d8b1d6f568177fe9c4",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/queries/gitlab.ts": {
+  "app/queries/gitlab.ts": {
     "mtime": 1782732197.5629547,
-    "hash": "10d4cb5e187517b496526ab75c4ceecc"
+    "ast_hash": "10d4cb5e187517b496526ab75c4ceecc",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/stores/monthly.ts": {
+  "app/stores/monthly.ts": {
     "mtime": 1784615985.0239182,
-    "hash": "eb572e8c97912b60a3b37ddb08d92b1e"
+    "ast_hash": "eb572e8c97912b60a3b37ddb08d92b1e",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/stores/daily.ts": {
+  "app/stores/daily.ts": {
     "mtime": 1779874549.2119677,
-    "hash": "ae7a3af1c84b39980f88b0da3b5765c5"
+    "ast_hash": "ae7a3af1c84b39980f88b0da3b5765c5",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/stores/jira.ts": {
+  "app/stores/jira.ts": {
     "mtime": 1782732194.8987956,
-    "hash": "49ea1785f337750de291f28654ada269"
+    "ast_hash": "49ea1785f337750de291f28654ada269",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/stores/yearly.ts": {
+  "app/stores/yearly.ts": {
     "mtime": 1782732156.1209388,
-    "hash": "f62905fedaedbd2bb02cd4464dc68c32"
+    "ast_hash": "f62905fedaedbd2bb02cd4464dc68c32",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/stores/calendar.ts": {
+  "app/stores/calendar.ts": {
     "mtime": 1782732196.7936816,
-    "hash": "513dabaaae6181532ae5b141b3187262"
+    "ast_hash": "513dabaaae6181532ae5b141b3187262",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/stores/core.ts": {
+  "app/stores/core.ts": {
     "mtime": 1782732195.6446078,
-    "hash": "953fba0026050caddf1550184f197fb0"
+    "ast_hash": "953fba0026050caddf1550184f197fb0",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/stores/gitlab.ts": {
+  "app/stores/gitlab.ts": {
     "mtime": 1782732193.8826594,
-    "hash": "d5cb0ef797cb30b6c4fc4de7e8171e7e"
+    "ast_hash": "d5cb0ef797cb30b6c4fc4de7e8171e7e",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/utils/ics.ts": {
+  "app/utils/ics.ts": {
     "mtime": 1782732201.5670583,
-    "hash": "5286412ac9c594f05437dba31c7b91fb"
+    "ast_hash": "5286412ac9c594f05437dba31c7b91fb",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/utils/dates.ts": {
-    "mtime": 1784615964.9573693,
-    "hash": "3934fa067f697962ec18fa732dabf72c"
+  "app/utils/dates.ts": {
+    "mtime": 1784618949.3636527,
+    "ast_hash": "025bbb28d9e64ae2a3076c49ac4959b5",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/utils/jira.ts": {
+  "app/utils/jira.ts": {
     "mtime": 1782734898.853978,
-    "hash": "f5594b6ae8282fdbf22a2a4694705ecd"
+    "ast_hash": "f5594b6ae8282fdbf22a2a4694705ecd",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/utils/reports.ts": {
+  "app/utils/reports.ts": {
     "mtime": 1782734153.4935358,
-    "hash": "06b80b817b7bff5c3024e99a68152f24"
+    "ast_hash": "06b80b817b7bff5c3024e99a68152f24",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/utils/calendar.ts": {
-    "mtime": 1782732193.0839186,
-    "hash": "e66eba5e204de21fe3318341eb154c36"
+  "app/utils/calendar.ts": {
+    "mtime": 1786002583.2243602,
+    "ast_hash": "4d0e848311f9ce3891d5158dd55ac781",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/utils/prompts.ts": {
+  "app/utils/prompts.ts": {
     "mtime": 1784615994.9153023,
-    "hash": "5ba379cc7ba627ad5f3186ed790e2859"
+    "ast_hash": "5ba379cc7ba627ad5f3186ed790e2859",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/utils/format.ts": {
+  "app/utils/format.ts": {
     "mtime": 1782734216.412167,
-    "hash": "59eb9b54806381ce41b71ad4c3bdd3dd"
+    "ast_hash": "59eb9b54806381ce41b71ad4c3bdd3dd",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/utils/ai.ts": {
+  "app/utils/ai.ts": {
     "mtime": 1782732153.953286,
-    "hash": "1616039659d8ad435b9f8c6bec6d98e7"
+    "ast_hash": "1616039659d8ad435b9f8c6bec6d98e7",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/utils/gitlab.ts": {
+  "app/utils/gitlab.ts": {
     "mtime": 1782732239.2405086,
-    "hash": "36d95a6720d2ffc5085f37821b42368f"
+    "ast_hash": "36d95a6720d2ffc5085f37821b42368f",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/utils/index.ts": {
+  "app/utils/index.ts": {
     "mtime": 1777104168.0664377,
-    "hash": "ea1c194ee828369e6fcdde84b4d8b8ba"
+    "ast_hash": "ea1c194ee828369e6fcdde84b4d8b8ba",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/tabs/Tabs.vue": {
+  "app/components/ui/tabs/Tabs.vue": {
     "mtime": 1777174916.630679,
-    "hash": "d31b191f4162158d8f0453b93e92133d"
+    "ast_hash": "d31b191f4162158d8f0453b93e92133d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/tabs/TabsContent.vue": {
+  "app/components/ui/tabs/TabsContent.vue": {
     "mtime": 1777617688.1898491,
-    "hash": "6476ed6b7e483c63aa5d8e1288c35dca"
+    "ast_hash": "6476ed6b7e483c63aa5d8e1288c35dca",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/tabs/TabsTrigger.vue": {
+  "app/components/ui/tabs/TabsTrigger.vue": {
     "mtime": 1777174916.6320088,
-    "hash": "56702fb93b584561479f3de787f340b1"
+    "ast_hash": "56702fb93b584561479f3de787f340b1",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/tabs/TabsList.vue": {
+  "app/components/ui/tabs/TabsList.vue": {
     "mtime": 1777174916.6317012,
-    "hash": "4e800d85ba83eabf2f5beb1cf06b9f5e"
+    "ast_hash": "4e800d85ba83eabf2f5beb1cf06b9f5e",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/tabs/index.ts": {
+  "app/components/ui/tabs/index.ts": {
     "mtime": 1777117358.5895493,
-    "hash": "08b65633dbfadb167a4580c3635c8d6b"
+    "ast_hash": "08b65633dbfadb167a4580c3635c8d6b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/tooltip/Tooltip.vue": {
+  "app/components/ui/tooltip/Tooltip.vue": {
     "mtime": 1777174645.1312788,
-    "hash": "b4067861ea647a301afd2bcd1705c45b"
+    "ast_hash": "b4067861ea647a301afd2bcd1705c45b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/tooltip/TooltipProvider.vue": {
+  "app/components/ui/tooltip/TooltipProvider.vue": {
     "mtime": 1777174645.1314957,
-    "hash": "de5bc70a2b829b7a7c41baf7cd07a8df"
+    "ast_hash": "de5bc70a2b829b7a7c41baf7cd07a8df",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/tooltip/index.ts": {
+  "app/components/ui/tooltip/index.ts": {
     "mtime": 1777104591.0405335,
-    "hash": "1d5bde90e7f3d5b6cbab38c6b1e43317"
+    "ast_hash": "1d5bde90e7f3d5b6cbab38c6b1e43317",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/tooltip/TooltipTrigger.vue": {
+  "app/components/ui/tooltip/TooltipTrigger.vue": {
     "mtime": 1777174645.1320446,
-    "hash": "bdb6ad34c5e42b044bc8858d535195c0"
+    "ast_hash": "bdb6ad34c5e42b044bc8858d535195c0",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/tooltip/TooltipContent.vue": {
+  "app/components/ui/tooltip/TooltipContent.vue": {
     "mtime": 1777538217.2325664,
-    "hash": "1c0369a899e58f00432bee0fab533908"
+    "ast_hash": "1c0369a899e58f00432bee0fab533908",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarPrevButton.vue": {
+  "app/components/ui/calendar/CalendarPrevButton.vue": {
     "mtime": 1777175173.850266,
-    "hash": "9152bd8fddb166f98d3691b33f253237"
+    "ast_hash": "9152bd8fddb166f98d3691b33f253237",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarHeadCell.vue": {
+  "app/components/ui/calendar/CalendarHeadCell.vue": {
     "mtime": 1777175173.791895,
-    "hash": "b1e9abedf82b63bfbadbf7000c323a73"
+    "ast_hash": "b1e9abedf82b63bfbadbf7000c323a73",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarHeading.vue": {
+  "app/components/ui/calendar/CalendarHeading.vue": {
     "mtime": 1777538217.2290971,
-    "hash": "8f3d42117924a350b9ab3deaf21057c4"
+    "ast_hash": "8f3d42117924a350b9ab3deaf21057c4",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarHeader.vue": {
+  "app/components/ui/calendar/CalendarHeader.vue": {
     "mtime": 1777175173.8079257,
-    "hash": "b9c8755daffb4b8c8bd3f3fc3612def7"
+    "ast_hash": "b9c8755daffb4b8c8bd3f3fc3612def7",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarGridHead.vue": {
+  "app/components/ui/calendar/CalendarGridHead.vue": {
     "mtime": 1777175173.7674754,
-    "hash": "8a97b73499b0c5185e4f3ac050a48845"
+    "ast_hash": "8a97b73499b0c5185e4f3ac050a48845",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarGridRow.vue": {
+  "app/components/ui/calendar/CalendarGridRow.vue": {
     "mtime": 1777175173.7768936,
-    "hash": "22d320200dfd46951196d80ee669683b"
+    "ast_hash": "22d320200dfd46951196d80ee669683b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarCell.vue": {
+  "app/components/ui/calendar/CalendarCell.vue": {
     "mtime": 1777175173.7315714,
-    "hash": "9a96d93c15d9a422f2f8fcd604d4eb0b"
+    "ast_hash": "9a96d93c15d9a422f2f8fcd604d4eb0b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/Calendar.vue": {
+  "app/components/ui/calendar/Calendar.vue": {
     "mtime": 1777175173.7225018,
-    "hash": "4b55ef26d79b726cb8c1fc5857ad2916"
+    "ast_hash": "4b55ef26d79b726cb8c1fc5857ad2916",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarGrid.vue": {
+  "app/components/ui/calendar/CalendarGrid.vue": {
     "mtime": 1777175173.7524705,
-    "hash": "7357844e7c20e2c6c72d22b53c52c351"
+    "ast_hash": "7357844e7c20e2c6c72d22b53c52c351",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarGridBody.vue": {
+  "app/components/ui/calendar/CalendarGridBody.vue": {
     "mtime": 1777175173.759484,
-    "hash": "fb232abad66f7251724d846f4f8dd8f3"
+    "ast_hash": "fb232abad66f7251724d846f4f8dd8f3",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/index.ts": {
+  "app/components/ui/calendar/index.ts": {
     "mtime": 1777175173.862823,
-    "hash": "b95d1c4ce56b2b5b1d21444ade0a2ffc"
+    "ast_hash": "b95d1c4ce56b2b5b1d21444ade0a2ffc",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarCellTrigger.vue": {
+  "app/components/ui/calendar/CalendarCellTrigger.vue": {
     "mtime": 1777175173.7425475,
-    "hash": "5fbf36c56244544d7ca4f9a9b9fa7115"
+    "ast_hash": "5fbf36c56244544d7ca4f9a9b9fa7115",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/calendar/CalendarNextButton.vue": {
+  "app/components/ui/calendar/CalendarNextButton.vue": {
     "mtime": 1777175173.8392391,
-    "hash": "ef21d32e18af199281f546209ad94705"
+    "ast_hash": "ef21d32e18af199281f546209ad94705",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/card/Card.vue": {
+  "app/components/ui/card/Card.vue": {
     "mtime": 1777174916.6271124,
-    "hash": "4f39f55127a6cba3f3ca70ce1bd62268"
+    "ast_hash": "4f39f55127a6cba3f3ca70ce1bd62268",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/card/CardContent.vue": {
+  "app/components/ui/card/CardContent.vue": {
     "mtime": 1777174916.6275344,
-    "hash": "0505e3dac52f10bcfb00943bcc532710"
+    "ast_hash": "0505e3dac52f10bcfb00943bcc532710",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/card/CardTitle.vue": {
+  "app/components/ui/card/CardTitle.vue": {
     "mtime": 1777174916.629377,
-    "hash": "d7b035e8328c3aa3e5250a4bc2e853da"
+    "ast_hash": "d7b035e8328c3aa3e5250a4bc2e853da",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/card/CardHeader.vue": {
+  "app/components/ui/card/CardHeader.vue": {
     "mtime": 1777174916.62889,
-    "hash": "c3a10278cc3b97924b4aa339b3a1230d"
+    "ast_hash": "c3a10278cc3b97924b4aa339b3a1230d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/card/CardFooter.vue": {
+  "app/components/ui/card/CardFooter.vue": {
     "mtime": 1777174916.6282377,
-    "hash": "57cf51484df65f5d90dbb4c596af7dd1"
+    "ast_hash": "57cf51484df65f5d90dbb4c596af7dd1",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/card/index.ts": {
+  "app/components/ui/card/index.ts": {
     "mtime": 1777103564.8977575,
-    "hash": "cb4720ca9763c1643ebb8e143f7329f2"
+    "ast_hash": "cb4720ca9763c1643ebb8e143f7329f2",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/card/CardDescription.vue": {
+  "app/components/ui/card/CardDescription.vue": {
     "mtime": 1777174916.6278293,
-    "hash": "961b94b4e2f2d52a62015e777328b69b"
+    "ast_hash": "961b94b4e2f2d52a62015e777328b69b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert-dialog/AlertDialog.vue": {
+  "app/components/ui/alert-dialog/AlertDialog.vue": {
     "mtime": 1779685022.1415136,
-    "hash": "7b9ca8406de7b927a248bbcd6208cf87"
+    "ast_hash": "7b9ca8406de7b927a248bbcd6208cf87",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert-dialog/AlertDialogHeader.vue": {
+  "app/components/ui/alert-dialog/AlertDialogHeader.vue": {
     "mtime": 1779685022.1819563,
-    "hash": "00d2d4e45f737cf87f91731459af886d"
+    "ast_hash": "00d2d4e45f737cf87f91731459af886d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert-dialog/AlertDialogFooter.vue": {
+  "app/components/ui/alert-dialog/AlertDialogFooter.vue": {
     "mtime": 1779685022.1757836,
-    "hash": "59f59528fc51b5991a6fa51076544b73"
+    "ast_hash": "59f59528fc51b5991a6fa51076544b73",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert-dialog/AlertDialogTitle.vue": {
+  "app/components/ui/alert-dialog/AlertDialogTitle.vue": {
     "mtime": 1779685022.1919377,
-    "hash": "88b9ceb80789c6179668bfff4deb62d6"
+    "ast_hash": "88b9ceb80789c6179668bfff4deb62d6",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert-dialog/AlertDialogTrigger.vue": {
+  "app/components/ui/alert-dialog/AlertDialogTrigger.vue": {
     "mtime": 1779685022.2017574,
-    "hash": "45adaf09fb8a28161471cdc51f40ca36"
+    "ast_hash": "45adaf09fb8a28161471cdc51f40ca36",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert-dialog/AlertDialogContent.vue": {
+  "app/components/ui/alert-dialog/AlertDialogContent.vue": {
     "mtime": 1779685022.1601887,
-    "hash": "0a50c091a1e19f920e9958a0208ef401"
+    "ast_hash": "0a50c091a1e19f920e9958a0208ef401",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert-dialog/AlertDialogAction.vue": {
+  "app/components/ui/alert-dialog/AlertDialogAction.vue": {
     "mtime": 1779685022.1476414,
-    "hash": "5b9ffff012dc838ef90f51d1559154e7"
+    "ast_hash": "5b9ffff012dc838ef90f51d1559154e7",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert-dialog/index.ts": {
+  "app/components/ui/alert-dialog/index.ts": {
     "mtime": 1779685022.2097137,
-    "hash": "e23bce6e2439db00018bd3ad09a18f4c"
+    "ast_hash": "e23bce6e2439db00018bd3ad09a18f4c",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert-dialog/AlertDialogCancel.vue": {
+  "app/components/ui/alert-dialog/AlertDialogCancel.vue": {
     "mtime": 1779685022.1531782,
-    "hash": "5d7e740901d1676d45a9e71f1ed1a41e"
+    "ast_hash": "5d7e740901d1676d45a9e71f1ed1a41e",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert-dialog/AlertDialogDescription.vue": {
+  "app/components/ui/alert-dialog/AlertDialogDescription.vue": {
     "mtime": 1779685022.1652777,
-    "hash": "8a24520d627fe9bca9e8622a49701162"
+    "ast_hash": "8a24520d627fe9bca9e8622a49701162",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/input/index.ts": {
+  "app/components/ui/input/index.ts": {
     "mtime": 1777103564.9093792,
-    "hash": "e01a4ba6ce63f3eb66a97f2a0e45d981"
+    "ast_hash": "e01a4ba6ce63f3eb66a97f2a0e45d981",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/input/Input.vue": {
+  "app/components/ui/input/Input.vue": {
     "mtime": 1777174916.6296785,
-    "hash": "550819c645fb60d8f9bb666a1fbcd0d7"
+    "ast_hash": "550819c645fb60d8f9bb666a1fbcd0d7",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert/Alert.vue": {
+  "app/components/ui/alert/Alert.vue": {
     "mtime": 1779685022.2209973,
-    "hash": "e9b28ad8e7c8f53fb18a10d4ed57836b"
+    "ast_hash": "e9b28ad8e7c8f53fb18a10d4ed57836b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert/AlertDescription.vue": {
+  "app/components/ui/alert/AlertDescription.vue": {
     "mtime": 1779685022.227004,
-    "hash": "13a16b16b25f83b95c20d222e747884c"
+    "ast_hash": "13a16b16b25f83b95c20d222e747884c",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert/AlertTitle.vue": {
+  "app/components/ui/alert/AlertTitle.vue": {
     "mtime": 1779685022.2351425,
-    "hash": "9cafc0e2ac284e708cf04ebd35915c96"
+    "ast_hash": "9cafc0e2ac284e708cf04ebd35915c96",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/alert/index.ts": {
+  "app/components/ui/alert/index.ts": {
     "mtime": 1779685022.2470734,
-    "hash": "18098f4ea80bdb7ad8fed372c5993a56"
+    "ast_hash": "18098f4ea80bdb7ad8fed372c5993a56",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/separator/index.ts": {
+  "app/components/ui/separator/index.ts": {
     "mtime": 1777104591.000952,
-    "hash": "208532e780e098d44588e912ee4f13d5"
+    "ast_hash": "208532e780e098d44588e912ee4f13d5",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/separator/Separator.vue": {
+  "app/components/ui/separator/Separator.vue": {
     "mtime": 1777538217.2309182,
-    "hash": "218d9f771342cfe783d4e4282bcdc0e9"
+    "ast_hash": "218d9f771342cfe783d4e4282bcdc0e9",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/toast/Toaster.vue": {
+  "app/components/ui/toast/Toaster.vue": {
     "mtime": 1777190446.054489,
-    "hash": "8571dce5c420a41974d47a2805f19900"
+    "ast_hash": "8571dce5c420a41974d47a2805f19900",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/toast/index.ts": {
+  "app/components/ui/toast/index.ts": {
     "mtime": 1777538217.232276,
-    "hash": "23b455ae720c331bd0491608cb594e1d"
+    "ast_hash": "23b455ae720c331bd0491608cb594e1d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/toast/Toast.vue": {
+  "app/components/ui/toast/Toast.vue": {
     "mtime": 1777538217.231919,
-    "hash": "901ddcebdc34422fbba3f1dad17b37cc"
+    "ast_hash": "901ddcebdc34422fbba3f1dad17b37cc",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/checkbox/index.ts": {
+  "app/components/ui/checkbox/index.ts": {
     "mtime": 1777251045.8712058,
-    "hash": "49e5b77f32dad5d2141ef7a3f8ef7bd8"
+    "ast_hash": "49e5b77f32dad5d2141ef7a3f8ef7bd8",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/checkbox/Checkbox.vue": {
+  "app/components/ui/checkbox/Checkbox.vue": {
     "mtime": 1777533855.1499915,
-    "hash": "906517f656697556b94ed00b22417302"
+    "ast_hash": "906517f656697556b94ed00b22417302",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/label/Label.vue": {
+  "app/components/ui/label/Label.vue": {
     "mtime": 1777174916.6300647,
-    "hash": "c6be4ed8f3f52baf540f532bd70d88a6"
+    "ast_hash": "c6be4ed8f3f52baf540f532bd70d88a6",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/label/index.ts": {
+  "app/components/ui/label/index.ts": {
     "mtime": 1777103564.9190497,
-    "hash": "79294f5885bcb4debfd256b72c987786"
+    "ast_hash": "79294f5885bcb4debfd256b72c987786",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/FieldDescription.vue": {
+  "app/components/ui/field/FieldDescription.vue": {
     "mtime": 1779685022.3724108,
-    "hash": "bb08c2977f35db80edb5b552a50b61e0"
+    "ast_hash": "bb08c2977f35db80edb5b552a50b61e0",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/FieldLabel.vue": {
+  "app/components/ui/field/FieldLabel.vue": {
     "mtime": 1779685022.4258616,
-    "hash": "66b9ca2160f6c6ff8c9f180d2d3870b3"
+    "ast_hash": "66b9ca2160f6c6ff8c9f180d2d3870b3",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/Field.vue": {
+  "app/components/ui/field/Field.vue": {
     "mtime": 1779685022.3517025,
-    "hash": "0369390aeff411b7ed459225dc5bb812"
+    "ast_hash": "0369390aeff411b7ed459225dc5bb812",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/FieldContent.vue": {
+  "app/components/ui/field/FieldContent.vue": {
     "mtime": 1779685022.3586557,
-    "hash": "086887e694f2fd669dbeae7cc00cb0d2"
+    "ast_hash": "086887e694f2fd669dbeae7cc00cb0d2",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/FieldTitle.vue": {
+  "app/components/ui/field/FieldTitle.vue": {
     "mtime": 1779685022.4625392,
-    "hash": "9c5781af9ebc95dc84c9121257853e75"
+    "ast_hash": "9c5781af9ebc95dc84c9121257853e75",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/FieldGroup.vue": {
+  "app/components/ui/field/FieldGroup.vue": {
     "mtime": 1779685022.4094691,
-    "hash": "875ed6488c0db380b30dc037c9c3ea9d"
+    "ast_hash": "875ed6488c0db380b30dc037c9c3ea9d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/FieldLegend.vue": {
+  "app/components/ui/field/FieldLegend.vue": {
     "mtime": 1779685022.437124,
-    "hash": "d851051ec20868504449d4528797fdd3"
+    "ast_hash": "d851051ec20868504449d4528797fdd3",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/FieldSeparator.vue": {
+  "app/components/ui/field/FieldSeparator.vue": {
     "mtime": 1779685022.4463155,
-    "hash": "8b2bcb44912b73eefc56ee037b6d1083"
+    "ast_hash": "8b2bcb44912b73eefc56ee037b6d1083",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/index.ts": {
+  "app/components/ui/field/index.ts": {
     "mtime": 1779685022.4699385,
-    "hash": "5f9dc228ef908779999a6626faa5b8ad"
+    "ast_hash": "5f9dc228ef908779999a6626faa5b8ad",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/FieldError.vue": {
+  "app/components/ui/field/FieldError.vue": {
     "mtime": 1779685022.396209,
-    "hash": "f05005ea3a7cba13a364f7b4e420e151"
+    "ast_hash": "f05005ea3a7cba13a364f7b4e420e151",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/field/FieldSet.vue": {
+  "app/components/ui/field/FieldSet.vue": {
     "mtime": 1779685022.4546316,
-    "hash": "b99f997d41830edef5b70565712387d7"
+    "ast_hash": "b99f997d41830edef5b70565712387d7",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/dialog/DialogTitle.vue": {
+  "app/components/ui/dialog/DialogTitle.vue": {
     "mtime": 1779685022.3315132,
-    "hash": "d28ec8d0c6cb283899cd0a3538773017"
+    "ast_hash": "d28ec8d0c6cb283899cd0a3538773017",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/dialog/DialogHeader.vue": {
+  "app/components/ui/dialog/DialogHeader.vue": {
     "mtime": 1779685022.3165946,
-    "hash": "2d9528d4548fe16244d69085163c77b6"
+    "ast_hash": "2d9528d4548fe16244d69085163c77b6",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/dialog/DialogFooter.vue": {
+  "app/components/ui/dialog/DialogFooter.vue": {
     "mtime": 1779685022.3113437,
-    "hash": "cee455e801493424d1eb95b6c560f310"
+    "ast_hash": "cee455e801493424d1eb95b6c560f310",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/dialog/DialogContent.vue": {
+  "app/components/ui/dialog/DialogContent.vue": {
     "mtime": 1779685022.2937038,
-    "hash": "0f9724eed05233f63d466215dfb692c9"
+    "ast_hash": "0f9724eed05233f63d466215dfb692c9",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/dialog/DialogTrigger.vue": {
+  "app/components/ui/dialog/DialogTrigger.vue": {
     "mtime": 1779685022.3376815,
-    "hash": "a92a2b19e1a2b8df1f930d6dc6c8fad7"
+    "ast_hash": "a92a2b19e1a2b8df1f930d6dc6c8fad7",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/dialog/DialogScrollContent.vue": {
+  "app/components/ui/dialog/DialogScrollContent.vue": {
     "mtime": 1779685022.325556,
-    "hash": "fd878ad878bfd6ee18d3dd122528104c"
+    "ast_hash": "fd878ad878bfd6ee18d3dd122528104c",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/dialog/Dialog.vue": {
+  "app/components/ui/dialog/Dialog.vue": {
     "mtime": 1779685022.2635589,
-    "hash": "caf426391ce08ef888a998a109987490"
+    "ast_hash": "caf426391ce08ef888a998a109987490",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/dialog/DialogDescription.vue": {
+  "app/components/ui/dialog/DialogDescription.vue": {
     "mtime": 1779685022.303698,
-    "hash": "e857121a91211e06c8c7898287cc7519"
+    "ast_hash": "e857121a91211e06c8c7898287cc7519",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/dialog/DialogClose.vue": {
+  "app/components/ui/dialog/DialogClose.vue": {
     "mtime": 1779685022.2721052,
-    "hash": "59400a132d9d5f6855c23c2b0cfe34d3"
+    "ast_hash": "59400a132d9d5f6855c23c2b0cfe34d3",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/dialog/index.ts": {
+  "app/components/ui/dialog/index.ts": {
     "mtime": 1779685022.3414054,
-    "hash": "79dbf670a793c27d370cc83029987c40"
+    "ast_hash": "79dbf670a793c27d370cc83029987c40",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/popover/Popover.vue": {
+  "app/components/ui/popover/Popover.vue": {
     "mtime": 1777175173.6281662,
-    "hash": "2641afa6ad7276448a5f0a9712846d19"
+    "ast_hash": "2641afa6ad7276448a5f0a9712846d19",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/popover/PopoverContent.vue": {
+  "app/components/ui/popover/PopoverContent.vue": {
     "mtime": 1777538217.2301812,
-    "hash": "0085891e29da2f6f88138c4425f8e142"
+    "ast_hash": "0085891e29da2f6f88138c4425f8e142",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/popover/index.ts": {
+  "app/components/ui/popover/index.ts": {
     "mtime": 1777175173.6669374,
-    "hash": "f022ae6c4552301c2ebe7bda23c4e38e"
+    "ast_hash": "f022ae6c4552301c2ebe7bda23c4e38e",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/popover/PopoverTrigger.vue": {
+  "app/components/ui/popover/PopoverTrigger.vue": {
     "mtime": 1777175173.6594784,
-    "hash": "df75c40639a9692b51f3eaead06b099c"
+    "ast_hash": "df75c40639a9692b51f3eaead06b099c",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/textarea/index.ts": {
+  "app/components/ui/textarea/index.ts": {
     "mtime": 1779685022.502008,
-    "hash": "d7c90645b4e6c6f42faa7ddfbef3b462"
+    "ast_hash": "d7c90645b4e6c6f42faa7ddfbef3b462",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/textarea/Textarea.vue": {
+  "app/components/ui/textarea/Textarea.vue": {
     "mtime": 1779685022.496545,
-    "hash": "935633771d33739224576c526706cddb"
+    "ast_hash": "935633771d33739224576c526706cddb",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/button/index.ts": {
+  "app/components/ui/button/index.ts": {
     "mtime": 1777267247.268289,
-    "hash": "1fb89136f6d0fe67ecc471c471a2ff67"
+    "ast_hash": "1fb89136f6d0fe67ecc471c471a2ff67",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/button/Button.vue": {
+  "app/components/ui/button/Button.vue": {
     "mtime": 1777538217.2286727,
-    "hash": "7031b74de21d92a3e34315cec2c6084f"
+    "ast_hash": "7031b74de21d92a3e34315cec2c6084f",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/SelectItem.vue": {
+  "app/components/ui/select/SelectItem.vue": {
     "mtime": 1777251045.7986283,
-    "hash": "2e7770ed7161f68ba97dc72e30c6d3b8"
+    "ast_hash": "2e7770ed7161f68ba97dc72e30c6d3b8",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/SelectTrigger.vue": {
+  "app/components/ui/select/SelectTrigger.vue": {
     "mtime": 1777251045.845113,
-    "hash": "1250e9ccedbec63bbad52c8be0a8f989"
+    "ast_hash": "1250e9ccedbec63bbad52c8be0a8f989",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/SelectContent.vue": {
+  "app/components/ui/select/SelectContent.vue": {
     "mtime": 1777538217.2305741,
-    "hash": "c2b64e71e0c96828223a6a46a470faf3"
+    "ast_hash": "c2b64e71e0c96828223a6a46a470faf3",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/SelectGroup.vue": {
+  "app/components/ui/select/SelectGroup.vue": {
     "mtime": 1777251045.7879431,
-    "hash": "d69ef9849ef92b2dd9dbe5965ff3eab7"
+    "ast_hash": "d69ef9849ef92b2dd9dbe5965ff3eab7",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/SelectSeparator.vue": {
+  "app/components/ui/select/SelectSeparator.vue": {
     "mtime": 1777251045.8372846,
-    "hash": "b58cb9e1d96d3748ff90c858c7e02eab"
+    "ast_hash": "b58cb9e1d96d3748ff90c858c7e02eab",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/SelectScrollUpButton.vue": {
+  "app/components/ui/select/SelectScrollUpButton.vue": {
     "mtime": 1777251045.8303306,
-    "hash": "2c03d0df0c16ce891d110d15a06936e0"
+    "ast_hash": "2c03d0df0c16ce891d110d15a06936e0",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/index.ts": {
+  "app/components/ui/select/index.ts": {
     "mtime": 1777251045.857645,
-    "hash": "f74248d69af22771efe3f47b51632f8c"
+    "ast_hash": "f74248d69af22771efe3f47b51632f8c",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/SelectScrollDownButton.vue": {
+  "app/components/ui/select/SelectScrollDownButton.vue": {
     "mtime": 1777251045.8226025,
-    "hash": "4daa7a33a17d3decf5001354184fc959"
+    "ast_hash": "4daa7a33a17d3decf5001354184fc959",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/SelectValue.vue": {
+  "app/components/ui/select/SelectValue.vue": {
     "mtime": 1777251045.8513753,
-    "hash": "d5fe1b7a00e27104afb37a317736c14b"
+    "ast_hash": "d5fe1b7a00e27104afb37a317736c14b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/SelectLabel.vue": {
+  "app/components/ui/select/SelectLabel.vue": {
     "mtime": 1777251045.8130682,
-    "hash": "00d118766abac6f6369b4d48fe5fb90d"
+    "ast_hash": "00d118766abac6f6369b4d48fe5fb90d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/Select.vue": {
+  "app/components/ui/select/Select.vue": {
     "mtime": 1777251045.7585986,
-    "hash": "61e0bf2b7b2603f5e36fdca5ed92c52d"
+    "ast_hash": "61e0bf2b7b2603f5e36fdca5ed92c52d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/select/SelectItemText.vue": {
+  "app/components/ui/select/SelectItemText.vue": {
     "mtime": 1777251045.8060029,
-    "hash": "3c4f5e505131bd48f2f97faa68301c1d"
+    "ast_hash": "3c4f5e505131bd48f2f97faa68301c1d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/timeline/Timeline.vue": {
+  "app/components/ui/timeline/Timeline.vue": {
     "mtime": 1777617433.5373712,
-    "hash": "0f7fc02654c4c094b911bee4e759978d"
+    "ast_hash": "0f7fc02654c4c094b911bee4e759978d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/timeline/index.ts": {
+  "app/components/ui/timeline/index.ts": {
     "mtime": 1777538217.231645,
-    "hash": "9c4b7f07c91f23b12b0bffba4122ba26"
+    "ast_hash": "9c4b7f07c91f23b12b0bffba4122ba26",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/badge/Badge.vue": {
+  "app/components/ui/badge/Badge.vue": {
     "mtime": 1777174916.6261556,
-    "hash": "8a6fcc84cd9d9c7f01b31dd164980622"
+    "ast_hash": "8a6fcc84cd9d9c7f01b31dd164980622",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/badge/index.ts": {
+  "app/components/ui/badge/index.ts": {
     "mtime": 1777104590.9811685,
-    "hash": "865420db44ca42a86a4748b6df65523d"
+    "ast_hash": "865420db44ca42a86a4748b6df65523d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/data-table/DataTable.vue": {
+  "app/components/ui/data-table/DataTable.vue": {
     "mtime": 1777538217.2293277,
-    "hash": "a4b0506c1ee64ad03349ff49f75975e2"
+    "ast_hash": "a4b0506c1ee64ad03349ff49f75975e2",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/ui/data-table/index.ts": {
+  "app/components/ui/data-table/index.ts": {
     "mtime": 1777538217.229774,
-    "hash": "2da74cab99e4b840ad642ca50c85d8a8"
+    "ast_hash": "2da74cab99e4b840ad642ca50c85d8a8",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/YearlyActivityGrid.vue": {
+  "app/components/report/YearlyActivityGrid.vue": {
     "mtime": 1779874549.2077308,
-    "hash": "1f84742341526fa57477bcfdabb0cb53"
+    "ast_hash": "1f84742341526fa57477bcfdabb0cb53",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/JiraExportModal.vue": {
+  "app/components/report/JiraExportModal.vue": {
     "mtime": 1782732213.9831493,
-    "hash": "c6989c904bceb4ad0e673a3d11269ed1"
+    "ast_hash": "c6989c904bceb4ad0e673a3d11269ed1",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/DailyReportRow.vue": {
+  "app/components/report/DailyReportRow.vue": {
     "mtime": 1779684944.7972987,
-    "hash": "37670de8b5be96e0ba3b6c22e56a02b6"
+    "ast_hash": "37670de8b5be96e0ba3b6c22e56a02b6",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/YearlyReport.vue": {
+  "app/components/report/YearlyReport.vue": {
     "mtime": 1784615401.0597677,
-    "hash": "c63fa93a20d7c14bf57cba830cbecb80"
+    "ast_hash": "c63fa93a20d7c14bf57cba830cbecb80",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/MonthlyReport.vue": {
+  "app/components/report/MonthlyReport.vue": {
     "mtime": 1784615389.212113,
-    "hash": "afbdffcae8924a3ed19dd0d51e8e3fcc"
+    "ast_hash": "afbdffcae8924a3ed19dd0d51e8e3fcc",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/SyncConfirmModal.vue": {
+  "app/components/report/SyncConfirmModal.vue": {
     "mtime": 1782734216.2595034,
-    "hash": "a1dacf287bffc7836800009782d192ec"
+    "ast_hash": "a1dacf287bffc7836800009782d192ec",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/ActivityCalendar.vue": {
+  "app/components/report/ActivityCalendar.vue": {
     "mtime": 1779874549.204677,
-    "hash": "187bf724614235e0660d886acbc0dbb9"
+    "ast_hash": "187bf724614235e0660d886acbc0dbb9",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/DailyReport.vue": {
+  "app/components/report/DailyReport.vue": {
     "mtime": 1779874549.205402,
-    "hash": "3ff1b87eedf643756833ff25d56a97de"
+    "ast_hash": "3ff1b87eedf643756833ff25d56a97de",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/ManualActivityModal.vue": {
+  "app/components/report/ManualActivityModal.vue": {
     "mtime": 1779872068.8282106,
-    "hash": "a94cf70b8643950b6bd63b7b6bfcbbd0"
+    "ast_hash": "a94cf70b8643950b6bd63b7b6bfcbbd0",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/JiraChildTaskList.vue": {
+  "app/components/report/JiraChildTaskList.vue": {
     "mtime": 1779877570.036003,
-    "hash": "8bbfed4813c5566634c80711165d2117"
+    "ast_hash": "8bbfed4813c5566634c80711165d2117",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/SettingsModal.vue": {
+  "app/components/report/SettingsModal.vue": {
     "mtime": 1779874549.2074075,
-    "hash": "ff84f344c70b709cf533159308e56428"
+    "ast_hash": "ff84f344c70b709cf533159308e56428",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/components/report/MonthPicker.vue": {
+  "app/components/report/MonthPicker.vue": {
     "mtime": 1779684944.7979643,
-    "hash": "d95adc922f93f7d301f7a677764fa56b"
+    "ast_hash": "d95adc922f93f7d301f7a677764fa56b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/layouts/default.vue": {
+  "app/layouts/default.vue": {
     "mtime": 1779684944.8060684,
-    "hash": "f2262d7524bca07dab3ed69129aa89cb"
+    "ast_hash": "f2262d7524bca07dab3ed69129aa89cb",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/db/schema.ts": {
+  "app/db/schema.ts": {
     "mtime": 1779695444.900355,
-    "hash": "042d1f7fde0e9168ad7b1a6fc6ed12bf"
+    "ast_hash": "042d1f7fde0e9168ad7b1a6fc6ed12bf",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/db/index.ts": {
+  "app/db/index.ts": {
     "mtime": 1779690810.1039138,
-    "hash": "6be2e37d224ebd3cb4591062ef3812d3"
+    "ast_hash": "6be2e37d224ebd3cb4591062ef3812d3",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/app/pages/index.vue": {
+  "app/pages/index.vue": {
     "mtime": 1779874549.2087705,
-    "hash": "d33168283b49e781bad1125c39514f10"
+    "ast_hash": "d33168283b49e781bad1125c39514f10",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/tests/e2e/example.spec.ts": {
+  "tests/e2e/example.spec.ts": {
     "mtime": 1777538217.285186,
-    "hash": "5ecbd1de3bf255f5d3954af8ee8bf9cb"
+    "ast_hash": "5ecbd1de3bf255f5d3954af8ee8bf9cb",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/tests/e2e/tauri.mock.ts": {
+  "tests/e2e/tauri.mock.ts": {
     "mtime": 1777538217.28562,
-    "hash": "c66bae51dc306fe0ad9b3b7a6a1ea178"
+    "ast_hash": "c66bae51dc306fe0ad9b3b7a6a1ea178",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/build.rs": {
+  "src-tauri/build.rs": {
     "mtime": 1777538217.2455623,
-    "hash": "9e949d967099bcc42cfa6f8765a6c938"
+    "ast_hash": "9e949d967099bcc42cfa6f8765a6c938",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/src/lib.rs": {
+  "src-tauri/src/lib.rs": {
     "mtime": 1779872046.857229,
-    "hash": "9c1ea69ef62831be07a3e97f86bb92c4"
+    "ast_hash": "9c1ea69ef62831be07a3e97f86bb92c4",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/src/main.rs": {
+  "src-tauri/src/main.rs": {
     "mtime": 1777538217.2842371,
-    "hash": "744d17489cc4e580f67879b318b79029"
+    "ast_hash": "744d17489cc4e580f67879b318b79029",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/README.md": {
+  "README.md": {
     "mtime": 1777538217.2187536,
-    "hash": "71c09d5290ec8763da3802f5cb27192f"
+    "ast_hash": "71c09d5290ec8763da3802f5cb27192f",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/playwright-report/index.html": {
-    "mtime": 1777531974.0760508,
-    "hash": "f48f5aedca7fb84764caaa6a3081fecf"
-  },
-  "/Users/deanufriana/Project/brilife/presence/playwright-report/data/0eee7f00ea8de4d9441d6bda7e1eea33dc5a6948.md": {
-    "mtime": 1777531974.0687704,
-    "hash": "6b2bb4b5ca8dadd206f4093b59b6b145"
-  },
-  "/Users/deanufriana/Project/brilife/presence/playwright-report/data/4e93c4013c7a4ab4adecbbe6d6a422520d2ee503.md": {
-    "mtime": 1777531974.06718,
-    "hash": "a07815187f64acaddcaefbd7d014135c"
-  },
-  "/Users/deanufriana/Project/brilife/presence/playwright-report/data/1c2f33f335b53770f9382206b51c4c4693996454.md": {
-    "mtime": 1777531974.0678697,
-    "hash": "b0d388e028565235a5f66fbc485c7357"
-  },
-  "/Users/deanufriana/Project/brilife/presence/playwright-report/data/2e703078fe8e7b5ef4ae2226b5a747b54cb7e966.md": {
-    "mtime": 1777531974.0683162,
-    "hash": "0b959dc8f90b0ec4934b992ba4fd050b"
-  },
-  "/Users/deanufriana/Project/brilife/presence/playwright-report/data/e70aab54929c28a0252432ae3128b348a393c398.md": {
-    "mtime": 1777531974.0664177,
-    "hash": "ffd53c2164d5dd1c058d8ee0a765de12"
-  },
-  "/Users/deanufriana/Project/brilife/presence/test-results/daily-report-Daily-Report--62809-ize-button-if-AI-is-enabled-chromium/error-context.md": {
-    "mtime": 1777531949.2713661,
-    "hash": "6b2bb4b5ca8dadd206f4093b59b6b145"
-  },
-  "/Users/deanufriana/Project/brilife/presence/test-results/daily-report-Daily-Report--173f5-eport-title-and-description-chromium/error-context.md": {
-    "mtime": 1777531949.2711687,
-    "hash": "ffd53c2164d5dd1c058d8ee0a765de12"
-  },
-  "/Users/deanufriana/Project/brilife/presence/test-results/daily-report-Daily-Report--90c1b-mark-after-copying-activity-chromium/error-context.md": {
-    "mtime": 1777531973.9774997,
-    "hash": "0b959dc8f90b0ec4934b992ba4fd050b"
-  },
-  "/Users/deanufriana/Project/brilife/presence/test-results/daily-report-Daily-Report--7ba8c--activities-in-the-timeline-chromium/error-context.md": {
-    "mtime": 1777531954.264007,
-    "hash": "a07815187f64acaddcaefbd7d014135c"
-  },
-  "/Users/deanufriana/Project/brilife/presence/test-results/daily-report-Daily-Report--772df-en-clicking-Sync-Activities-chromium/error-context.md": {
-    "mtime": 1777531962.5720668,
-    "hash": "b0d388e028565235a5f66fbc485c7357"
-  },
-  "/Users/deanufriana/Project/brilife/presence/app-icon.png": {
+  "app-icon.png": {
     "mtime": 1777538217.2235706,
-    "hash": "421ce5bc7a5423bcd3ba710b9a39c1b8"
+    "ast_hash": "421ce5bc7a5423bcd3ba710b9a39c1b8",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/icon.png": {
+  "src-tauri/icons/icon.png": {
     "mtime": 1777538217.273315,
-    "hash": "2ce09779ce72cf6a00bf43c0094be7ca"
+    "ast_hash": "2ce09779ce72cf6a00bf43c0094be7ca",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/Square30x30Logo.png": {
+  "src-tauri/icons/Square30x30Logo.png": {
     "mtime": 1777538217.2501462,
-    "hash": "2ec7375a47391d43e3fb6af3cf4b9358"
+    "ast_hash": "2ec7375a47391d43e3fb6af3cf4b9358",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/Square150x150Logo.png": {
+  "src-tauri/icons/Square150x150Logo.png": {
     "mtime": 1777538217.2482672,
-    "hash": "2213200026d9c8126c7df6926dd5626f"
+    "ast_hash": "2213200026d9c8126c7df6926dd5626f",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/StoreLogo.png": {
+  "src-tauri/icons/StoreLogo.png": {
     "mtime": 1777538217.2542458,
-    "hash": "5371aec86625f171ecc5343a2e46fd46"
+    "ast_hash": "5371aec86625f171ecc5343a2e46fd46",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/Square107x107Logo.png": {
+  "src-tauri/icons/Square107x107Logo.png": {
     "mtime": 1777538217.2478828,
-    "hash": "4936c9796d374451ca8f219450af91c9"
+    "ast_hash": "4936c9796d374451ca8f219450af91c9",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/Square89x89Logo.png": {
+  "src-tauri/icons/Square89x89Logo.png": {
     "mtime": 1777538217.2539907,
-    "hash": "3896103af10f5196e5e2a431e6f31999"
+    "ast_hash": "3896103af10f5196e5e2a431e6f31999",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/Square310x310Logo.png": {
+  "src-tauri/icons/Square310x310Logo.png": {
     "mtime": 1777538217.2522533,
-    "hash": "36c9ed66edfdb4e2bfec074e82d0ca02"
+    "ast_hash": "36c9ed66edfdb4e2bfec074e82d0ca02",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/Square142x142Logo.png": {
+  "src-tauri/icons/Square142x142Logo.png": {
     "mtime": 1777538217.248056,
-    "hash": "30d106f28e0337bbe8aefd493f39e9d5"
+    "ast_hash": "30d106f28e0337bbe8aefd493f39e9d5",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/128x128.png": {
+  "src-tauri/icons/128x128.png": {
     "mtime": 1777538217.2465205,
-    "hash": "181c199bb1238bb1e20fa7fa44b46e70"
+    "ast_hash": "181c199bb1238bb1e20fa7fa44b46e70",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/Square284x284Logo.png": {
+  "src-tauri/icons/Square284x284Logo.png": {
     "mtime": 1777538217.249364,
-    "hash": "108901dfb458d2b8ae0ff300a0ca82ab"
+    "ast_hash": "108901dfb458d2b8ae0ff300a0ca82ab",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/32x32.png": {
+  "src-tauri/icons/32x32.png": {
     "mtime": 1777538217.2472258,
-    "hash": "c9de3e2d55800f6a8b6b6b6e90947565"
+    "ast_hash": "c9de3e2d55800f6a8b6b6b6e90947565",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/Square44x44Logo.png": {
+  "src-tauri/icons/Square44x44Logo.png": {
     "mtime": 1777538217.253069,
-    "hash": "a551c24507aa41635d169bc50e450e98"
+    "ast_hash": "a551c24507aa41635d169bc50e450e98",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/Square71x71Logo.png": {
+  "src-tauri/icons/Square71x71Logo.png": {
     "mtime": 1777538217.2535603,
-    "hash": "b5913bce939de887b9136921e94ca7ea"
+    "ast_hash": "b5913bce939de887b9136921e94ca7ea",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/128x128@2x.png": {
+  "src-tauri/icons/128x128@2x.png": {
     "mtime": 1777538217.2469537,
-    "hash": "7a90ddd5d4278be6a5604a1393332d43"
+    "ast_hash": "7a90ddd5d4278be6a5604a1393332d43",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/64x64.png": {
+  "src-tauri/icons/64x64.png": {
     "mtime": 1777538217.2475588,
-    "hash": "bc48c45c952b5ac1939908a48dbd15c4"
+    "ast_hash": "bc48c45c952b5ac1939908a48dbd15c4",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-20x20@3x.png": {
+  "src-tauri/icons/ios/AppIcon-20x20@3x.png": {
     "mtime": 1777538217.274408,
-    "hash": "d89d1a00309126ef4650b13e1b4a90e8"
+    "ast_hash": "d89d1a00309126ef4650b13e1b4a90e8",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-512@2x.png": {
+  "src-tauri/icons/ios/AppIcon-512@2x.png": {
     "mtime": 1777538217.2810402,
-    "hash": "01ed0e5d60557b75ebbfdff5d19446aa"
+    "ast_hash": "01ed0e5d60557b75ebbfdff5d19446aa",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-83.5x83.5@2x.png": {
+  "src-tauri/icons/ios/AppIcon-83.5x83.5@2x.png": {
     "mtime": 1777538217.283232,
-    "hash": "405c77c6a17162250c2e8f4f51238ed3"
+    "ast_hash": "405c77c6a17162250c2e8f4f51238ed3",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-20x20@2x.png": {
+  "src-tauri/icons/ios/AppIcon-20x20@2x.png": {
     "mtime": 1777538217.2740958,
-    "hash": "a15fe1ab8d26063bfb89a403dad494ad"
+    "ast_hash": "a15fe1ab8d26063bfb89a403dad494ad",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-29x29@3x.png": {
+  "src-tauri/icons/ios/AppIcon-29x29@3x.png": {
     "mtime": 1777538217.27573,
-    "hash": "163d6def5d741e9bb89f4a49dc66607d"
+    "ast_hash": "163d6def5d741e9bb89f4a49dc66607d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-40x40@2x.png": {
+  "src-tauri/icons/ios/AppIcon-40x40@2x.png": {
     "mtime": 1777538217.2766857,
-    "hash": "55faf621dcf253b6997e2fc0119adba3"
+    "ast_hash": "55faf621dcf253b6997e2fc0119adba3",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-60x60@3x.png": {
+  "src-tauri/icons/ios/AppIcon-60x60@3x.png": {
     "mtime": 1777538217.282132,
-    "hash": "e77be4a03c13481468d3bf66197d370d"
+    "ast_hash": "e77be4a03c13481468d3bf66197d370d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-40x40@2x-1.png": {
+  "src-tauri/icons/ios/AppIcon-40x40@2x-1.png": {
     "mtime": 1777538217.2763424,
-    "hash": "55faf621dcf253b6997e2fc0119adba3"
+    "ast_hash": "55faf621dcf253b6997e2fc0119adba3",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-20x20@2x-1.png": {
+  "src-tauri/icons/ios/AppIcon-20x20@2x-1.png": {
     "mtime": 1777538217.2739801,
-    "hash": "a15fe1ab8d26063bfb89a403dad494ad"
+    "ast_hash": "a15fe1ab8d26063bfb89a403dad494ad",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-60x60@2x.png": {
+  "src-tauri/icons/ios/AppIcon-60x60@2x.png": {
     "mtime": 1777538217.281507,
-    "hash": "b4e4c382e914a81a3167cb4831a5445b"
+    "ast_hash": "b4e4c382e914a81a3167cb4831a5445b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-76x76@1x.png": {
+  "src-tauri/icons/ios/AppIcon-76x76@1x.png": {
     "mtime": 1777538217.2824857,
-    "hash": "322264a89fb8ed3b6371961e2af0fa3d"
+    "ast_hash": "322264a89fb8ed3b6371961e2af0fa3d",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-40x40@3x.png": {
+  "src-tauri/icons/ios/AppIcon-40x40@3x.png": {
     "mtime": 1777538217.2770727,
-    "hash": "b4e4c382e914a81a3167cb4831a5445b"
+    "ast_hash": "b4e4c382e914a81a3167cb4831a5445b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-29x29@2x.png": {
+  "src-tauri/icons/ios/AppIcon-29x29@2x.png": {
     "mtime": 1777538217.2752318,
-    "hash": "831b280e87deb1c2f8dbe08faf0da262"
+    "ast_hash": "831b280e87deb1c2f8dbe08faf0da262",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-76x76@2x.png": {
+  "src-tauri/icons/ios/AppIcon-76x76@2x.png": {
     "mtime": 1777538217.282932,
-    "hash": "2f3a445a62066fee195dd4667fc66b83"
+    "ast_hash": "2f3a445a62066fee195dd4667fc66b83",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-29x29@1x.png": {
+  "src-tauri/icons/ios/AppIcon-29x29@1x.png": {
     "mtime": 1777538217.2745893,
-    "hash": "b61673fd21a179d067561dad1323a27c"
+    "ast_hash": "b61673fd21a179d067561dad1323a27c",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-40x40@1x.png": {
+  "src-tauri/icons/ios/AppIcon-40x40@1x.png": {
     "mtime": 1777538217.2758925,
-    "hash": "a15fe1ab8d26063bfb89a403dad494ad"
+    "ast_hash": "a15fe1ab8d26063bfb89a403dad494ad",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-20x20@1x.png": {
+  "src-tauri/icons/ios/AppIcon-20x20@1x.png": {
     "mtime": 1777538217.2736459,
-    "hash": "7764e3f63bca53d1d828802392e42058"
+    "ast_hash": "7764e3f63bca53d1d828802392e42058",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/ios/AppIcon-29x29@2x-1.png": {
+  "src-tauri/icons/ios/AppIcon-29x29@2x-1.png": {
     "mtime": 1777538217.2750602,
-    "hash": "831b280e87deb1c2f8dbe08faf0da262"
+    "ast_hash": "831b280e87deb1c2f8dbe08faf0da262",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-mdpi/ic_launcher_foreground.png": {
+  "src-tauri/icons/android/mipmap-mdpi/ic_launcher_foreground.png": {
     "mtime": 1777538217.25635,
-    "hash": "14e8cc84bc16ac6e34134e6d9e381f74"
+    "ast_hash": "14e8cc84bc16ac6e34134e6d9e381f74",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-mdpi/ic_launcher.png": {
+  "src-tauri/icons/android/mipmap-mdpi/ic_launcher.png": {
     "mtime": 1777538217.2560618,
-    "hash": "5f27f704e542245455a23b0d2846824b"
+    "ast_hash": "5f27f704e542245455a23b0d2846824b",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-mdpi/ic_launcher_round.png": {
+  "src-tauri/icons/android/mipmap-mdpi/ic_launcher_round.png": {
     "mtime": 1777538217.2564785,
-    "hash": "0022c08254ecfce2368ce9e1e9859d27"
+    "ast_hash": "0022c08254ecfce2368ce9e1e9859d27",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-hdpi/ic_launcher_foreground.png": {
+  "src-tauri/icons/android/mipmap-hdpi/ic_launcher_foreground.png": {
     "mtime": 1777538217.2551246,
-    "hash": "793254d33debe9fb5272fe2777e05fcb"
+    "ast_hash": "793254d33debe9fb5272fe2777e05fcb",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-hdpi/ic_launcher.png": {
+  "src-tauri/icons/android/mipmap-hdpi/ic_launcher.png": {
     "mtime": 1777538217.254953,
-    "hash": "2d01caffe77118f13f330bea23e0206f"
+    "ast_hash": "2d01caffe77118f13f330bea23e0206f",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-hdpi/ic_launcher_round.png": {
+  "src-tauri/icons/android/mipmap-hdpi/ic_launcher_round.png": {
     "mtime": 1777538217.2553904,
-    "hash": "1c53abf42c2651e7de15f60062d0af22"
+    "ast_hash": "1c53abf42c2651e7de15f60062d0af22",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher_foreground.png": {
+  "src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher_foreground.png": {
     "mtime": 1777538217.2624109,
-    "hash": "552a42a88816fe8e38689a9714546e16"
+    "ast_hash": "552a42a88816fe8e38689a9714546e16",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher.png": {
+  "src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher.png": {
     "mtime": 1777538217.2605724,
-    "hash": "5f76f9775f700033589c33bd5d0cabf9"
+    "ast_hash": "5f76f9775f700033589c33bd5d0cabf9",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher_round.png": {
+  "src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher_round.png": {
     "mtime": 1777538217.263152,
-    "hash": "07bb25e4a418b6783d134b6de1e0450f"
+    "ast_hash": "07bb25e4a418b6783d134b6de1e0450f",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-xxhdpi/ic_launcher_foreground.png": {
+  "src-tauri/icons/android/mipmap-xxhdpi/ic_launcher_foreground.png": {
     "mtime": 1777538217.2589312,
-    "hash": "8567f3240b217bdc16d585507e58f7ff"
+    "ast_hash": "8567f3240b217bdc16d585507e58f7ff",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-xxhdpi/ic_launcher.png": {
+  "src-tauri/icons/android/mipmap-xxhdpi/ic_launcher.png": {
     "mtime": 1777538217.2581754,
-    "hash": "2bb501c7f5b829a856f4434795158c2c"
+    "ast_hash": "2bb501c7f5b829a856f4434795158c2c",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-xxhdpi/ic_launcher_round.png": {
+  "src-tauri/icons/android/mipmap-xxhdpi/ic_launcher_round.png": {
     "mtime": 1777538217.2598226,
-    "hash": "bdebf01e14fe18f15f2fca1a313ac2ec"
+    "ast_hash": "bdebf01e14fe18f15f2fca1a313ac2ec",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-xhdpi/ic_launcher_foreground.png": {
+  "src-tauri/icons/android/mipmap-xhdpi/ic_launcher_foreground.png": {
     "mtime": 1777538217.2574728,
-    "hash": "bb21aaac92a9bd2a29de9a9535e80d01"
+    "ast_hash": "bb21aaac92a9bd2a29de9a9535e80d01",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-xhdpi/ic_launcher.png": {
+  "src-tauri/icons/android/mipmap-xhdpi/ic_launcher.png": {
     "mtime": 1777538217.256892,
-    "hash": "bcafd3e96b17059b19b0f0dd8bedd1ed"
+    "ast_hash": "bcafd3e96b17059b19b0f0dd8bedd1ed",
+    "semantic_hash": ""
   },
-  "/Users/deanufriana/Project/brilife/presence/src-tauri/icons/android/mipmap-xhdpi/ic_launcher_round.png": {
+  "src-tauri/icons/android/mipmap-xhdpi/ic_launcher_round.png": {
     "mtime": 1777538217.2579317,
-    "hash": "b62c6fe16cc93d4a9af7d8a5cb8f33de"
+    "ast_hash": "b62c6fe16cc93d4a9af7d8a5cb8f33de",
+    "semantic_hash": ""
+  },
+  ".husky/post-checkout": {
+    "mtime": 1779870092.4127235,
+    "ast_hash": "1d4ecd567958082f56f73b820e676b18",
+    "semantic_hash": ""
+  },
+  ".husky/post-commit": {
+    "mtime": 1779870092.4125462,
+    "ast_hash": "5ab17fd3c766ee17b5944457f1b3bc97",
+    "semantic_hash": ""
+  },
+  "components.json": {
+    "mtime": 1777119798.1394243,
+    "ast_hash": "e97176eb462f47dfe8a40232faef5124",
+    "semantic_hash": ""
+  },
+  "package.json": {
+    "mtime": 1782732145.0363352,
+    "ast_hash": "729843d5dff1f0e421e25ec15e292d58",
+    "semantic_hash": ""
+  },
+  "src-tauri/capabilities/default.json": {
+    "mtime": 1786002587.616327,
+    "ast_hash": "7adaa1e3372d955b8839a7ca55322f0d",
+    "semantic_hash": ""
+  },
+  "src-tauri/tauri.conf.json": {
+    "mtime": 1777538217.284647,
+    "ast_hash": "ee4b21a9bd67a66880fe36722b1e03c6",
+    "semantic_hash": ""
+  },
+  "tsconfig.json": {
+    "mtime": 1777371805.31576,
+    "ast_hash": "07807a46dbdf0707e8087ac313b83239",
+    "semantic_hash": ""
+  },
+  ".agents/rules/graphify.md": {
+    "mtime": 1779870359.9806387,
+    "ast_hash": "52ab4665f0ffed45d29883e2bdcbfa05",
+    "semantic_hash": ""
+  },
+  ".agents/rules/ui-composition.md": {
+    "mtime": 1779685021.559482,
+    "ast_hash": "af3d896321a732fd1585341832456156",
+    "semantic_hash": ""
+  },
+  ".agents/rules/ui-forms.md": {
+    "mtime": 1779685021.5811753,
+    "ast_hash": "6be5a50c550bf488e4fa4a80763e25d4",
+    "semantic_hash": ""
+  },
+  ".agents/rules/ui-icons.md": {
+    "mtime": 1779685021.5909376,
+    "ast_hash": "7af6afab5a8fc83e4e934d86c8a6f513",
+    "semantic_hash": ""
+  },
+  ".agents/rules/ui-styling.md": {
+    "mtime": 1779685021.6063323,
+    "ast_hash": "61d42cf082642954f81c4b44a08de213",
+    "semantic_hash": ""
+  },
+  ".agents/rules/ui.md": {
+    "mtime": 1779684944.7950635,
+    "ast_hash": "e10c193fd8a145fe4bdca73c09aac334",
+    "semantic_hash": ""
+  },
+  ".agents/skills/shadcn-vue/SKILL.md": {
+    "mtime": 1779685021.6535785,
+    "ast_hash": "862e4d3440c66a9b024a93c487dc0877",
+    "semantic_hash": ""
+  },
+  ".agents/skills/shadcn-vue/cli.md": {
+    "mtime": 1779685021.678402,
+    "ast_hash": "360714020b797d77b610032e9dc13925",
+    "semantic_hash": ""
+  },
+  ".agents/skills/shadcn-vue/customization.md": {
+    "mtime": 1779685021.7106814,
+    "ast_hash": "36dc1933a3378721ece34b3220f17bca",
+    "semantic_hash": ""
+  },
+  ".agents/skills/shadcn-vue/mcp.md": {
+    "mtime": 1779685021.7184505,
+    "ast_hash": "80e85ca1eb634bece8f8b0fceda1d7e6",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/graphify.md": {
+    "mtime": 1779870080.6528363,
+    "ast_hash": "afa1ffc01aa56ac681c7335686f44767",
+    "semantic_hash": ""
+  },
+  ".github/workflows/build.yml": {
+    "mtime": 1777622504.5484402,
+    "ast_hash": "40e064d8e5364df24c042e0813747549",
+    "semantic_hash": ""
   }
 }

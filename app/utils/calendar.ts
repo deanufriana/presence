@@ -37,18 +37,25 @@ export async function fetchHolidays(year: string, month: number) {
 
   const { fetch } = await import('@tauri-apps/plugin-http')
   try {
-    const response = await fetch(`https://libur.deno.dev/api?year=${year}&month=${month}`)
+    const response = await fetch(
+      `https://tanggalmerah.upset.dev/api/holidays?year=${year}&month=${month}`,
+    )
     if (response.ok) {
-      const data = (await response.json()) as {
-        date: string
-        name: string
-      }[]
-      for (const h of data) {
-        await upsertHoliday({
-          holiday_date: h.date,
-          holiday_name: h.name,
-          is_holiday: true,
-        })
+      const result = (await response.json()) as {
+        success: boolean
+        data?: {
+          date: string
+          name: string
+        }[]
+      }
+      if (result.success && Array.isArray(result.data)) {
+        for (const h of result.data) {
+          await upsertHoliday({
+            holiday_date: h.date,
+            holiday_name: h.name,
+            is_holiday: true,
+          })
+        }
       }
     }
   } catch (err) {
