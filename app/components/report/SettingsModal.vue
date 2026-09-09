@@ -328,11 +328,13 @@
                 <SelectContent>
                   <SelectGroup>
                     <template v-if="settings.ai_provider === 'gemini'">
+                      <SelectItem value="gemini-2.0-flash-lite">
+                        Gemini 2.0 Flash Lite (Free & Fast)
+                      </SelectItem>
+                      <SelectItem value="gemini-2.5-flash-lite"> Gemini 2.5 Flash Lite </SelectItem>
                       <SelectItem value="gemini-3.1-flash-lite-preview">
                         Gemini 3.1 Flash Lite Preview
                       </SelectItem>
-                      <SelectItem value="gemini-2.5-flash-lite"> Gemini 2.5 Flash Lite </SelectItem>
-                      <SelectItem value="gemini-2.0-flash-lite"> Gemini 2.0 Flash Lite </SelectItem>
                       <SelectItem value="gemini-1.5-flash"> Gemini 1.5 Flash </SelectItem>
                       <SelectItem value="gemini-1.5-pro"> Gemini 1.5 Pro </SelectItem>
                     </template>
@@ -342,10 +344,10 @@
                       <SelectItem value="gpt-3.5-turbo"> GPT-3.5 Turbo </SelectItem>
                     </template>
                     <template v-else-if="settings.ai_provider === 'deepseek'">
-                      <SelectItem value="deepseek-chat"> DeepSeek Chat </SelectItem>
-                      <SelectItem value="deepseek-reasoner"> DeepSeek Reasoner </SelectItem>
-                      <SelectItem value="deepseek-v4-flash"> DeepSeek v4 Flash </SelectItem>
+                      <SelectItem value="deepseek-v4-flash"> DeepSeek v4 Flash (Fast) </SelectItem>
                       <SelectItem value="deepseek-v4-pro"> DeepSeek v4 Pro </SelectItem>
+                      <SelectItem value="deepseek-chat"> DeepSeek Chat (V3) </SelectItem>
+                      <SelectItem value="deepseek-reasoner"> DeepSeek Reasoner (R1) </SelectItem>
                     </template>
 
                     <template v-else-if="settings.ai_provider === 'ollama'">
@@ -362,14 +364,26 @@
             </Field>
 
             <Field v-if="settings.ai_provider === 'gemini'">
-              <FieldLabel class="text-xs">Gemini API Key</FieldLabel>
+              <div class="flex items-center justify-between">
+                <FieldLabel class="text-xs">Gemini API Key</FieldLabel>
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  class="text-[10px] text-violet-500 hover:underline inline-flex items-center gap-1"
+                >
+                  Get Free Key (aistudio.google.com)
+                  <ExternalLink class="size-2.5" />
+                </a>
+              </div>
               <Input
                 v-model="settings.gemini_api_key"
                 type="password"
                 placeholder="Enter your Google AI API Key"
                 class="h-9 text-sm"
               />
-              <FieldDescription> Google's high-speed AI for text processing. </FieldDescription>
+              <FieldDescription>
+                100% free tier (15 RPM / 1,500 RPD) with Google AI Studio.
+              </FieldDescription>
             </Field>
 
             <Field v-else-if="settings.ai_provider === 'openai'">
@@ -432,7 +446,17 @@
 </template>
 
 <script setup lang="ts">
-import { Settings, RefreshCw, GitMerge, Sparkles, User, FileText, Trello, X } from 'lucide-vue-next'
+import {
+  Settings,
+  RefreshCw,
+  GitMerge,
+  Sparkles,
+  User,
+  FileText,
+  Trello,
+  X,
+  ExternalLink,
+} from 'lucide-vue-next'
 import { Button } from '~/components/ui/button'
 import { Badge } from '~/components/ui/badge'
 import {

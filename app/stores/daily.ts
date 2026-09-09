@@ -150,7 +150,7 @@ export const useDailyStore = defineStore('daily', () => {
         console.log(`Summarization aborted for ${row.date}`)
       } else {
         console.error('Failed to summarize row:', err)
-        error('Failed to generate summary')
+        error('Failed to generate summary', err)
       }
     } finally {
       summarizingRows.value[row.date] = false
@@ -334,12 +334,137 @@ export const useDailyStore = defineStore('daily', () => {
       const { upsertDailyReport } = await import('~/utils/reports')
       const rows = Array.isArray(data) ? data : [data]
       for (const row of rows) {
-        await upsertDailyReport({ date: row.date, activities: [row.aktivitas] })
+        const activities = row.aktivitas
+          ? row.aktivitas
+              .split('\n')
+              .map((a) => a.trim())
+              .filter(Boolean)
+          : []
+        const report = await upsertDailyReport({
+          date: row.date,
+          activities,
+          masuk: row.masuk || undefined,
+          pulang: row.pulang || undefined,
+        })
+        const idx = dailyTable.value.findIndex((r) => r.date === row.date)
+        const existingRow = dailyTable.value[idx]
+        if (existingRow) {
+          existingRow.aktivitas = report?.aktivitas || ''
+          if (report?.masuk) existingRow.masuk = report.masuk
+          if (report?.pulang) existingRow.pulang = report.pulang
+        } else if (report) {
+          dailyTable.value.push({
+            date: report.date,
+            masuk: report.masuk || '',
+            pulang: report.pulang || '',
+            ti: report.ti || '',
+            aktivitas: report.aktivitas || '',
+          })
+          dailyTable.value.sort((a, b) => a.date.localeCompare(b.date))
+        }
       }
     } catch {
       console.error('Failed to update row(s)')
       error('Failed to save changes')
     }
+  }
+
+  const moveActivity = async (sourceDate: string, targetDate: string, activityText: string) => {
+    if (!sourceDate || !targetDate || sourceDate === targetDate) return
+
+    const sourceRow = dailyTable.value.find((r) => r.date === sourceDate)
+    const targetRow = dailyTable.value.find((r) => r.date === targetDate)
+    if (!sourceRow) return
+
+    const cleanText = activityText.trim()
+    const stripBullet = (s: string) => s.replace(/^[-*•]\s*/, '').trim()
+
+    const rawSourceLines = (sourceRow.aktivitas || '')
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean)
+
+    const removeIdx = rawSourceLines.findIndex(
+      (line) => line === cleanText || stripBullet(line) === stripBullet(cleanText),
+    )
+    if (removeIdx !== -1) {
+      rawSourceLines.splice(removeIdx, 1)
+    }
+
+    const rawTargetLines = (targetRow?.aktivitas || '')
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean)
+
+    rawTargetLines.push(cleanText)
+
+    await updateRow([
+      {
+        ...sourceRow,
+        aktivitas: rawSourceLines.join('\n'),
+      },
+      {
+        date: targetDate,
+        masuk: targetRow?.masuk || '',
+        pulang: targetRow?.pulang || '',
+        ti: targetRow?.ti || '',
+        aktivitas: rawTargetLines.join('\n'),
+      },
+    ])
+    success(`Moved activity to ${targetDate}`)
+  }
+
+  const applyActivityMoves = async (moves: import('~/utils/balance').ActivityMoveProposal[]) => {
+    if (!moves.length) return
+
+    const dateActivitiesMap = new Map<string, string[]>()
+    for (const row of dailyTable.value) {
+      const lines = (row.aktivitas || '')
+        .split('\n')
+        .map((s) => s.trim())
+        .filter(Boolean)
+      dateActivitiesMap.set(row.date, lines)
+    }
+
+    const stripBullet = (s: string) => s.replace(/^[-*•]\s*/, '').trim()
+
+    for (const move of moves) {
+      const sourceLines = dateActivitiesMap.get(move.sourceDate) || []
+      const removeIdx = sourceLines.findIndex(
+        (line) =>
+          line === move.activityText.trim() || stripBullet(line) === stripBullet(move.activityText),
+      )
+      if (removeIdx !== -1) {
+        sourceLines.splice(removeIdx, 1)
+      }
+      dateActivitiesMap.set(move.sourceDate, sourceLines)
+
+      const targetLines = dateActivitiesMap.get(move.targetDate) || []
+      targetLines.push(move.activityText.trim())
+      dateActivitiesMap.set(move.targetDate, targetLines)
+    }
+
+    const affectedDates = new Set<string>()
+    for (const move of moves) {
+      affectedDates.add(move.sourceDate)
+      affectedDates.add(move.targetDate)
+    }
+
+    const rowsToUpdate: ReportRow[] = []
+    for (const date of affectedDates) {
+      const existing = dailyTable.value.find((r) => r.date === date)
+      const lines = dateActivitiesMap.get(date) || []
+      rowsToUpdate.push({
+        date,
+        masuk: existing?.masuk || '',
+        pulang: existing?.pulang || '',
+        ti: existing?.ti || '',
+        aktivitas: lines.join('\n'),
+      })
+    }
+
+    await updateRow(rowsToUpdate)
+    success(`Balanced ${moves.length} activities successfully!`)
   }
 
   return {
@@ -367,5 +492,7 @@ export const useDailyStore = defineStore('daily', () => {
     saveManualActivity,
     syncDayActivity,
     updateRow,
+    moveActivity,
+    applyActivityMoves,
   }
 })

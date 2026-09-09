@@ -7,6 +7,7 @@ export interface ToastProps {
   variant?: 'default' | 'destructive' | 'success' | 'info' | 'loading'
   duration?: number
   open?: boolean
+  copyable?: boolean
 }
 
 const toasts = ref<ToastProps[]>([])
@@ -61,8 +62,31 @@ export function useToast() {
     dismiss,
     success: (title: string, options?: Partial<ToastProps>) =>
       toast({ title, variant: 'success', ...options }),
-    error: (title: string, options?: Partial<ToastProps>) =>
-      toast({ title, variant: 'destructive', ...options }),
+    error: (title: string, optionsOrError?: Partial<ToastProps> | string | unknown) => {
+      let opts: Partial<ToastProps> = {}
+      if (typeof optionsOrError === 'string') {
+        opts = { description: optionsOrError }
+      } else if (optionsOrError instanceof Error) {
+        opts = { description: optionsOrError.message }
+      } else if (optionsOrError && typeof optionsOrError === 'object') {
+        const anyObj = optionsOrError as Record<string, unknown>
+        if (
+          'message' in anyObj &&
+          typeof anyObj.message === 'string' &&
+          !('description' in anyObj)
+        ) {
+          opts = { description: anyObj.message, ...anyObj }
+        } else {
+          opts = anyObj as Partial<ToastProps>
+        }
+      }
+      return toast({
+        title,
+        variant: 'destructive',
+        duration: 9000,
+        ...opts,
+      })
+    },
     info: (title: string, options?: Partial<ToastProps>) =>
       toast({ title, variant: 'info', ...options }),
     loading: (title: string, options?: Partial<ToastProps>) =>

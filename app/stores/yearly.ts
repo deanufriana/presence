@@ -88,7 +88,10 @@ export const useYearlyStore = defineStore('yearly', () => {
       }
     } catch (err: unknown) {
       console.error('Failed to generate AI summary:', err)
-      error('AI service error', { id: loadingToastId })
+      error('AI service error', {
+        id: loadingToastId,
+        description: (err as Error)?.message || String(err),
+      })
     } finally {
       summarizing.value = false
     }

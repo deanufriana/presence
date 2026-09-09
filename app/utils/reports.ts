@@ -34,13 +34,13 @@ export async function upsertDailyReport(data: {
   const masuk = data.masuk || existing?.masuk || getRandomTime('07:30', '08:00')
   const pulang = data.pulang || existing?.pulang || getRandomTime('17:00', '17:30')
 
+  const cleanedActivities = (data.activities || []).map((a) => a.trim()).filter(Boolean)
+
   const result = {
     masuk,
     pulang,
     ti: 'TI',
-    aktivitas: data.activities
-      .map((a) => (a.trim().startsWith('-') ? a.trim() : `- ${a.trim()}`))
-      .join('\n'),
+    aktivitas: cleanedActivities.map((a) => (a.startsWith('-') ? a : `- ${a}`)).join('\n'),
   }
 
   return await dbUpsertDailyReport(data.date, result)
@@ -150,35 +150,76 @@ function getRandomTime(start = '07:30', end = '17:30') {
 export function parseMonthlyMarkdown(markdown: string) {
   const lines = markdown.split('\n')
   const rows: MonthlyReportRow[] = []
-  let currentProject = ''
+  let currentProject = 'General'
 
   for (const line of lines) {
     const trimmed = line.trim()
     if (!trimmed) continue
 
-    const projectMatch = trimmed.match(/^\*\*([^*]+)\*\*$/)
-    if (projectMatch && projectMatch[1]) {
-      currentProject = projectMatch[1].trim()
-      continue
+    // Check if line is a bullet item
+    const isBullet = /^[-*•]\s+/.test(trimmed) || /^\d+[.)]\s+/.test(trimmed)
+
+    if (!isBullet) {
+      // Check for project title header (e.g., **Project Name**, ### Project Name, ### **Project Name**, etc.)
+      const headerMatch = trimmed.match(/^(?:#{1,4}\s*)?(?:\d+[.)]\s*)?\*{0,2}([^*#:]+?)\*{0,2}:?$/)
+      if (headerMatch && headerMatch[1]) {
+        const candidate = headerMatch[1].trim()
+        if (candidate && !candidate.startsWith('---') && !candidate.startsWith('===')) {
+          currentProject = candidate
+          continue
+        }
+      }
     }
 
-    const bulletMatch = trimmed.match(
-      /^[-*]\s*\[([^\]]+)\]\s*(.+?)(?:\s*\[Status:\s*([^\]]+)\])?\.?$/i,
-    )
-    if (bulletMatch && bulletMatch[1] && bulletMatch[2]) {
-      const sourceStr = bulletMatch[1].trim()
-      const description = bulletMatch[2].trim()
-      const status = bulletMatch[3]?.trim() || 'Project'
-      const sources = sourceStr.split(',').map((s: string) => s.trim())
+    if (isBullet) {
+      // Strip bullet prefix (- , * , 1. , etc.)
+      const rawContent = trimmed
+        .replace(/^[-*•]\s+/, '')
+        .replace(/^\d+[.)]\s+/, '')
+        .trim()
+      if (!rawContent) continue
 
-      rows.push({
-        month: '',
-        project: `[${currentProject}] ${description}`,
-        progres: '100%',
-        done: 'Done',
-        status,
-        sources,
-      })
+      let sources: string[] = []
+      let description = rawContent
+      let status = 'Project'
+      let itemProject = currentProject
+
+      // 1. Extract [Status: ...] from end if present
+      const statusMatch = description.match(/\s*\[Status:\s*([^\]]+)\]\.?$/i)
+      if (statusMatch && statusMatch[1]) {
+        status = statusMatch[1].trim()
+        description = description.replace(statusMatch[0], '').trim()
+      }
+
+      // 2. Extract leading bracket tags: [2024-04-01, 2024-04-02] or [Project: Foo]
+      const leadingTagMatch = description.match(/^\[([^\]]+)\]\s*(.*)$/)
+      if (leadingTagMatch && leadingTagMatch[1] && leadingTagMatch[2]) {
+        const tagContent = leadingTagMatch[1].trim()
+        description = leadingTagMatch[2].trim()
+
+        if (tagContent.toLowerCase().startsWith('project:')) {
+          itemProject = tagContent.replace(/^project:\s*/i, '').trim() || itemProject
+        } else {
+          sources = tagContent
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+        }
+      }
+
+      // Strip any leftover trailing period
+      description = description.replace(/\.+$/, '').trim()
+
+      if (description) {
+        rows.push({
+          month: '',
+          project: itemProject ? `[${itemProject}] ${description}` : description,
+          progres: '100%',
+          done: 'Done',
+          status,
+          sources,
+        })
+      }
     }
   }
 

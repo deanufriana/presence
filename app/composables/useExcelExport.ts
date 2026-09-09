@@ -5,6 +5,7 @@ import { id as idLocale } from 'date-fns/locale'
 import { useCalendarStore } from '~/stores/calendar'
 import type { MonthlyReportRow, ReportRow } from '~/types/report'
 import type { SettingsData } from '~/types/settings'
+import { calculateMandaysAllocation } from '~/utils/mandays'
 
 export function useExcelExport() {
   const exporting = ref(false)
@@ -316,46 +317,7 @@ export function useExcelExport() {
       })
 
       // Calculate Mandays Distribution per Task based on active date sources & total working days in month
-      const rowCount = monthlyRows.length
-
-      // Weight each task by the number of unique activity dates recorded for it
-      const taskWeights = monthlyRows.map((row) => {
-        if (row.sources && row.sources.length > 0) {
-          return row.sources.length
-        }
-        return 1
-      })
-      const totalWeight = taskWeights.reduce((acc, w) => acc + w, 0)
-
-      let allocatedMDs: number[] = []
-      if (rowCount > 0 && totalWeight > 0) {
-        let currentSum = 0
-        allocatedMDs = taskWeights.map((w) => {
-          const md = Math.round((w / totalWeight) * totalMandaysMonth)
-          currentSum += md
-          return md
-        })
-
-        // Adjust rounding residual so SUM(allocatedMDs) strictly equals totalMandaysMonth
-        let diff = totalMandaysMonth - currentSum
-        let i = 0
-        while (diff !== 0 && rowCount > 0) {
-          const idx = i % rowCount
-          const val = allocatedMDs[idx] ?? 0
-          if (diff > 0) {
-            allocatedMDs[idx] = val + 1
-            diff--
-          } else if (val > 1) {
-            allocatedMDs[idx] = val - 1
-            diff++
-          }
-          i++
-        }
-      } else {
-        const baseMD = rowCount > 0 ? Math.floor(totalMandaysMonth / rowCount) : 0
-        const rem = rowCount > 0 ? totalMandaysMonth % rowCount : 0
-        allocatedMDs = monthlyRows.map((_, idx) => (idx < rem ? baseMD + 1 : baseMD))
-      }
+      const allocatedMDs = calculateMandaysAllocation(monthlyRows, totalMandaysMonth)
 
       // Data Rows (Row 8+)
       monthlyRows.forEach((row, idx) => {
@@ -488,6 +450,7 @@ export function useExcelExport() {
   return {
     exportToExcel,
     exportBASTToExcel,
+    getWorkingDaysCount,
     exporting,
   }
 }

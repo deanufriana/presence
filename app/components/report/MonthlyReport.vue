@@ -80,6 +80,54 @@
           <X />
         </Button>
       </Alert>
+
+      <!-- BAST Readiness & Mandays Summary Banner -->
+      <div
+        v-if="monthlyRows.length > 0"
+        class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 pt-3 border-t border-border/40"
+      >
+        <div class="p-2.5 rounded-xl bg-muted/30 border border-border/40 text-center">
+          <div class="text-sm font-black tabular-nums text-foreground">
+            {{ totalWorkingDays }} MD
+          </div>
+          <div class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+            Target Mandays
+          </div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
+          <div class="text-sm font-black tabular-nums text-emerald-600 dark:text-emerald-400">
+            {{ totalAllocatedMD }} MD
+          </div>
+          <div
+            class="text-[10px] font-bold uppercase tracking-wider text-emerald-600/70 dark:text-emerald-400/70"
+          >
+            Allocated ({{ Math.round((totalAllocatedMD / (totalWorkingDays || 1)) * 100) }}%)
+          </div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-center">
+          <div class="text-sm font-black tabular-nums text-indigo-600 dark:text-indigo-400">
+            {{ monthlyRows.length }}
+          </div>
+          <div
+            class="text-[10px] font-bold uppercase tracking-wider text-indigo-600/70 dark:text-indigo-400/70"
+          >
+            BAST Tasks
+          </div>
+        </div>
+        <div
+          class="p-2.5 rounded-xl bg-violet-500/10 border border-violet-500/20 text-center flex flex-col justify-center"
+        >
+          <div class="text-xs font-bold text-violet-600 dark:text-violet-400 truncate">
+            {{ statusCounts.project }} Proj / {{ statusCounts.enhance }} Enh /
+            {{ statusCounts.continuing }} BAU
+          </div>
+          <div
+            class="text-[10px] font-bold uppercase tracking-wider text-violet-600/70 dark:text-violet-400/70"
+          >
+            Classification
+          </div>
+        </div>
+      </div>
     </CardHeader>
     <CardContent class="p-0">
       <Timeline
@@ -129,36 +177,48 @@
                 </Button>
               </div>
 
-              <!-- Sources Badge -->
-              <div v-if="row.sources && row.sources.length" class="absolute right-2 bottom-2 z-20">
-                <TooltipProvider :delay-duration="100">
-                  <Tooltip>
-                    <TooltipTrigger as-child>
-                      <Badge
-                        variant="secondary"
-                        class="h-6 px-2 flex items-center gap-1.5 text-[9px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20 cursor-help rounded-full"
-                      >
-                        <CalendarDays class="size-3" />
-                        {{ row.sources.length }} sources
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent side="left" class="p-3 text-[10px] max-w-[240px]">
-                      <p class="font-bold mb-2 flex items-center gap-1.5 text-indigo-500">
-                        <Sparkles class="size-3" />
-                        Summarized from:
-                      </p>
-                      <div class="flex flex-wrap gap-1.5">
-                        <span
-                          v-for="date in row.sources"
-                          :key="date"
-                          class="px-1.5 py-0.5 rounded bg-muted/50 border border-border/50 font-medium"
+              <!-- Badges Container -->
+              <div class="absolute right-2 bottom-2 z-20 flex items-center gap-1.5">
+                <!-- Mandays Badge -->
+                <Badge
+                  variant="outline"
+                  class="h-6 px-2 text-[10px] font-black border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 rounded-full cursor-help"
+                  title="Estimated Mandays (MD) for BAST"
+                >
+                  {{ allocatedMDs[index] || 0 }} MD
+                </Badge>
+
+                <!-- Sources Badge -->
+                <div v-if="row.sources && row.sources.length">
+                  <TooltipProvider :delay-duration="100">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <Badge
+                          variant="secondary"
+                          class="h-6 px-2 flex items-center gap-1.5 text-[9px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20 cursor-help rounded-full"
                         >
-                          {{ date }}
-                        </span>
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                          <CalendarDays class="size-3" />
+                          {{ row.sources.length }} dates
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" class="p-3 text-[10px] max-w-[240px]">
+                        <p class="font-bold mb-2 flex items-center gap-1.5 text-indigo-500">
+                          <Sparkles class="size-3" />
+                          Attributed Dates:
+                        </p>
+                        <div class="flex flex-wrap gap-1.5">
+                          <span
+                            v-for="date in row.sources"
+                            :key="date"
+                            class="px-1.5 py-0.5 rounded bg-muted/50 border border-border/50 font-medium"
+                          >
+                            {{ date }}
+                          </span>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
             </div>
 
@@ -278,6 +338,7 @@ import { useMonthlyStore } from '~/stores/monthly'
 import { useDailyStore } from '~/stores/daily'
 import { useJiraStore } from '~/stores/jira'
 import type { MonthlyReportRow } from '~/types/report'
+import { calculateMandaysAllocation } from '~/utils/mandays'
 
 const coreStore = useCoreStore()
 const monthlyStore = useMonthlyStore()
@@ -294,8 +355,36 @@ const { dailyTable } = storeToRefs(dailyStore)
 
 const { generateAiSummary, addMonthlyRow, removeMonthlyRow, fetchMonthlyReport } = monthlyStore
 const { exportTaskJob, exportingDocx } = useDocxExport()
-const { exportBASTToExcel, exporting: exportingExcel } = useExcelExport()
+const { exportBASTToExcel, getWorkingDaysCount, exporting: exportingExcel } = useExcelExport()
 const { success, error } = useToast()
+
+const totalWorkingDays = computed(() => {
+  const [yearStr, monthStr] = selectedDate.value.split('-')
+  const y = parseInt(yearStr || '0', 10)
+  const m = parseInt(monthStr || '0', 10) - 1
+  return getWorkingDaysCount(y, m)
+})
+
+const allocatedMDs = computed(() => {
+  return calculateMandaysAllocation(monthlyRows.value, totalWorkingDays.value)
+})
+
+const totalAllocatedMD = computed(() => {
+  return allocatedMDs.value.reduce((acc, val) => acc + val, 0)
+})
+
+const statusCounts = computed(() => {
+  let project = 0
+  let enhance = 0
+  let continuing = 0
+  for (const r of monthlyRows.value) {
+    const s = (r.status || '').toLowerCase()
+    if (s.includes('enhance')) enhance++
+    else if (s.includes('continuing') || s.includes('daily')) continuing++
+    else project++
+  }
+  return { project, enhance, continuing }
+})
 
 const handleDocxExport = async () => {
   try {

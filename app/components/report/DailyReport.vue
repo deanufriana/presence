@@ -11,7 +11,27 @@
           </CardTitle>
           <CardDescription class="mt-1">Daily attendance and activity log</CardDescription>
         </div>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="xs"
+            title="Jump to today's date in timeline"
+            @click="scrollToToday(true)"
+          >
+            <LocateFixed data-icon="inline-start" />
+            <span class="hidden sm:inline">Today</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="xs"
+            title="Auto-balance activities across workdays (max +/- 2 days)"
+            @click="showBalanceModal = true"
+          >
+            <Scale data-icon="inline-start" />
+            <span class="hidden sm:inline">Balance Days</span>
+          </Button>
+
           <Button variant="gradient" size="xs" :disabled="syncing" @click="confirmSync()">
             <RefreshCw :class="{ 'animate-spin': syncing }" data-icon="inline-start" />
             <span class="hidden sm:inline">Sync Activities</span>
@@ -57,12 +77,60 @@
             <span class="text-xl font-black tabular-nums tracking-tighter mt-1 leading-none">
               {{ row.dayNum }}
             </span>
+
+            <!-- Day Quota Indicator Pill -->
+            <div class="mt-2 flex sm:justify-end">
+              <!-- Workday: 0 activities -->
+              <span
+                v-if="row.isWorkday && row.activityCount === 0"
+                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 whitespace-nowrap select-none"
+                title="Workday with 0 activities (Target: ≥3 tasks for BAST)"
+              >
+                <AlertCircle class="size-2.5 shrink-0" />
+                0 / 3
+              </span>
+              <!-- Workday: 1 or 2 activities (Under-quota) -->
+              <span
+                v-else-if="row.isWorkday && row.activityCount < 3"
+                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 whitespace-nowrap select-none"
+                title="Under BAST quota (Target: ≥3 tasks)"
+              >
+                <span class="size-1.5 rounded-full bg-amber-500 shrink-0" />
+                {{ row.activityCount }} / 3
+              </span>
+              <!-- Workday: 5+ activities (High density / potential donor) -->
+              <span
+                v-else-if="row.isWorkday && row.activityCount >= 5"
+                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20 whitespace-nowrap select-none"
+                title="High density (Donor candidate for Balance Days)"
+              >
+                <Check class="size-2.5 stroke-[3] shrink-0" />
+                {{ row.activityCount }} tasks
+              </span>
+              <!-- Workday: 3-4 activities (Optimal quota met) -->
+              <span
+                v-else-if="row.isWorkday"
+                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 whitespace-nowrap select-none"
+                title="Meets BAST daily target"
+              >
+                <Check class="size-2.5 stroke-[3] shrink-0" />
+                {{ row.activityCount }} tasks
+              </span>
+              <!-- Weekend/Holiday with activities -->
+              <span
+                v-else-if="row.activityCount > 0"
+                class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground border border-border/40 whitespace-nowrap select-none"
+                title="Weekend/Holiday Activities"
+              >
+                {{ row.activityCount }} tasks
+              </span>
+            </div>
           </div>
         </template>
 
         <template #metadata="{ item: row }">
           <!-- Attendance Times (Desktop) -->
-          <div class="hidden sm:flex flex-col items-end gap-1.5 mt-4">
+          <div class="hidden sm:flex flex-col items-end gap-1.5 mt-2">
             <div
               v-if="row.masuk"
               class="flex items-center gap-1.5 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20"
@@ -106,6 +174,13 @@
             class="absolute -top-3 left-4 px-2 py-0.5 rounded-md bg-red-500 text-[10px] font-bold text-white shadow-lg z-20"
           >
             {{ row.holidayName }}
+          </div>
+          <div
+            v-else-if="row.isToday"
+            class="absolute -top-3 left-4 px-2 py-0.5 rounded-md bg-gradient-to-r from-violet-600 to-indigo-600 text-[10px] font-bold text-white shadow-lg shadow-violet-500/25 z-20 flex items-center gap-1 select-none"
+          >
+            <span class="size-1.5 rounded-full bg-white animate-ping" />
+            Hari Ini
           </div>
         </template>
 
@@ -185,6 +260,7 @@
       </Timeline>
     </CardContent>
     <SyncConfirmModal v-if="showConfirmSync" v-model="showConfirmSync" @confirm="executeSync" />
+    <BalanceActivitiesModal v-if="showBalanceModal" v-model="showBalanceModal" />
   </Card>
 </template>
 
@@ -206,6 +282,9 @@ import {
   Pencil,
   Clock,
   Zap,
+  Scale,
+  LocateFixed,
+  AlertCircle,
 } from 'lucide-vue-next'
 import { useExcelExport } from '~/composables/useExcelExport'
 import { Button } from '~/components/ui/button'
@@ -217,6 +296,10 @@ import DailyReportRow from '~/components/report/DailyReportRow.vue'
 const SyncConfirmModal = defineAsyncComponent(
   () => import('~/components/report/SyncConfirmModal.vue'),
 )
+const BalanceActivitiesModal = defineAsyncComponent(
+  () => import('~/components/report/BalanceActivitiesModal.vue'),
+)
+const showBalanceModal = ref(false)
 
 const coreStore = useCoreStore()
 const dailyStore = useDailyStore()
@@ -255,23 +338,45 @@ type OptimizedReportRow = ReportRow & {
   isWeekend: boolean
   holidayName: string | undefined
   isHoliday: boolean
+  isWorkday: boolean
+  isToday: boolean
+  activityCount: number
 }
+
+const todayDateStr = format(new Date(), 'yyyy-MM-dd')
+const currentMonthStr = format(new Date(), 'yyyy-MM')
 
 const optimizedRows = computed<OptimizedReportRow[]>(() => {
   return dailyTable.value.map((row: ReportRow) => {
     const dateObj = parseISO(row.date)
+    const isWknd = isWeekend(dateObj)
+    const holName = getHolidayName(row.date)
+    const isHol = isHoliday(row.date)
+    const activityCount = row.aktivitas
+      ? row.aktivitas
+          .split('\n')
+          .map((s) => s.trim())
+          .filter(Boolean).length
+      : 0
+
     return {
       ...row,
       dayName: format(dateObj, 'EEE'),
       dayNum: format(dateObj, 'dd'),
-      isWeekend: isWeekend(dateObj),
-      holidayName: getHolidayName(row.date),
-      isHoliday: isHoliday(row.date),
+      isWeekend: isWknd,
+      holidayName: holName,
+      isHoliday: isHol,
+      isWorkday: !isWknd && !isHol,
+      isToday: row.date === todayDateStr,
+      activityCount,
     }
   })
 })
 
 const getRowClass = (row: OptimizedReportRow) => {
+  if (row.isToday) {
+    return 'border-violet-500/40 shadow-md shadow-violet-500/5 bg-violet-500/[0.02]'
+  }
   return row.isWeekend || row.isHoliday
     ? 'bg-red-50/50 dark:bg-red-950/20 hover:bg-red-100/50 dark:hover:bg-red-900/30'
     : ''
@@ -304,12 +409,29 @@ watch(
   { immediate: true },
 )
 
-const scrollToToday = () => {
-  const todayStr = format(new Date(), 'yyyy-MM-dd')
+const scrollToToday = (highlight = false) => {
+  // If user is currently looking at another month, switch to current month first
+  if (selectedDate.value !== currentMonthStr) {
+    selectedDate.value = currentMonthStr
+  }
+
   nextTick(() => {
-    const todayEl = document.querySelector(`[data-key="${todayStr}"]`)
+    const todayEl = document.querySelector(`[data-key="${todayDateStr}"]`) as HTMLElement | null
     if (todayEl) {
       todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (highlight) {
+        const card = (todayEl.querySelector('.group.rounded-2xl') || todayEl) as HTMLElement
+        card.classList.add(
+          'ring-2',
+          'ring-violet-500',
+          'ring-offset-2',
+          'transition-all',
+          'duration-500',
+        )
+        setTimeout(() => {
+          card.classList.remove('ring-2', 'ring-violet-500', 'ring-offset-2')
+        }, 2000)
+      }
     }
   })
 }
@@ -319,9 +441,9 @@ const hasScrolledToToday = ref(false)
 watch(
   () => dailyTable.value,
   (newVal) => {
-    if (newVal.length > 0 && !hasScrolledToToday.value) {
+    if (newVal.length > 0 && !hasScrolledToToday.value && selectedDate.value === currentMonthStr) {
       hasScrolledToToday.value = true
-      scrollToToday()
+      scrollToToday(false)
     }
   },
 )

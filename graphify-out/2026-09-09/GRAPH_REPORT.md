@@ -2,12 +2,12 @@
 
 ## Corpus Check
 
-- 184 files · ~175,722 words
+- 184 files · ~175,351 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
 
-- 1099 nodes · 1645 edges · 103 communities (56 shown, 47 thin omitted)
+- 1094 nodes · 1636 edges · 103 communities (59 shown, 44 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -19,7 +19,7 @@
 
 ## Community Hubs (Navigation)
 
-- YearlyReport.vue
+- SelectContent.vue
 - BalanceActivitiesModal.vue
 - JiraExportModal.vue
 - devDependencies
@@ -51,12 +51,12 @@
 - open_url
 - example.spec.ts
 - 59e27a32-5d32-46e7-b223-fe1593073fb1.json
-- utils/index.ts
+- cn
 - CalendarCell.vue
 - SettingsModal.vue
 - MonthlyReport.vue
 - DailyReportRow.vue
-- cn
+- utils/index.ts
 - report.ts
 - Tabs.vue
 - utils/jira.ts
@@ -65,15 +65,15 @@
 - useDocxExport.ts
 - husky.sh
 - TooltipContent.vue
-- use-toast.ts
+- core.ts
 - components.json
+- ai.ts
 - format.ts
-- loadJiraConfig
-- groupSubtasksWithAI
+- saveJiraExportData
 - prompts.ts
-- DataTable.vue
+- SelectItem.vue
 - FieldSeparator.vue
-- Select.vue
+- Toast.vue
 - drizzle.config.ts
 - post-commit
 - tsconfig.json
@@ -148,12 +148,12 @@
 
 - None detected.
 
-## Communities (103 total, 47 thin omitted)
+## Communities (103 total, 44 thin omitted)
 
-### Community 0 - "YearlyReport.vue"
+### Community 0 - "SelectContent.vue"
 
-Cohesion: 0.13
-Nodes (11): columns, coreStore, { exportBASTToExcel, exporting: exportingExcel }, { exportingDocx }, { isAiEnabled, selectedDate }, { success, error }, { yearlyRows, yearlyHighlights, summarizing, isLoading, currentYear }, yearlyStore (+3 more)
+Cohesion: 0.40
+Nodes (4): delegatedProps, emits, forwarded, props
 
 ### Community 1 - "BalanceActivitiesModal.vue"
 
@@ -190,7 +190,7 @@ Nodes (15): ActivityCalendar, calendarInput, calendarStore, coreStore, dailyStor
 ### Community 6 - "getDb"
 
 Cohesion: 0.06
-Nodes (62): getDb(), deleteCalendarEventsByMonth(), deleteHolidayByDate(), getCalendarEventsByMonth(), getHolidaysByMonth(), insertCalendarEvent(), insertCalendarEvents(), upsertHoliday() (+54 more)
+Nodes (57): getDb(), deleteCalendarEventsByMonth(), deleteHolidayByDate(), getCalendarEventsByMonth(), getHolidaysByMonth(), insertCalendarEvent(), insertCalendarEvents(), upsertHoliday() (+49 more)
 
 ### Community 7 - "Commands"
 
@@ -249,8 +249,8 @@ Nodes (13): code:bash (shadcn-vue mcp # start the MCP server (stdio)), code:json
 
 ### Community 18 - "select/index.ts"
 
-Cohesion: 0.06
-Nodes (23): delegatedProps, emits, forwarded, props, delegatedProps, props, delegatedProps, forwardedProps (+15 more)
+Cohesion: 0.07
+Nodes (19): emits, forwarded, props, delegatedProps, props, props, props, delegatedProps (+11 more)
 
 ### Community 19 - "dialog/index.ts"
 
@@ -294,8 +294,8 @@ Nodes (16): core:default, dialog:allow-save, dialog:default, fs:allow-write-file
 
 ### Community 27 - "DailyReport.vue"
 
-Cohesion: 0.09
-Nodes (16): BalanceActivitiesModal, calendarStore, copiedRows, coreStore, dailyStore, {
+Cohesion: 0.10
+Nodes (15): BalanceActivitiesModal, calendarStore, copiedRows, coreStore, dailyStore, {
 dailyTable,
 summarizingRows,
 syncingRows,
@@ -303,7 +303,7 @@ summarizingAll,
 isLoading,
 syncing,
 showConfirmSync,
-}, dateObj, { exportToExcel, exporting } (+8 more)
+}, dateObj, { exportToExcel, exporting } (+7 more)
 
 ### Community 28 - "alert/index.ts"
 
@@ -325,10 +325,10 @@ Nodes (3): main, mockTauri(), Window
 Cohesion: 0.40
 Nodes (4): id, name, projectResources, resources
 
-### Community 32 - "utils/index.ts"
+### Community 32 - "cn"
 
 Cohesion: 0.17
-Nodes (7): props, props, props, props, props, props, props
+Nodes (8): props, props, props, props, props, props, props, cn()
 
 ### Community 33 - "CalendarCell.vue"
 
@@ -337,28 +337,35 @@ Nodes (3): delegatedProps, forwardedProps, props
 
 ### Community 34 - "SettingsModal.vue"
 
-Cohesion: 0.08
-Nodes (17): coreStore, fetchingModels, { fetchingProjects, allProjects }, fetchOllamaModels(), gitlabStore, jiraProjectInput, ollamaModels, { saving, settings, selectedProjectIds, selectedJiraProjects } (+9 more)
+Cohesion: 0.05
+Nodes (31): dailyStore, {
+selectedDayForEntry,
+manualActivityText,
+manualHolidayName,
+isManualHoliday,
+manualMasukText,
+manualPulangText,
+}, coreStore, fetchingModels, { fetchingProjects, allProjects }, fetchOllamaModels(), gitlabStore, jiraProjectInput (+23 more)
 
 ### Community 35 - "MonthlyReport.vue"
 
 Cohesion: 0.10
-Nodes (15): allocatedMDs, copiedRows, coreStore, dailyStore, { dailyTable }, { exportBASTToExcel, getWorkingDaysCount, exporting: exportingExcel }, { exportTaskJob, exportingDocx }, { isAiEnabled, selectedDate, dateDisplay, formatMonth } (+7 more)
+Nodes (13): copiedRows, coreStore, dailyStore, { dailyTable }, { exportBASTToExcel, exporting: exportingExcel }, { exportTaskJob, exportingDocx }, { isAiEnabled, selectedDate, dateDisplay, formatMonth }, jiraStore (+5 more)
 
 ### Community 36 - "DailyReportRow.vue"
 
 Cohesion: 0.06
 Nodes (27): ActivityItem, addInputRef, availableMonthDates, cancelAdding(), canMoveNext, canMovePrev, confirmAdd(), currentMonth (+19 more)
 
-### Community 38 - "cn"
+### Community 38 - "utils/index.ts"
 
 Cohesion: 0.10
-Nodes (15): props, props, props, props, content, props, props, props (+7 more)
+Nodes (14): props, props, props, props, content, props, props, props (+6 more)
 
 ### Community 39 - "report.ts"
 
-Cohesion: 0.19
-Nodes (16): useCoreStore, useGitlabStore, useJiraStore, useMonthlyStore, CalendarCache, CalendarDay, CalendarEvent, GitlabCache (+8 more)
+Cohesion: 0.24
+Nodes (12): useGitlabStore, CalendarCache, CalendarDay, CalendarEvent, GitlabCache, GitLabEvent, Holiday, JiraEvent (+4 more)
 
 ### Community 40 - "Tabs.vue"
 
@@ -367,87 +374,95 @@ Nodes (12): delegatedProps, emits, forwarded, props, delegatedProps, forwardedPr
 
 ### Community 41 - "utils/jira.ts"
 
-Cohesion: 0.14
-Nodes (9): submitJiraIssue(), buildAdfRowDescription(), createJiraIssue(), JiraApiError, JiraConfig, JiraIssue, JiraIssueType, JiraMyself (+1 more)
+Cohesion: 0.17
+Nodes (8): useJiraStore, JiraCache, JiraApiError, JiraConfig, JiraIssue, JiraIssueType, JiraMyself, JiraProject
 
 ### Community 42 - "ActivityCalendar.vue"
 
-Cohesion: 0.14
-Nodes (10): { calendarBlanks, calendarDays }, calendarStore, coreStore, dailyStore, { pending: syncingAll, dateDisplay, selectedDate }, { syncingRows }, dailyStore, {
-selectedDayForEntry,
-manualActivityText,
-manualHolidayName,
-isManualHoliday,
-manualMasukText,
-manualPulangText,
-} (+2 more)
+Cohesion: 0.18
+Nodes (7): { calendarBlanks, calendarDays }, calendarStore, coreStore, dailyStore, { pending: syncingAll, dateDisplay, selectedDate }, { syncingRows }, useDailyStore
 
 ### Community 44 - "YearlyActivityGrid.vue"
 
-Cohesion: 0.15
-Nodes (10): coreStore, getMonthTextClasses(), isNextYearDisabled, isSelected(), { selectedDate, viewMode }, { yearlyActivities, fetchingActivities, currentYear }, yearlyStore, useYearlyStore (+2 more)
+Cohesion: 0.17
+Nodes (8): coreStore, getMonthTextClasses(), isNextYearDisabled, isSelected(), { selectedDate, viewMode }, { yearlyActivities, fetchingActivities, currentYear }, yearlyStore, useYearlyStore
 
 ### Community 45 - "useDocxExport.ts"
 
 Cohesion: 0.39
-Nodes (6): useDocxExport(), useExcelExport(), useCalendarStore, MonthlyReportRow, SettingsData, calculateMandaysAllocation()
+Nodes (6): useDocxExport(), useExcelExport(), useCalendarStore, MonthlyReportRow, ReportRow, SettingsData
 
 ### Community 47 - "TooltipContent.vue"
 
 Cohesion: 0.14
 Nodes (9): emits, forwarded, props, delegatedProps, emits, forwarded, props, props (+1 more)
 
-### Community 48 - "use-toast.ts"
+### Community 48 - "core.ts"
 
-Cohesion: 0.19
-Nodes (9): { success }, emits, forwarded, Props, variantClass, { toasts }, ToastProps, toasts (+1 more)
+Cohesion: 0.29
+Nodes (7): { success }, { toasts }, ToastProps, toasts, useToast(), useCoreStore, YearlyActivityMonth
 
 ### Community 49 - "components.json"
 
 Cohesion: 0.17
 Nodes (11): aliases, components, utils, $schema, style, tailwind, baseColor, config (+3 more)
 
-### Community 51 - "loadJiraConfig"
+### Community 50 - "ai.ts"
 
-Cohesion: 0.40
+Cohesion: 0.31
+Nodes (8): AiOptions, generateDeepSeek(), generateGemini(), generateOllama(), generateOpenAi(), generateSummary(), parseAiJsonResponse(), stripMarkdownCodeBlock()
+
+### Community 51 - "format.ts"
+
+Cohesion: 0.22
 Nodes (5): loadJiraConfig(), loadProjectIssueTypes(), parseProjectText(), getJiraConfig(), getJiraIssueTypesForProject()
 
-### Community 52 - "groupSubtasksWithAI"
+### Community 52 - "saveJiraExportData"
 
 Cohesion: 0.29
-Nodes (7): closeModal(), emit, groupSubtasksWithAI(), isActivityRelated(), openSettings(), saveJiraExportData(), getJiraGroupSubtasksPrompt()
+Nodes (7): closeModal(), emit, openSettings(), saveJiraExportData(), submitJiraIssue(), buildAdfRowDescription(), createJiraIssue()
+
+### Community 53 - "prompts.ts"
+
+Cohesion: 0.20
+Nodes (5): generateParentDescription(), groupSubtasksWithAI(), isActivityRelated(), getJiraGroupSubtasksPrompt(), getJiraParentDescriptionPrompt()
+
+### Community 54 - "SelectItem.vue"
+
+Cohesion: 0.50
+Nodes (3): delegatedProps, forwardedProps, props
 
 ### Community 55 - "FieldSeparator.vue"
 
 Cohesion: 0.33
 Nodes (3): props, delegatedProps, props
 
-### Community 56 - "Select.vue"
+### Community 56 - "Toast.vue"
 
-Cohesion: 0.50
-Nodes (3): emits, forwarded, props
+Cohesion: 0.33
+Nodes (4): emits, forwarded, Props, variantClass
 
 ## Knowledge Gaps
 
-- **595 isolated node(s):** `coreStore`, `dailyStore`, `calendarStore`, `{ calendarBlanks, calendarDays }`, `{ syncingRows }` (+590 more)
+- **591 isolated node(s):** `coreStore`, `dailyStore`, `calendarStore`, `{ calendarBlanks, calendarDays }`, `{ syncingRows }` (+586 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **47 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **44 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `cn` to `utils/index.ts`, `BalanceActivitiesModal.vue`, `CalendarCell.vue`, `SettingsModal.vue`, `MonthPicker.vue`, `YearlyReport.vue`, `Tabs.vue`, `TooltipContent.vue`, `select/index.ts`, `dialog/index.ts`, `calendar/index.ts`, `FieldSeparator.vue`, `alert-dialog/index.ts`, `button/index.ts`, `alert/index.ts`?**
-  _High betweenness centrality (0.048) - this node is a cross-community bridge._
+- **Why does `cn()` connect `cn` to `SelectContent.vue`, `BalanceActivitiesModal.vue`, `CalendarCell.vue`, `SettingsModal.vue`, `MonthPicker.vue`, `utils/index.ts`, `Tabs.vue`, `TooltipContent.vue`, `select/index.ts`, `dialog/index.ts`, `calendar/index.ts`, `FieldSeparator.vue`, `alert-dialog/index.ts`, `button/index.ts`, `SelectItem.vue`, `alert/index.ts`?**
+  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+- **Why does `getDb()` connect `getDb` to `ai.ts`, `report.ts`?**
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Why does `dependencies` connect `dependencies` to `scripts`, `class-variance-authority`, `clsx`, `date-fns`, `docx`, `drizzle-orm`, `exceljs`, `lucide-vue-next`, `pinia`, `@pinia/nuxt`, `reka-ui`, `tailwind-merge`, `@tauri-apps/api`, `@tauri-apps/plugin-dialog`, `@tauri-apps/plugin-fs`, `@tauri-apps/plugin-http`, `@tauri-apps/plugin-sql`, `vue`, `vue-router`, `vuedraggable`, `@vueuse/core`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
-- **Why does `getDb()` connect `getDb` to `report.ts`?**
-  _High betweenness centrality (0.013) - this node is a cross-community bridge._
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **What connects `coreStore`, `dailyStore`, `calendarStore` to the rest of the system?**
-  _595 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `YearlyReport.vue` be split into smaller, more focused modules?**
-  _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
+  _591 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `BalanceActivitiesModal.vue` be split into smaller, more focused modules?**
   _Cohesion score 0.08045977011494253 - nodes in this community are weakly interconnected._
 - **Should `JiraExportModal.vue` be split into smaller, more focused modules?**
   _Cohesion score 0.0625 - nodes in this community are weakly interconnected._
+- **Should `devDependencies` be split into smaller, more focused modules?**
+  _Cohesion score 0.10526315789473684 - nodes in this community are weakly interconnected._

@@ -72,6 +72,12 @@ export const useMonthlyStore = defineStore('monthly', () => {
       })
 
       const rows = parseMonthlyMarkdown(rawContent)
+      if (rows.length === 0) {
+        throw new Error(
+          'AI produced a response, but no table rows could be parsed. Please check model and prompt, or try again.',
+        )
+      }
+
       const report = await upsertMonthlyReport({
         month: core.selectedDate,
         summary: rawContent.trim(),
@@ -91,7 +97,10 @@ export const useMonthlyStore = defineStore('monthly', () => {
       success('Monthly report and table generated!', { id: loadingToastId })
     } catch (err: unknown) {
       console.error('Failed to generate AI summary:', err)
-      error('AI service error', { id: loadingToastId })
+      error('AI service error', {
+        id: loadingToastId,
+        description: (err as Error)?.message || String(err),
+      })
     } finally {
       summarizing.value = false
     }
