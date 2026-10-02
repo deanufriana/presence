@@ -54,11 +54,11 @@ export async function deleteJiraActivitiesOutsideProjects(
   firstDay: Date,
   lastDay: Date,
   allowedKeys: string[],
-) {
-  if (allowedKeys.length === 0) return 0
+): Promise<void> {
+  if (allowedKeys.length === 0) return
 
   const db = await getDb()
-  const result = await db
+  await db
     .delete(schema.jiraActivities)
     .where(
       and(
@@ -70,13 +70,12 @@ export async function deleteJiraActivitiesOutsideProjects(
         ),
       ),
     )
-  return result.rowsAffected ?? 0
 }
 
 export async function getJiraActivitiesByDates(dates: string[]) {
   if (!dates || dates.length === 0) return []
   const db = await getDb()
-  const { format } = await import('date-fns')
+  const { toDateKey } = await import('~/utils/dates')
 
   const sorted = [...dates].sort()
   const startDate = `${sorted[0]}T00:00:00`
@@ -90,12 +89,5 @@ export async function getJiraActivitiesByDates(dates: string[]) {
   })
 
   const dateSet = new Set(dates)
-  return activities.filter((act) => {
-    try {
-      const dateStr = format(act.updatedAt, 'yyyy-MM-dd')
-      return dateSet.has(dateStr)
-    } catch {
-      return false
-    }
-  })
+  return activities.filter((act) => dateSet.has(toDateKey(act.updatedAt)))
 }

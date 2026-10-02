@@ -11,6 +11,7 @@ import {
 import { getGitLabCache, formatGitLabActivity } from './gitlab'
 import { getJiraCache, formatJiraActivity } from './jira'
 import { getCalendarCache, formatCalendarActivity } from './calendar'
+import { toDateKey } from './dates'
 import type { MonthlyReportRow, YearlyReportRow } from '~/types/report'
 import type { GitLabEvent } from '~/types/gitlab'
 import type { CalendarEvent } from '~/types/calendar'
@@ -64,17 +65,27 @@ export async function upsertYearlyReport(data: {
 
 export async function fetchAndGroupActivities(dateStr: string, isMonth: boolean = false) {
   const monthStr = isMonth ? dateStr : dateStr.slice(0, 7)
+  // Each source is independent: one failing must not blank out the other two.
   const [gitlabRes, calendarCache, jiraRes] = await Promise.all([
-    getGitLabCache(monthStr),
-    getCalendarCache(monthStr),
-    getJiraCache(monthStr),
+    getGitLabCache(monthStr).catch((err) => {
+      console.error('Failed to load GitLab activities:', err)
+      return { success: false, events: [], date: monthStr }
+    }),
+    getCalendarCache(monthStr).catch((err) => {
+      console.error('Failed to load calendar activities:', err)
+      return { success: false, events: [], date: monthStr }
+    }),
+    getJiraCache(monthStr).catch((err) => {
+      console.error('Failed to load Jira activities:', err)
+      return { success: false, events: [], date: monthStr }
+    }),
   ])
 
   const grouped: Record<string, string[]> = {}
 
   // GitLab
   gitlabRes.events.forEach((ev: GitLabEvent) => {
-    const date = ev.created_at?.split('T')[0]
+    const date = toDateKey(ev.created_at)
     if (date) {
       if (!grouped[date]) grouped[date] = []
       grouped[date].push(formatGitLabActivity(ev))
@@ -92,7 +103,7 @@ export async function fetchAndGroupActivities(dateStr: string, isMonth: boolean 
 
   // Jira
   jiraRes.events.forEach((ev: JiraEvent) => {
-    const date = ev.updated_at?.split('T')[0]
+    const date = toDateKey(ev.updated_at)
     if (date) {
       if (!grouped[date]) grouped[date] = []
       grouped[date].push(formatJiraActivity(ev))

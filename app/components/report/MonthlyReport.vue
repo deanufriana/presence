@@ -483,10 +483,10 @@ import { useMonthlyStore } from '~/stores/monthly'
 import { useDailyStore } from '~/stores/daily'
 import { useJiraStore } from '~/stores/jira'
 import { calculateMandaysAllocation } from '~/utils/mandays'
-import { format } from 'date-fns'
 import { useLocalStorage } from '@vueuse/core'
 import type { JiraEvent } from '~/types/jira'
 import type { MonthlyReportRow } from '~/types/report'
+import { toDateKey } from '~/utils/dates'
 
 const coreStore = useCoreStore()
 const monthlyStore = useMonthlyStore()
@@ -521,12 +521,7 @@ const suggestedByRow = computed<Set<string>[]>(() =>
 
     const sourceSet = new Set(row.sources)
     for (const ev of allJiraEvents.value) {
-      try {
-        // Local-time key, matching how dates are bucketed everywhere else.
-        if (sourceSet.has(format(new Date(ev.updated_at), 'yyyy-MM-dd'))) found.add(ev.key)
-      } catch {
-        // Ignore unparsable dates
-      }
+      if (sourceSet.has(toDateKey(ev.updated_at))) found.add(ev.key)
     }
     return found
   }),

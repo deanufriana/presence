@@ -1,4 +1,10 @@
 import { defineStore } from 'pinia'
+import {
+  DEFAULT_AI_MODEL,
+  DEFAULT_AI_PROVIDER,
+  DEFAULT_GITLAB_URL,
+  DEFAULT_OLLAMA_URL,
+} from '~/constants/defaults'
 import { format, addMonths, subMonths, addYears, subYears, parse } from 'date-fns'
 import { useToast } from '~/composables/use-toast'
 import type { SettingsData } from '~/types/settings'
@@ -19,7 +25,7 @@ export const useCoreStore = defineStore('core', () => {
 
   const settings = ref<SettingsData>({
     gitlab_token: '',
-    gitlab_url: 'https://gitlab-ce.brilife.co.id',
+    gitlab_url: DEFAULT_GITLAB_URL,
     gitlab_selected_projects: '',
     jira_token: '',
     jira_url: '',
@@ -27,9 +33,9 @@ export const useCoreStore = defineStore('core', () => {
     gemini_api_key: '',
     openai_api_key: '',
     deepseek_api_key: '',
-    ai_provider: 'gemini',
-    ai_model: 'gemini-2.0-flash-lite',
-    ollama_url: 'http://localhost:11434',
+    ai_provider: DEFAULT_AI_PROVIDER,
+    ai_model: DEFAULT_AI_MODEL.gemini,
+    ollama_url: DEFAULT_OLLAMA_URL,
     user_name: '',
     user_position: '',
     user_nopeg: '',
@@ -169,22 +175,39 @@ export const useCoreStore = defineStore('core', () => {
     selectedDate.value = format(subYears(current, 1), 'yyyy-MM')
   }
 
-  /** Re-reads every activity cache from the local DB. Assumes `pending` is already handled. */
-  async function refreshActivityCaches() {
-    await Promise.all([
-      useCalendarStore().fetchCalendarEvents(),
-      useGitlabStore().fetchGitlabCache(),
-      useJiraStore().fetchJiraCache(),
-    ])
+  /**
+   * Re-reads every activity cache from the local DB. Sources are settled
+   * independently so one failing source never blanks out the others.
+   * Assumes `pending` is already handled. Returns the labels that failed.
+   */
+  async function refreshActivityCaches(): Promise<string[]> {
+    const sources = [
+      ['Calendar', () => useCalendarStore().fetchCalendarEvents()],
+      ['GitLab', () => useGitlabStore().fetchGitlabCache()],
+      ['Jira', () => useJiraStore().fetchJiraCache()],
+    ] as const
+
+    const results = await Promise.allSettled(sources.map(([, run]) => run()))
+    const failed: string[] = []
+
+    results.forEach((r, i) => {
+      const source = sources[i]
+      if (r.status === 'rejected' && source) {
+        failed.push(source[0])
+        console.error(`Failed to refresh ${source[0]} activities:`, r.reason)
+      }
+    })
+
+    return failed
   }
 
   async function fetchAllActivities() {
     pending.value = true
     try {
-      await refreshActivityCaches()
-    } catch (err) {
-      console.error('Failed to sync activities:', err)
-      error('Failed to sync activities')
+      const failed = await refreshActivityCaches()
+      if (failed.length) {
+        error(`Failed to load: ${failed.join(', ')}`)
+      }
     } finally {
       pending.value = false
     }
@@ -208,37 +231,54 @@ export const useCoreStore = defineStore('core', () => {
 
     pending.value = true
     try {
-      const jobs: Promise<void>[] = []
+      const jobs: { label: string; run: () => Promise<void> }[] = []
 
       if (wantGitLab) {
-        jobs.push(
-          (async () => {
+        jobs.push({
+          label: 'GitLab',
+          run: async () => {
             const { syncGitLabEvents } = await import('~/utils/gitlab')
-            const gitlab = await syncGitLabEvents(selectedDate.value, force)
-            useGitlabStore().setCache(gitlab)
-          })(),
-        )
+            useGitlabStore().setCache(await syncGitLabEvents(selectedDate.value, force))
+          },
+        })
       }
 
       if (wantJira) {
-        jobs.push(
-          (async () => {
+        jobs.push({
+          label: 'Jira',
+          run: async () => {
             const { syncJiraActivities } = await import('~/utils/jira')
-            const jira = await syncJiraActivities(selectedDate.value, force)
-            useJiraStore().setCache(jira)
-          })(),
-        )
+            useJiraStore().setCache(await syncJiraActivities(selectedDate.value, force))
+          },
+        })
       }
 
-      await Promise.all(jobs)
-      // Re-read every cache so the sources left untouched stay consistent with the DB.
-      await refreshActivityCaches()
+      // Settle per source: a GitLab outage must not discard a successful Jira sync.
+      const results = await Promise.allSettled(jobs.map((j) => j.run()))
+      const failed: string[] = []
+      results.forEach((r, i) => {
+        const job = jobs[i]
+        if (r.status === 'rejected' && job) {
+          failed.push(job.label)
+          console.error(`Failed to sync ${job.label}:`, r.reason)
+        }
+      })
 
-      const synced = [wantGitLab && 'GitLab', wantJira && 'Jira'].filter(Boolean).join(' + ')
-      success(`${synced} synced successfully`)
-    } catch (err) {
-      console.error('Failed to sync activities:', err)
-      error('Failed to sync activities')
+      // Re-read every cache so the sources left untouched stay consistent with the DB,
+      // and so whichever source did succeed is actually displayed.
+      failed.push(...(await refreshActivityCaches()))
+
+      const broken = [...new Set(failed)]
+      if (broken.length === 0) {
+        success(`${jobs.map((j) => j.label).join(' + ')} synced successfully`)
+      } else {
+        const ok = jobs.map((j) => j.label).filter((l) => !broken.includes(l))
+        error(
+          ok.length
+            ? `Sync failed for ${broken.join(', ')} - ${ok.join(', ')} still updated`
+            : `Sync failed for: ${broken.join(', ')}`,
+        )
+      }
     } finally {
       pending.value = false
     }

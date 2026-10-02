@@ -172,4 +172,4 @@ export const holidaysDateNameUniqueIdx = uniqueIndex('dateNameUnique').on(
   holidays.date,
   holidays.name,
 )
-export const holidaysDateIdx = index('dateIdx').on(holidays.date)
+export const holidaysDateIdx = index('holidayDateIdx').on(holidays.date)

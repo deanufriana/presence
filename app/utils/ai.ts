@@ -1,4 +1,5 @@
 import { getDb, schema } from '~/db'
+import { DEFAULT_AI_MODEL, DEFAULT_AI_PROVIDER, DEFAULT_OLLAMA_URL } from '~/constants/defaults'
 import type { OllamaModel } from '~/types/ollama'
 import { eq } from 'drizzle-orm'
 import { fetch } from '@tauri-apps/plugin-http'
@@ -21,7 +22,7 @@ export async function generateSummary(prompt: string, options: AiOptions = {}) {
     const providerSetting = await db.query.settings.findFirst({
       where: eq(schema.settings.key, 'ai_provider'),
     })
-    provider = providerSetting?.value || 'gemini'
+    provider = providerSetting?.value || DEFAULT_AI_PROVIDER
   }
 
   let result = ''
@@ -63,7 +64,7 @@ async function generateGemini(prompt: string, options: AiOptions) {
     const modelSetting = await db.query.settings.findFirst({
       where: eq(schema.settings.key, 'ai_model'),
     })
-    model = modelSetting?.value || 'gemini-2.0-flash'
+    model = modelSetting?.value || DEFAULT_AI_MODEL.gemini
   }
 
   const response = await fetch(
@@ -132,7 +133,7 @@ async function generateOpenAi(prompt: string, options: AiOptions) {
     const modelSetting = await db.query.settings.findFirst({
       where: eq(schema.settings.key, 'ai_model'),
     })
-    model = modelSetting?.value || 'gpt-4o'
+    model = modelSetting?.value || DEFAULT_AI_MODEL.openai
   }
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -182,7 +183,7 @@ async function generateDeepSeek(prompt: string, options: AiOptions) {
     const modelSetting = await db.query.settings.findFirst({
       where: eq(schema.settings.key, 'ai_model'),
     })
-    model = modelSetting?.value || 'deepseek-chat'
+    model = modelSetting?.value || DEFAULT_AI_MODEL.deepseek
   }
 
   const isReasoner = model.includes('reasoner') || model.includes('r1')
@@ -257,7 +258,7 @@ async function generateOllama(prompt: string, options: AiOptions) {
     const urlSetting = await db.query.settings.findFirst({
       where: eq(schema.settings.key, 'ollama_url'),
     })
-    baseUrl = urlSetting?.value || 'http://localhost:11434'
+    baseUrl = urlSetting?.value || DEFAULT_OLLAMA_URL
   }
 
   let model = options.model
@@ -266,7 +267,7 @@ async function generateOllama(prompt: string, options: AiOptions) {
     const modelSetting = await db.query.settings.findFirst({
       where: eq(schema.settings.key, 'ai_model'),
     })
-    model = modelSetting?.value || 'gemma:latest'
+    model = modelSetting?.value || DEFAULT_AI_MODEL.ollama
   }
 
   const response = await fetch(`${baseUrl}/api/generate`, {

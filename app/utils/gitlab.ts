@@ -1,4 +1,5 @@
 import { fetch } from '@tauri-apps/plugin-http'
+import { DEFAULT_GITLAB_URL } from '~/constants/defaults'
 import type { GitLabEvent } from '~/types/gitlab'
 import { getSetting } from '~/queries/settings'
 import { getGitLabCommitsByPeriod, upsertGitLabCommit } from '~/queries/gitlab'
@@ -48,7 +49,7 @@ export async function getGitLabConfig(): Promise<GitLabConfig> {
 
   return {
     token: token || '',
-    url: url || 'https://gitlab-ce.brilife.co.id',
+    url: url || DEFAULT_GITLAB_URL,
   }
 }
 

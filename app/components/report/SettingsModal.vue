@@ -457,6 +457,7 @@ import {
   X,
   ExternalLink,
 } from 'lucide-vue-next'
+import { DEFAULT_OLLAMA_URL } from '~/constants/defaults'
 import { Button } from '~/components/ui/button'
 import { Badge } from '~/components/ui/badge'
 import {
@@ -517,7 +518,7 @@ async function fetchOllamaModels() {
   fetchingModels.value = true
   try {
     const { fetchOllamaModels: fetchModels } = await import('~/utils/ai')
-    const models = await fetchModels(settings.value?.ollama_url || 'http://localhost:11434')
+    const models = await fetchModels(settings.value?.ollama_url || DEFAULT_OLLAMA_URL)
     ollamaModels.value = models
     // If current model is not in the list and list is not empty, select the first one
     if (

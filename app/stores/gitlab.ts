@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { DEFAULT_GITLAB_URL } from '~/constants/defaults'
 import { useToast } from '~/composables/use-toast'
 import { useCoreStore } from '~/stores/core'
 import type { GitlabCache } from '~/types/gitlab'
@@ -37,7 +38,7 @@ export const useGitlabStore = defineStore('gitlab', () => {
       const { getGitLabProjects } = await import('~/utils/gitlab')
       const config = {
         token: core.settings.gitlab_token?.trim() || '',
-        url: core.settings.gitlab_url?.trim() || 'https://gitlab-ce.brilife.co.id',
+        url: core.settings.gitlab_url?.trim() || DEFAULT_GITLAB_URL,
       }
 
       if (!config.token) {

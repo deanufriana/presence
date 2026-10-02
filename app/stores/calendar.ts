@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { parse, startOfMonth, getDaysInMonth, getDay, format } from 'date-fns'
 import { useToast } from '~/composables/use-toast'
+import { toDateKey } from '~/utils/dates'
 import { parseICS } from '~/utils/ics'
 import { useCoreStore } from '~/stores/core'
 import { useGitlabStore } from '~/stores/gitlab'
@@ -43,7 +44,7 @@ export const useCalendarStore = defineStore('calendar', () => {
     // Pre-group events by date for O(N + M) efficiency
     const gitlabByDate: Record<string, GitLabEvent[]> = {}
     gitlabEvents.forEach((ev) => {
-      const date = ev.created_at?.split('T')[0]
+      const date = toDateKey(ev.created_at)
       if (date) {
         if (!gitlabByDate[date]) gitlabByDate[date] = []
         gitlabByDate[date].push(ev)
@@ -61,7 +62,7 @@ export const useCalendarStore = defineStore('calendar', () => {
 
     const jiraByDate: Record<string, JiraEvent[]> = {}
     jiraEvents.forEach((ev) => {
-      const date = ev.updated_at?.split('T')[0]
+      const date = toDateKey(ev.updated_at)
       if (date) {
         if (!jiraByDate[date]) jiraByDate[date] = []
         jiraByDate[date].push(ev)

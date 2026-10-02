@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { useCoreStore } from '~/stores/core'
 import { useToast } from '~/composables/use-toast'
-import type { MonthlyReportRow, JiraChildTask } from '~/types/report'
+import type { MonthlyReportRow } from '~/types/report'
 import { watchDebounced } from '@vueuse/core'
 
 export const useMonthlyStore = defineStore('monthly', () => {
@@ -91,11 +91,6 @@ export const useMonthlyStore = defineStore('monthly', () => {
         monthlyRows.value = report.rows as MonthlyReportRow[]
       }
 
-      // Generate Jira export data inline (inside loading toast)
-      if (rows.length > 0) {
-        await generateJiraExportData(activities, rows, report?.summary)
-      }
-
       success('Monthly report and table generated!', { id: loadingToastId })
     } catch (err: unknown) {
       console.error('Failed to generate AI summary:', err)
@@ -105,56 +100,6 @@ export const useMonthlyStore = defineStore('monthly', () => {
       })
     } finally {
       summarizing.value = false
-    }
-  }
-
-  async function generateJiraExportData(
-    activities: string[],
-    rows: { project: string; sources?: string[] }[],
-    monthlySummary?: string,
-  ) {
-    try {
-      const { generateSummary } = await import('~/utils/ai')
-      const { getJiraExportPrompt } = await import('~/utils/prompts')
-      const { upsertJiraExportData } = await import('~/queries/jiraExport')
-
-      const jiraPrompt = getJiraExportPrompt(activities, rows, monthlySummary)
-      const jiraRaw = await generateSummary(jiraPrompt, {
-        max_tokens: 8192,
-        temperature: 0.2,
-        provider: core.settings.ai_provider,
-        model: core.settings.ai_model,
-        apiKey: core.activeApiKey,
-        ollamaUrl: core.settings.ollama_url,
-      })
-
-      const { stripMarkdownCodeBlock } = await import('~/utils/format')
-      const clean = stripMarkdownCodeBlock(jiraRaw)
-
-      const jiraData = JSON.parse(clean) as {
-        project: string
-        description: string
-        childTasks: JiraChildTask[]
-      }[]
-
-      if (!Array.isArray(jiraData)) return
-
-      for (const item of jiraData) {
-        if (!item.project) continue
-        const childTasks = (item.childTasks || []).map((ct) => ({
-          title: ct.title || '',
-          description: ct.description || '',
-        }))
-        await upsertJiraExportData({
-          month: core.selectedDate,
-          project: item.project,
-          description: item.description || null,
-          childTasks: JSON.stringify(childTasks),
-        })
-      }
-    } catch (err) {
-      console.error('Failed to generate/save Jira export data:', err)
-      error('Failed to prepare Jira descriptions')
     }
   }
 
