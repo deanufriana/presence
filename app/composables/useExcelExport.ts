@@ -5,6 +5,7 @@ import { id as idLocale } from 'date-fns/locale'
 import { useCalendarStore } from '~/stores/calendar'
 import type { MonthlyReportRow, ReportRow } from '~/types/report'
 import type { SettingsData } from '~/types/settings'
+import type { Workbook } from 'exceljs'
 import { calculateMandaysAllocation } from '~/utils/mandays'
 
 export function useExcelExport() {
@@ -13,21 +14,30 @@ export function useExcelExport() {
   const cleanMarkdown = (text: string): string => {
     if (!text) return '-'
     return text
-      .replace(/```[a-zA-Z]*\s*/gi, '')
-      .replace(/```\s*/g, '')
+      .replace(/```[a-zA-Z]*[\r\n]*/g, '')
+      .replace(/```/g, '')
       .replace(/`([^`]+)`/g, '$1')
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/__([^_]+)__/g, '$1')
+      .replace(/_([^_]+)_/g, '$1')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/^\s*[-*+]\s+/gm, '• ')
+      .replace(/^#{1,6}\s+/gm, '')
       .trim()
   }
 
   const getWorkingDaysCount = (year: number, month: number) => {
     const calendarStore = useCalendarStore()
     const daysCount = getDaysInMonth(new Date(year, month))
+    const holidaySet = new Set(calendarStore.holidays.map((h) => h.date))
+
     let count = 0
     for (let day = 1; day <= daysCount; day++) {
       const date = new Date(year, month, day)
       const dateStr = format(date, 'yyyy-MM-dd')
       const isWeekendDay = isWeekend(date)
-      const isHoliday = calendarStore.holidays.some((h) => h.date === dateStr)
+      const isHoliday = holidaySet.has(dateStr)
 
       if (!isWeekendDay && !isHoliday) {
         count++
@@ -36,11 +46,33 @@ export function useExcelExport() {
     return count > 0 ? count : 20
   }
 
+  async function saveWorkbook(workbook: Workbook, defaultPath: string): Promise<boolean> {
+    const buffer = await workbook.xlsx.writeBuffer()
+    const uint8Array = new Uint8Array(buffer)
+
+    const filePath = await save({
+      filters: [
+        {
+          name: 'Excel',
+          extensions: ['xlsx'],
+        },
+      ],
+      defaultPath,
+    })
+
+    if (filePath) {
+      await writeFile(filePath, uint8Array)
+      return true
+    }
+    return false
+  }
+
   async function exportToExcel(dailyRows: ReportRow[], monthYear: string, settings: SettingsData) {
     exporting.value = true
     try {
       const ExcelJS = await import('exceljs')
       const workbook = new ExcelJS.default.Workbook()
+      workbook.creator = 'Presence App'
 
       const thinBorder = {
         top: { style: 'thin' as const },
@@ -48,20 +80,29 @@ export function useExcelExport() {
         bottom: { style: 'thin' as const },
         right: { style: 'thin' as const },
       }
-      workbook.creator = 'Presence App'
 
       // --- 1. DAILY REPORT SHEET ---
       const dailySheet = workbook.addWorksheet('Daily Presence')
+      dailySheet.views = [{ showGridLines: true }]
+
+      // Configure page setup for printing
+      dailySheet.pageSetup = {
+        paperSize: 9, // A4
+        orientation: 'portrait',
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+      }
 
       // Set column widths
       dailySheet.columns = [
-        { width: 4 }, // A (empty)
+        { width: 4 }, // A (empty margin)
         { width: 8 }, // B (No)
-        { width: 20 }, // C (Tanggal)
+        { width: 18 }, // C (Tanggal)
         { width: 12 }, // D (Masuk)
         { width: 12 }, // E (Pulang)
         { width: 15 }, // F (Unit Kerja)
-        { width: 50 }, // G (Keterangan)
+        { width: 52 }, // G (Keterangan)
         { width: 25 }, // H (Tanda Tangan)
       ]
 
@@ -72,6 +113,18 @@ export function useExcelExport() {
       titleCell.value = 'DATA KEHADIRAN PEKERJA PT.PKSS'
       titleCell.font = { name: 'Calibri', size: 14, bold: true }
       titleCell.alignment = { horizontal: 'center', vertical: 'middle' }
+
+      // Month name parsing
+      let displayMonth = monthYear
+      try {
+        if (/^\d{4}-\d{2}$/.test(monthYear)) {
+          const parsed = parse(monthYear, 'yyyy-MM', new Date())
+          displayMonth = format(parsed, 'MMMM yyyy', { locale: idLocale })
+        }
+      } catch {
+        // use original string
+      }
+      const monthOnly = displayMonth.split(' ')[0] || displayMonth
 
       // Metadata
       const addMeta = (row: number, label: string, value: string) => {
@@ -84,13 +137,17 @@ export function useExcelExport() {
         valueCell.font = { name: 'Calibri', size: 12, bold: true }
       }
 
-      addMeta(4, 'NAMA', settings.user_name)
-      addMeta(5, 'BULAN', monthYear.split(' ')[0] || 'April')
-      addMeta(6, 'JABATAN', settings.user_position || 'Staff IT Governance')
+      addMeta(4, 'NAMA', settings.user_name || '')
+      addMeta(5, 'BULAN', monthOnly)
+      addMeta(6, 'JABATAN', settings.user_position || settings.user_function || '')
 
-      // Placeholder Logo (H1:H6)
-      dailySheet.getCell('H1').value = '[LOGO]'
-      dailySheet.getCell('H1').alignment = { horizontal: 'center', vertical: 'middle' }
+      // Logo Placeholder (H1:H6)
+      dailySheet.mergeCells('H1:H6')
+      const logoCell = dailySheet.getCell('H1')
+      logoCell.value = '[LOGO]'
+      logoCell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: '7F7F7F' } }
+      logoCell.alignment = { horizontal: 'center', vertical: 'middle' }
+      logoCell.border = thinBorder
 
       // --- TABLE HEADER (Row 8 & 9) ---
       const headerRows = [8, 9]
@@ -129,15 +186,24 @@ export function useExcelExport() {
 
         excelRow.getCell(2).value = index + 1 // No
 
-        // Tanggal (Date Formatting)
+        // Tanggal (Local Timezone Safe Date Formatting)
         const dateCell = excelRow.getCell(3)
-        dateCell.value = new Date(row.date)
-        dateCell.numFmt = 'd-mmm-yyyy'
+        try {
+          const parsedDate = parse(row.date, 'yyyy-MM-dd', new Date())
+          dateCell.value = isNaN(parsedDate.getTime()) ? row.date : parsedDate
+          if (!isNaN(parsedDate.getTime())) {
+            dateCell.numFmt = 'd-mmm-yyyy'
+          }
+        } catch {
+          dateCell.value = row.date
+        }
 
         excelRow.getCell(4).value = row.masuk // Masuk
         excelRow.getCell(5).value = row.pulang // Pulang
-        excelRow.getCell(6).value = row.ti || 'TI' // Unit Kerja
-        excelRow.getCell(7).value = row.aktivitas // Keterangan
+        excelRow.getCell(6).value = row.ti || settings.user_unit || 'TI' // Unit Kerja
+
+        const cleanAktivitas = cleanMarkdown(row.aktivitas || '')
+        excelRow.getCell(7).value = cleanAktivitas // Keterangan
         excelRow.getCell(8).value = '[SIGN]' // Tanda Tangan placeholder
 
         // Formatting
@@ -150,7 +216,11 @@ export function useExcelExport() {
             wrapText: true,
           }
         }
-        excelRow.height = 40 // Fixed height for signature feel
+
+        // Dynamic row height based on content
+        const newlineCount = (cleanAktivitas.match(/\n/g) || []).length
+        const estimatedLines = Math.max(newlineCount + 1, Math.ceil(cleanAktivitas.length / 50))
+        excelRow.height = Math.max(35, Math.min(120, estimatedLines * 18))
       })
 
       // --- SIGNATURE SECTION ---
@@ -162,37 +232,24 @@ export function useExcelExport() {
       briLifeCell.font = { name: 'Calibri', size: 11, bold: true }
       briLifeCell.alignment = { horizontal: 'center' }
 
-      // Name with dotted line
+      // Team Leader Name with dotted line
+      const leaderName = settings.team_leader_name?.trim() || ''
       const nameCell = dailySheet.getCell(`H${signatureStartRow + 4}`)
-      nameCell.value = '...........................Adhel Ekonofian................................'
+      nameCell.value = leaderName
+        ? `...........................${leaderName}...........................`
+        : '................................................................'
       nameCell.font = { name: 'Calibri', size: 10, bold: true }
       nameCell.alignment = { horizontal: 'center' }
 
-      // Role
+      // Role / Position
       const roleCell = dailySheet.getCell(`H${signatureStartRow + 5}`)
-      roleCell.value = 'TEAM LEADER'
+      roleCell.value = settings.team_leader_position?.trim() || 'TEAM LEADER'
       roleCell.font = { name: 'Calibri', size: 11, bold: true }
       roleCell.alignment = { horizontal: 'center' }
 
       // --- GENERATE & SAVE ---
-      const buffer = await workbook.xlsx.writeBuffer()
-      const uint8Array = new Uint8Array(buffer)
-
-      const filePath = await save({
-        filters: [
-          {
-            name: 'Excel',
-            extensions: ['xlsx'],
-          },
-        ],
-        defaultPath: `Absensi_${settings.user_name}_${monthYear}.xlsx`,
-      })
-
-      if (filePath) {
-        await writeFile(filePath, uint8Array)
-        return true
-      }
-      return false
+      const defaultFileName = `Absensi_${settings.user_name || 'Worker'}_${monthYear}.xlsx`
+      return await saveWorkbook(workbook, defaultFileName)
     } catch (error) {
       console.error('Export failed:', error)
       throw error
@@ -220,6 +277,24 @@ export function useExcelExport() {
       }
 
       const sheet = workbook.addWorksheet('Detail Pekerja')
+      sheet.views = [{ showGridLines: true }]
+
+      // Configure page setup for printing (landscape for 10 wide columns)
+      sheet.pageSetup = {
+        paperSize: 9, // A4
+        orientation: 'landscape',
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+        margins: {
+          left: 0.4,
+          right: 0.4,
+          top: 0.5,
+          bottom: 0.5,
+          header: 0.3,
+          footer: 0.3,
+        },
+      }
 
       // Set column widths matching template
       sheet.columns = [
@@ -281,7 +356,7 @@ export function useExcelExport() {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: '1F3864' }, // Dark navy blue matching screenshot
+          fgColor: { argb: '1F3864' }, // Dark navy blue
         }
         cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }
         cell.border = thinBorder
@@ -310,7 +385,7 @@ export function useExcelExport() {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: 'FCE4D6' }, // Peach fill matching screenshot
+          fgColor: { argb: 'FCE4D6' }, // Peach fill
         }
         cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }
         cell.border = thinBorder
@@ -322,23 +397,30 @@ export function useExcelExport() {
       // Data Rows (Row 8+)
       monthlyRows.forEach((row, idx) => {
         const allocatedMD = allocatedMDs[idx] || 0
-        const dataRow = sheet.getRow(8 + idx)
-        dataRow.height = 35
+        const rowNum = 8 + idx
+        const dataRow = sheet.getRow(rowNum)
+
+        const cleanProject = cleanMarkdown(row.project)
+        const cleanStatus = cleanMarkdown(row.status)
 
         dataRow.getCell(1).value = idx + 1 // No
-        dataRow.getCell(2).value = settings.user_nopeg || '700012410952025' // No Pegawai
-        dataRow.getCell(3).value = settings.user_name || 'Devi Adi Nufriana' // Nama
+        dataRow.getCell(2).value = settings.user_nopeg || '' // No Pegawai
+        dataRow.getCell(3).value = settings.user_name || '' // Nama
         dataRow.getCell(4).value = periodStr // Periode
-        dataRow.getCell(5).value = cleanMarkdown(row.project) // Project/BAU Task
+        dataRow.getCell(5).value = cleanProject // Project/BAU Task
         dataRow.getCell(6).value = allocatedMD // Target Assignment Project (MD)
         dataRow.getCell(7).value = allocatedMD // Total Realisasi Cumulative MD
         dataRow.getCell(8).value = allocatedMD // Total MD This Month
 
-        const pctCell = dataRow.getCell(9) // Percentage Realisasi Target
-        pctCell.value = 1.0
+        // Excel formula for Percentage Realisasi Target: G / F
+        const pctCell = dataRow.getCell(9)
+        pctCell.value = {
+          formula: `IF(F${rowNum}>0, G${rowNum}/F${rowNum}, 0)`,
+          result: allocatedMD > 0 ? 1.0 : 0,
+        }
         pctCell.numFmt = '0.0%'
 
-        dataRow.getCell(10).value = cleanMarkdown(row.status) // Notes
+        dataRow.getCell(10).value = cleanStatus // Notes
 
         for (let col = 1; col <= 10; col++) {
           const cell = dataRow.getCell(col)
@@ -350,6 +432,11 @@ export function useExcelExport() {
             wrapText: true,
           }
         }
+
+        // Dynamic row height
+        const maxTextLen = Math.max(cleanProject.length, cleanStatus.length)
+        const estLines = Math.max(1, Math.ceil(maxTextLen / 45))
+        dataRow.height = Math.max(30, Math.min(100, estLines * 18))
       })
 
       // Signatures section
@@ -405,7 +492,13 @@ export function useExcelExport() {
       }
 
       createSigBlock(2, 3, 'Dibuat Oleh', settings.user_name || '', settings.user_nopeg || '')
-      createSigBlock(5, 6, 'Diperiksa Oleh', '', '')
+      createSigBlock(
+        5,
+        6,
+        'Diperiksa Oleh',
+        settings.dept_head_name || settings.team_leader_name || '',
+        '',
+      )
       createSigBlock(8, 9, 'Disetujui Oleh', settings.div_head_name || '', '')
 
       // Notes section below signatures
@@ -419,26 +512,10 @@ export function useExcelExport() {
       notesText.font = { name: 'Calibri', size: 9, italic: true }
 
       // Generate & Save File
-      const buffer = await workbook.xlsx.writeBuffer()
-      const uint8Array = new Uint8Array(buffer)
-
       const monthNameIndo = format(parsedDate, 'MMMM yyyy', { locale: idLocale })
-      const userName = settings.user_name || 'Devi Adi Nufriana'
-      const filePath = await save({
-        filters: [
-          {
-            name: 'Excel',
-            extensions: ['xlsx'],
-          },
-        ],
-        defaultPath: `BAST - ${userName} - ${monthNameIndo}.xlsx`,
-      })
-
-      if (filePath) {
-        await writeFile(filePath, uint8Array)
-        return true
-      }
-      return false
+      const userName = settings.user_name || 'Worker'
+      const defaultFileName = `BAST - ${userName} - ${monthNameIndo}.xlsx`
+      return await saveWorkbook(workbook, defaultFileName)
     } catch (error) {
       console.error('BAST Excel Export failed:', error)
       throw error

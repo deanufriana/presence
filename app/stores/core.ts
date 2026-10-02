@@ -169,20 +169,19 @@ export const useCoreStore = defineStore('core', () => {
     selectedDate.value = format(subYears(current, 1), 'yyyy-MM')
   }
 
-  async function syncAllActivities(force = true) {
+  /** Re-reads every activity cache from the local DB. Assumes `pending` is already handled. */
+  async function refreshActivityCaches() {
+    await Promise.all([
+      useCalendarStore().fetchCalendarEvents(),
+      useGitlabStore().fetchGitlabCache(),
+      useJiraStore().fetchJiraCache(),
+    ])
+  }
+
+  async function fetchAllActivities() {
     pending.value = true
     try {
-      const { syncGitLabEvents } = await import('~/utils/gitlab')
-      const { syncJiraActivities } = await import('~/utils/jira')
-
-      const [gitlab, jira] = await Promise.all([
-        syncGitLabEvents(selectedDate.value, force),
-        syncJiraActivities(selectedDate.value, force),
-      ])
-
-      useGitlabStore().setCache(gitlab)
-      useJiraStore().setCache(jira)
-      success('Activities synced successfully')
+      await refreshActivityCaches()
     } catch (err) {
       console.error('Failed to sync activities:', err)
       error('Failed to sync activities')
@@ -191,14 +190,52 @@ export const useCoreStore = defineStore('core', () => {
     }
   }
 
-  async function fetchAllActivities() {
+  /**
+   * Pulls fresh data from the configured sources. Defaults to syncing both, so
+   * existing callers that pass only `force` keep their current behaviour.
+   *
+   * Calendar is intentionally absent: it has no remote source, it is populated
+   * by importing an .ics file, so it is refreshed from the DB instead.
+   */
+  async function syncAllActivities(force = true, sources?: { gitlab?: boolean; jira?: boolean }) {
+    const wantGitLab = sources?.gitlab ?? true
+    const wantJira = sources?.jira ?? true
+
+    if (!wantGitLab && !wantJira) {
+      error('Select at least one source to sync')
+      return
+    }
+
     pending.value = true
     try {
-      await Promise.all([
-        useCalendarStore().fetchCalendarEvents(),
-        useGitlabStore().fetchGitlabCache(),
-        useJiraStore().fetchJiraCache(),
-      ])
+      const jobs: Promise<void>[] = []
+
+      if (wantGitLab) {
+        jobs.push(
+          (async () => {
+            const { syncGitLabEvents } = await import('~/utils/gitlab')
+            const gitlab = await syncGitLabEvents(selectedDate.value, force)
+            useGitlabStore().setCache(gitlab)
+          })(),
+        )
+      }
+
+      if (wantJira) {
+        jobs.push(
+          (async () => {
+            const { syncJiraActivities } = await import('~/utils/jira')
+            const jira = await syncJiraActivities(selectedDate.value, force)
+            useJiraStore().setCache(jira)
+          })(),
+        )
+      }
+
+      await Promise.all(jobs)
+      // Re-read every cache so the sources left untouched stay consistent with the DB.
+      await refreshActivityCaches()
+
+      const synced = [wantGitLab && 'GitLab', wantJira && 'Jira'].filter(Boolean).join(' + ')
+      success(`${synced} synced successfully`)
     } catch (err) {
       console.error('Failed to sync activities:', err)
       error('Failed to sync activities')

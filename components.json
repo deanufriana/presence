@@ -3,8 +3,8 @@
   "style": "default",
   "typescript": true,
   "tailwind": {
-    "config": "tailwind.config.js",
-    "css": "app/assets/css/tailwind.css",
+    "config": "",
+    "css": "app/assets/css/main.css",
     "baseColor": "slate",
     "cssVariables": true
   },

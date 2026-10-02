@@ -206,8 +206,10 @@ const handleBastExport = async () => {
       status: r.keterangan,
     }))
 
-    await exportBASTToExcel(mappedRows, selectedDate.value, coreStore.settings)
-    success('BAST document exported to Excel!')
+    const saved = await exportBASTToExcel(mappedRows, selectedDate.value, coreStore.settings)
+    if (saved) {
+      success('BAST document exported to Excel!')
+    }
   } catch {
     error('Failed to export BAST document')
   }

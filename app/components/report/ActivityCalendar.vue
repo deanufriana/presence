@@ -32,15 +32,35 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
+            <!-- Pick which sources the next sync should pull -->
+            <button
+              v-for="opt in syncOptions"
+              :key="opt.key"
+              type="button"
+              class="flex items-center gap-1.5 h-6 px-2 rounded-md border text-[10px] font-bold uppercase tracking-wider transition-colors"
+              :class="
+                opt.enabled
+                  ? opt.activeClass
+                  : 'border-border/50 text-muted-foreground hover:bg-muted'
+              "
+              :title="opt.hint"
+              :aria-pressed="opt.enabled"
+              @click="toggleSource(opt.key)"
+            >
+              <span class="size-1.5 rounded-sm" :class="opt.dotClass" />
+              {{ opt.label }}
+              <Check v-if="opt.enabled" class="size-2.5" />
+            </button>
+
             <Button
               variant="outline"
               size="xs"
-              :disabled="syncingAll"
+              :disabled="syncingAll || !canSync"
               class="border-border/50"
-              @click="syncAllActivities()"
+              @click="handleSync"
             >
               <RefreshCw :class="{ 'animate-spin': syncingAll }" data-icon="inline-start" />
-              Sync All
+              {{ syncButtonLabel }}
             </Button>
           </div>
         </div>
@@ -250,7 +270,8 @@ import { storeToRefs } from 'pinia'
 import { useCoreStore } from '~/stores/core'
 import { useDailyStore } from '~/stores/daily'
 import { useCalendarStore } from '~/stores/calendar'
-import { CalendarRange, RefreshCw, Trash2 } from 'lucide-vue-next'
+import { CalendarRange, Check, RefreshCw, Trash2 } from 'lucide-vue-next'
+import { useLocalStorage } from '@vueuse/core'
 import { Button } from '~/components/ui/button'
 import { isWeekend } from 'date-fns'
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card'
@@ -266,6 +287,55 @@ const { openManualEntry, deleteActivity, syncDayActivity } = dailyStore
 const { calendarBlanks, calendarDays } = storeToRefs(calendarStore)
 const { syncingRows } = storeToRefs(dailyStore)
 const { pending: syncingAll, dateDisplay, selectedDate } = storeToRefs(coreStore)
+
+type SyncSourceKey = 'gitlab' | 'jira'
+
+// Persisted so the choice survives restarts. Calendar is not listed because it
+// has no remote source to sync - it comes from an imported .ics file.
+const syncSources = useLocalStorage<Record<SyncSourceKey, boolean>>('presence.syncSources', {
+  gitlab: true,
+  jira: true,
+})
+
+const syncOptions = computed(() => [
+  {
+    key: 'gitlab' as const,
+    label: 'GitLab',
+    enabled: syncSources.value.gitlab,
+    dotClass: 'bg-orange-500',
+    activeClass: 'border-orange-500/40 bg-orange-500/10 text-orange-600 dark:text-orange-400',
+    hint: 'Include GitLab commits in the next sync',
+  },
+  {
+    key: 'jira' as const,
+    label: 'Jira',
+    enabled: syncSources.value.jira,
+    dotClass: 'bg-blue-600',
+    activeClass: 'border-blue-500/40 bg-blue-500/10 text-blue-600 dark:text-blue-400',
+    hint: 'Include Jira issues in the next sync',
+  },
+])
+
+const canSync = computed(() => syncSources.value.gitlab || syncSources.value.jira)
+
+const syncButtonLabel = computed(() => {
+  const { gitlab, jira } = syncSources.value
+  if (gitlab && jira) return 'Sync All'
+  if (gitlab) return 'Sync GitLab'
+  if (jira) return 'Sync Jira'
+  return 'Sync'
+})
+
+const toggleSource = (key: SyncSourceKey) => {
+  syncSources.value = { ...syncSources.value, [key]: !syncSources.value[key] }
+}
+
+const handleSync = () => {
+  syncAllActivities(true, {
+    gitlab: syncSources.value.gitlab,
+    jira: syncSources.value.jira,
+  })
+}
 
 // ─── Class Helpers ────────────────────────────────
 const getDayContainerClasses = (day: CalendarDay) => {

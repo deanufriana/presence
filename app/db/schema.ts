@@ -75,6 +75,7 @@ export const monthlyReports = sqliteTable('MonthlyReport', {
   done: text('done'),
   status: text('status'),
   sources: text('sources'),
+  jiraKeys: text('jiraKeys'),
   createdAt: integer('createdAt', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),
@@ -106,6 +107,7 @@ export const jiraActivities = sqliteTable('JiraActivity', {
   type: text('type').notNull(),
   status: text('status'),
   projectName: text('projectName'),
+  projectKey: text('projectKey'),
   updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
   userEmail: text('userEmail').notNull(),
   webUrl: text('webUrl'),

@@ -3,7 +3,11 @@ import type { MonthlyReportRow } from '~/types/report'
 import type { JiraEvent } from '~/types/jira'
 import type { SettingsData } from '~/types/settings'
 import { getSetting } from '~/queries/settings'
-import { getJiraActivitiesByPeriod, upsertJiraActivity } from '~/queries/jira'
+import {
+  getJiraActivitiesByPeriod,
+  upsertJiraActivity,
+  deleteJiraActivitiesOutsideProjects,
+} from '~/queries/jira'
 
 export interface JiraConfig {
   baseUrl: string
@@ -29,7 +33,7 @@ export interface JiraIssue {
     summary: string
     issuetype: { name: string }
     status: { name: string }
-    project: { name: string }
+    project: { name: string; key: string }
     updated: string
   }
 }
@@ -137,6 +141,9 @@ export async function fetchJira<T = unknown>(
 
   return (await response.json()) as T
 }
+
+const JIRA_PAGE_SIZE = 100
+const JIRA_MAX_PAGES = 20
 
 export async function getJiraProjects(config: JiraConfig): Promise<JiraProject[]> {
   return await fetchJira<JiraProject[]>('project', config)
@@ -347,12 +354,49 @@ export async function syncJiraActivities(dateStr: string, force: boolean = false
 
   if (!config.baseUrl) return { success: true, events: [], date: dateStr }
 
-  // JQL for updated issues by current user in the month
-  const jql = `updated >= "${firstDayStr}" AND updated <= "${lastDayStr}" AND assignee = currentUser() ORDER BY updated DESC`
-  const data = await fetchJira<{ issues: JiraIssue[] }>('search/jql', config, {
-    query: { jql, maxResults: 100, fields: 'summary,issuetype,status,project,updated' },
-  })
-  const issues = data.issues || []
+  // Restrict to the project keys configured under Settings > Jira > Allowed Projects.
+  // Keys are free text from the user, so quotes/backslashes are escaped before
+  // being interpolated into the JQL.
+  const allowedSetting = await getSetting('jira_selected_projects')
+  const allowedKeys = (allowedSetting || '')
+    .split(',')
+    .map((k) => k.trim().toUpperCase())
+    .filter(Boolean)
+
+  const jqlKeys = allowedKeys.map((k) => `"${k.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`)
+  const projectClause = jqlKeys.length ? ` AND project in (${jqlKeys.join(', ')})` : ''
+
+  // Every issue updated in the month, scoped to allowed projects when configured
+  const jql = `updated >= "${firstDayStr}" AND updated <= "${lastDayStr}"${projectClause} ORDER BY updated DESC`
+  // The enhanced search endpoint is token-paginated: pass nextPageToken back in
+  // until isLast is true. Capped so a runaway result set cannot hang the sync.
+  const byId = new Map<string, JiraIssue>()
+  let token: string | undefined
+  let page = 0
+
+  do {
+    const query: Record<string, string | number | boolean> = {
+      jql,
+      maxResults: JIRA_PAGE_SIZE,
+      fields: 'summary,issuetype,status,project,updated',
+    }
+    if (token) query.nextPageToken = token
+
+    const data = await fetchJira<{
+      issues?: JiraIssue[]
+      isLast?: boolean
+      nextPageToken?: string
+    }>('search/jql', config, { query })
+
+    for (const issue of data.issues || []) byId.set(issue.id, issue)
+    page++
+
+    const next = data.isLast ? undefined : data.nextPageToken
+    // Bail out if Jira omits the token or repeats one, which would loop forever.
+    token = next && next !== token ? next : undefined
+  } while (token && page < JIRA_MAX_PAGES)
+
+  const issues = [...byId.values()]
   const events: JiraEvent[] = issues.map((issue) => ({
     id: issue.id,
     key: issue.key,
@@ -360,6 +404,7 @@ export async function syncJiraActivities(dateStr: string, force: boolean = false
     type: issue.fields.issuetype.name,
     status: issue.fields.status.name,
     project_name: issue.fields.project.name,
+    project_key: issue.fields.project.key,
     updated_at: issue.fields.updated,
     user_email: config.email,
     web_url: `${config.baseUrl}/browse/${issue.key}`,
@@ -367,6 +412,13 @@ export async function syncJiraActivities(dateStr: string, force: boolean = false
 
   for (const event of events) {
     await upsertJiraActivity(event)
+  }
+
+  // Prune anything already cached for this month that the filter now excludes.
+  if (allowedKeys.length) {
+    const { getMonthRange } = await import('./dates')
+    const { firstDay, lastDay } = getMonthRange(dateStr)
+    await deleteJiraActivitiesOutsideProjects(firstDay, lastDay, allowedKeys)
   }
 
   return { success: true, events, date: dateStr }
@@ -385,6 +437,7 @@ export async function getJiraCache(dateStr: string) {
     type: a.type,
     status: a.status,
     project_name: a.projectName,
+    project_key: a.projectKey,
     updated_at: a.updatedAt.toISOString(),
     user_email: a.userEmail,
     web_url: a.webUrl,

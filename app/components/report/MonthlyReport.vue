@@ -271,20 +271,163 @@
                 </Select>
               </Field>
             </FieldGroup>
+
+            <!-- Jira Issues (manually linked) -->
+            <div class="rounded-lg border border-blue-500/20 bg-blue-500/5">
+              <div class="flex items-center gap-2 px-2.5 py-1.5">
+                <Trello class="size-3 shrink-0 text-blue-600 dark:text-blue-400" />
+                <span
+                  class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400"
+                >
+                  Jira Issues
+                </span>
+                <Badge
+                  v-if="row.jiraKeys?.length"
+                  variant="secondary"
+                  class="h-4 px-1.5 text-[9px] font-black bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/20 rounded-full"
+                >
+                  {{ row.jiraKeys.length }}
+                </Badge>
+
+                <Popover
+                  :open="openJiraRow === index"
+                  @update:open="(v: boolean) => (openJiraRow = v ? index : null)"
+                >
+                  <PopoverTrigger as-child>
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      class="ml-auto h-6 px-2 text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-500/15"
+                    >
+                      <Plus class="size-3" />
+                      Link Issue
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" class="w-80 p-0">
+                    <div class="flex items-center gap-2 p-2 border-b border-border/60">
+                      <Input
+                        :model-value="jiraSearch[index] || ''"
+                        placeholder="Search key, summary, project, status..."
+                        class="h-7 text-xs"
+                        @update:model-value="(v) => (jiraSearch[index] = String(v))"
+                      />
+                      <button
+                        type="button"
+                        class="shrink-0 flex items-center gap-1 h-6 px-1.5 rounded border text-[9px] font-bold uppercase tracking-wider transition-colors"
+                        :class="
+                          hideDoneIssues
+                            ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                            : 'border-border/50 text-muted-foreground hover:bg-muted'
+                        "
+                        :aria-pressed="hideDoneIssues"
+                        title="Only list issues that are not finished"
+                        @click="hideDoneIssues = !hideDoneIssues"
+                      >
+                        <Check v-if="hideDoneIssues" class="size-2.5" />
+                        Not Done
+                      </button>
+                    </div>
+                    <div class="max-h-64 overflow-y-auto p-1">
+                      <div
+                        v-if="!allJiraEvents.length"
+                        class="px-2 py-4 text-[10px] text-muted-foreground text-center"
+                      >
+                        No Jira issues loaded. Run &quot;Sync All&quot; for this month first.
+                      </div>
+                      <div
+                        v-else-if="!filteredJiraEvents(index).length"
+                        class="px-2 py-4 text-[10px] text-muted-foreground text-center"
+                      >
+                        <template v-if="jiraSearch[index]">
+                          No issues match &quot;{{ jiraSearch[index] }}&quot;.
+                        </template>
+                        <template v-else-if="hiddenDoneCount">
+                          All {{ allJiraEvents.length }} issues are finished. Turn off &quot;Not
+                          Done&quot; to see them.
+                        </template>
+                      </div>
+                      <label
+                        v-for="ev in filteredJiraEvents(index)"
+                        :key="ev.id"
+                        class="flex items-start gap-2 rounded px-2 py-1.5 cursor-pointer hover:bg-blue-500/10"
+                      >
+                        <Checkbox
+                          :model-value="isJiraLinked(row, ev.key)"
+                          class="mt-0.5"
+                          @update:model-value="toggleJiraKey(row, ev.key)"
+                        />
+                        <span class="min-w-0 flex-1">
+                          <span class="flex items-center gap-1.5 flex-wrap">
+                            <span class="font-mono font-bold text-blue-600 dark:text-blue-400">
+                              {{ ev.key }}
+                            </span>
+                            <span
+                              v-if="isSuggested(index, ev.key)"
+                              class="text-[8px] font-bold uppercase tracking-wider px-1 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                            >
+                              suggested
+                            </span>
+                          </span>
+                          <span class="block text-[10px] leading-tight">{{ ev.summary }}</span>
+                          <span
+                            v-if="ev.project_name || ev.type || ev.status"
+                            class="block text-[9px] text-muted-foreground/70"
+                          >
+                            {{ [ev.project_name, ev.type, ev.status].filter(Boolean).join(' • ') }}
+                          </span>
+                        </span>
+                      </label>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <!-- Linked issues -->
+              <div
+                v-if="row.jiraKeys?.length"
+                class="border-t border-blue-500/20 px-2.5 py-2 flex flex-wrap gap-1.5"
+              >
+                <Badge
+                  v-for="key in row.jiraKeys"
+                  :key="key"
+                  variant="secondary"
+                  class="h-5 pl-1.5 pr-1 gap-1 text-[9px] font-mono font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/20"
+                  :title="jiraSummary(key)"
+                >
+                  {{ key }}
+                  <button
+                    type="button"
+                    class="rounded p-0.5 hover:bg-blue-500/25 transition-colors"
+                    :aria-label="`Unlink ${key}`"
+                    @click="removeJiraKey(row, key)"
+                  >
+                    <X class="size-2.5" />
+                  </button>
+                </Badge>
+              </div>
+
+              <!-- Date-based suggestions -->
+              <div
+                v-else-if="suggestedByRow[index]?.size"
+                class="border-t border-blue-500/20 px-2.5 py-1.5 flex items-center gap-2"
+              >
+                <span class="text-[9px] text-muted-foreground">
+                  {{ suggestedByRow[index].size }} issue(s) touched on this row's dates
+                </span>
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  class="ml-auto h-5 px-1.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15"
+                  @click="linkSuggested(row, index)"
+                >
+                  Link all
+                </Button>
+              </div>
+            </div>
           </div>
         </template>
 
-        <template #actions="{ item: row, index }">
-          <Button
-            variant="ghost"
-            size="icon"
-            class="size-9 rounded-xl text-blue-500 bg-blue-500/5 hover:bg-blue-500/20 hover:text-blue-600 transition-all duration-200"
-            title="Push to Jira"
-            @click="pushRowToJira(row)"
-          >
-            <Trello />
-          </Button>
-
+        <template #actions="{ index }">
           <Button
             variant="ghost"
             size="icon"
@@ -321,6 +464,8 @@ import { Badge } from '~/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 import { Field, FieldGroup, FieldLabel } from '~/components/ui/field'
 import { Input } from '~/components/ui/input'
+import { Checkbox } from '~/components/ui/checkbox'
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover'
 import { Textarea } from '~/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '~/components/ui/card'
@@ -337,21 +482,106 @@ import { useCoreStore } from '~/stores/core'
 import { useMonthlyStore } from '~/stores/monthly'
 import { useDailyStore } from '~/stores/daily'
 import { useJiraStore } from '~/stores/jira'
-import type { MonthlyReportRow } from '~/types/report'
 import { calculateMandaysAllocation } from '~/utils/mandays'
+import { format } from 'date-fns'
+import { useLocalStorage } from '@vueuse/core'
+import type { JiraEvent } from '~/types/jira'
+import type { MonthlyReportRow } from '~/types/report'
 
 const coreStore = useCoreStore()
 const monthlyStore = useMonthlyStore()
 const dailyStore = useDailyStore()
 const jiraStore = useJiraStore()
 
-const pushRowToJira = (row: MonthlyReportRow) => {
-  jiraStore.triggerRowJiraExport(row, selectedDate.value)
-}
-
 const { isAiEnabled, selectedDate, dateDisplay, formatMonth } = storeToRefs(coreStore)
 const { monthlyRows, monthlyHighlights, summarizing, isLoading } = storeToRefs(monthlyStore)
 const { dailyTable } = storeToRefs(dailyStore)
+const { jiraData } = storeToRefs(jiraStore)
+
+// Every Jira issue synced for the selected month, newest activity first.
+const allJiraEvents = computed<JiraEvent[]>(() => {
+  const events = jiraData.value?.events || []
+  return [...events].sort(
+    (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+  )
+})
+
+const jiraEventByKey = computed(() => {
+  const map = new Map<string, JiraEvent>()
+  for (const ev of allJiraEvents.value) map.set(ev.key, ev)
+  return map
+})
+
+// Issues whose activity date overlaps a row's attributed dates. Purely a hint to
+// speed up manual linking - the actual links live in row.jiraKeys.
+const suggestedByRow = computed<Set<string>[]>(() =>
+  monthlyRows.value.map((row) => {
+    const found = new Set<string>()
+    if (!row.sources?.length) return found
+
+    const sourceSet = new Set(row.sources)
+    for (const ev of allJiraEvents.value) {
+      try {
+        // Local-time key, matching how dates are bucketed everywhere else.
+        if (sourceSet.has(format(new Date(ev.updated_at), 'yyyy-MM-dd'))) found.add(ev.key)
+      } catch {
+        // Ignore unparsable dates
+      }
+    }
+    return found
+  }),
+)
+
+// Statuses treated as finished. Jira workflows differ per board, so this covers
+// the common terminal names plus the Indonesian "Selesai".
+const DONE_STATUSES = new Set(['done', 'closed', 'resolved', 'complete', 'completed', 'selesai'])
+
+const isIssueDone = (ev: JiraEvent) => DONE_STATUSES.has((ev.status || '').trim().toLowerCase())
+
+// Defaults on: for a monthly report the open issues are the useful ones.
+const hideDoneIssues = useLocalStorage('presence.hideDoneJira', true)
+
+const selectableJiraEvents = computed(() =>
+  hideDoneIssues.value ? allJiraEvents.value.filter((ev) => !isIssueDone(ev)) : allJiraEvents.value,
+)
+
+const hiddenDoneCount = computed(
+  () => allJiraEvents.value.length - selectableJiraEvents.value.length,
+)
+
+const jiraSearch = ref<Record<number, string>>({})
+const openJiraRow = ref<number | null>(null)
+
+const isJiraLinked = (row: MonthlyReportRow, key: string) => !!row.jiraKeys?.includes(key)
+
+const isSuggested = (index: number, key: string) => !!suggestedByRow.value[index]?.has(key)
+
+function toggleJiraKey(row: MonthlyReportRow, key: string) {
+  const current = row.jiraKeys || []
+  row.jiraKeys = current.includes(key) ? current.filter((k) => k !== key) : [...current, key]
+}
+
+const removeJiraKey = (row: MonthlyReportRow, key: string) => {
+  row.jiraKeys = (row.jiraKeys || []).filter((k) => k !== key)
+}
+
+const linkSuggested = (row: MonthlyReportRow, index: number) => {
+  const suggested = [...(suggestedByRow.value[index] || [])]
+  row.jiraKeys = [...new Set([...(row.jiraKeys || []), ...suggested])]
+}
+
+const jiraSummary = (key: string) => jiraEventByKey.value.get(key)?.summary || 'Linked issue'
+
+const filteredJiraEvents = (index: number) => {
+  const q = (jiraSearch.value[index] || '').trim().toLowerCase()
+  if (!q) return selectableJiraEvents.value
+
+  return selectableJiraEvents.value.filter((ev) =>
+    [ev.key, ev.summary, ev.project_name, ev.status, ev.type]
+      .filter(Boolean)
+      .some((field) => String(field).toLowerCase().includes(q)),
+  )
+}
 
 const { generateAiSummary, addMonthlyRow, removeMonthlyRow, fetchMonthlyReport } = monthlyStore
 const { exportTaskJob, exportingDocx } = useDocxExport()

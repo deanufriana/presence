@@ -18,9 +18,9 @@ export async function getDb() {
       'CREATE TABLE IF NOT EXISTS GitLabCommit (id TEXT PRIMARY KEY, shortId TEXT NOT NULL, title TEXT NOT NULL, message TEXT, authorName TEXT NOT NULL, authorEmail TEXT NOT NULL, authoredDate INTEGER NOT NULL, committerName TEXT NOT NULL, committerEmail TEXT NOT NULL, committedDate INTEGER NOT NULL, webUrl TEXT NOT NULL, projectName TEXT NOT NULL, projectPath TEXT NOT NULL, projectId INTEGER NOT NULL, branchName TEXT, branchNames TEXT, actionName TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
       'CREATE TABLE IF NOT EXISTS CalendarEvent (id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, summary TEXT NOT NULL, startTime TEXT, endTime TEXT, updatedAt INTEGER NOT NULL)',
       'CREATE TABLE IF NOT EXISTS DailyReport (id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT UNIQUE NOT NULL, masuk TEXT, pulang TEXT, ti TEXT, aktivitas TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
-      'CREATE TABLE IF NOT EXISTS MonthlyReport (id INTEGER PRIMARY KEY AUTOINCREMENT, month TEXT NOT NULL, project TEXT, progres TEXT, done TEXT, status TEXT, sources TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
+      'CREATE TABLE IF NOT EXISTS MonthlyReport (id INTEGER PRIMARY KEY AUTOINCREMENT, month TEXT NOT NULL, project TEXT, progres TEXT, done TEXT, status TEXT, sources TEXT, jiraKeys TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
       'CREATE TABLE IF NOT EXISTS SummaryLog (id INTEGER PRIMARY KEY AUTOINCREMENT, period TEXT UNIQUE NOT NULL, summary TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
-      'CREATE TABLE IF NOT EXISTS JiraActivity (id TEXT PRIMARY KEY, key TEXT NOT NULL, summary TEXT NOT NULL, type TEXT NOT NULL, status TEXT, projectName TEXT, updatedAt INTEGER NOT NULL, userEmail TEXT NOT NULL, webUrl TEXT)',
+      'CREATE TABLE IF NOT EXISTS JiraActivity (id TEXT PRIMARY KEY, key TEXT NOT NULL, summary TEXT NOT NULL, type TEXT NOT NULL, status TEXT, projectName TEXT, projectKey TEXT, updatedAt INTEGER NOT NULL, userEmail TEXT NOT NULL, webUrl TEXT)',
       'CREATE TABLE IF NOT EXISTS YearlyReport (id INTEGER PRIMARY KEY AUTOINCREMENT, year TEXT NOT NULL, tanggal TEXT, month TEXT, task TEXT, deliverable TEXT, status TEXT, keterangan TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
       'CREATE TABLE IF NOT EXISTS Holiday (id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, name TEXT NOT NULL, is_holiday INTEGER NOT NULL, type TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
       'CREATE TABLE IF NOT EXISTS JiraExportData (id INTEGER PRIMARY KEY AUTOINCREMENT, month TEXT NOT NULL, project TEXT NOT NULL, description TEXT, childTasks TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)',
@@ -40,6 +40,23 @@ export async function getDb() {
     for (const q of queries) {
       await sqlite.execute(q)
     }
+
+    // Additive migrations. The CREATE TABLE IF NOT EXISTS statements above are
+    // no-ops on databases that already exist, so new columns must be added here.
+    const monthlyReportColumns = await sqlite.select<{ name: string }[]>(
+      'PRAGMA table_info(MonthlyReport)',
+    )
+    if (!monthlyReportColumns.some((c) => c.name === 'jiraKeys')) {
+      await sqlite.execute('ALTER TABLE MonthlyReport ADD COLUMN jiraKeys TEXT')
+    }
+
+    const jiraActivityColumns = await sqlite.select<{ name: string }[]>(
+      'PRAGMA table_info(JiraActivity)',
+    )
+    if (!jiraActivityColumns.some((c) => c.name === 'projectKey')) {
+      await sqlite.execute('ALTER TABLE JiraActivity ADD COLUMN projectKey TEXT')
+    }
+
     _initialized = true
   }
 

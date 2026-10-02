@@ -130,6 +130,7 @@ export const useJiraStore = defineStore('jira', () => {
           type: a.type,
           status: a.status,
           project_name: a.projectName,
+          project_key: a.projectKey,
           updated_at: a.updatedAt.toISOString(),
           user_email: a.userEmail,
           web_url: a.webUrl,

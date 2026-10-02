@@ -13,13 +13,16 @@ export function parseProjectText(project: string): { key: string; summary: strin
   return { key: project.trim(), summary: project.trim() }
 }
 
-export function stripMarkdownCodeBlock(text: string): string {
-  let clean = text.trim()
-
-  // Remove thinking blocks if present
-  if (clean.includes('</think>')) {
-    clean = clean.split('</think>').pop()?.trim() || clean
+export function stripThinking(text: string): string {
+  if (!text) return ''
+  if (text.includes('</think>')) {
+    return text.split('</think>').pop()?.trim() || text
   }
+  return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim()
+}
+
+export function stripMarkdownCodeBlock(text: string): string {
+  let clean = stripThinking(text)
 
   // Try to find markdown code block first
   const blockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/i

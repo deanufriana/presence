@@ -2,6 +2,16 @@ import { getDb, schema } from '~/db'
 import { eq, sql, asc, gte, lte, and } from 'drizzle-orm'
 import type { MonthlyReportRow, YearlyReportRow } from '~/types/report'
 
+function parseStringArray(value: string | null | undefined): string[] {
+  if (!value) return []
+  try {
+    const parsed = JSON.parse(value)
+    return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : []
+  } catch {
+    return []
+  }
+}
+
 export async function getDailyReports(datePrefix: string) {
   const db = await getDb()
   return await db.query.dailyReports.findMany({
@@ -26,6 +36,7 @@ export async function getMonthlyReport(month: string) {
     rows: rows.map((r) => ({
       ...r,
       sources: r.sources ? JSON.parse(r.sources) : [],
+      jiraKeys: parseStringArray(r.jiraKeys),
     })),
     summary: summaryLog?.summary || '',
   }
@@ -97,6 +108,7 @@ export async function upsertMonthlyReport(
           done: row.done,
           status: row.status,
           sources: row.sources ? JSON.stringify(row.sources) : null,
+          jiraKeys: row.jiraKeys && row.jiraKeys.length ? JSON.stringify(row.jiraKeys) : null,
           createdAt: new Date(),
           updatedAt: new Date(),
         })),

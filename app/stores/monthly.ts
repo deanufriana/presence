@@ -78,10 +78,12 @@ export const useMonthlyStore = defineStore('monthly', () => {
         )
       }
 
+      const rowsWithJira = preserveJiraKeys(monthlyRows.value, rows)
+
       const report = await upsertMonthlyReport({
         month: core.selectedDate,
         summary: rawContent.trim(),
-        rows,
+        rows: rowsWithJira,
       })
 
       if (report) {
@@ -156,6 +158,27 @@ export const useMonthlyStore = defineStore('monthly', () => {
     }
   }
 
+  /**
+   * AI regeneration replaces every row wholesale, which would silently wipe the
+   * Jira keys linked by hand. Carry them across by matching project text, with
+   * an index fallback for rows the AI reworded.
+   */
+  function preserveJiraKeys(
+    prev: MonthlyReportRow[],
+    next: MonthlyReportRow[],
+  ): MonthlyReportRow[] {
+    const byProject = new Map<string, string[]>()
+    for (const row of prev) {
+      const norm = (row.project || '').trim().toUpperCase()
+      if (norm && row.jiraKeys?.length) byProject.set(norm, row.jiraKeys)
+    }
+
+    return next.map((row, i) => {
+      const jiraKeys = byProject.get((row.project || '').trim().toUpperCase()) ?? prev[i]?.jiraKeys
+      return jiraKeys?.length ? { ...row, jiraKeys: [...jiraKeys] } : row
+    })
+  }
+
   function addMonthlyRow(monthName?: string) {
     monthlyRows.value.push({
       month: monthName || '',
@@ -163,6 +186,7 @@ export const useMonthlyStore = defineStore('monthly', () => {
       progres: '100%',
       done: 'Done',
       status: 'Project',
+      jiraKeys: [],
     })
   }
 

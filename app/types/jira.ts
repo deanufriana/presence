@@ -5,6 +5,7 @@ export interface JiraEvent {
   type: string
   status: string | null
   project_name: string | null
+  project_key: string | null
   updated_at: string
   web_url: string | null
   user_email: string

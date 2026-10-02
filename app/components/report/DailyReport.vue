@@ -384,8 +384,10 @@ const getRowClass = (row: OptimizedReportRow) => {
 
 const handleExport = async () => {
   try {
-    await exportToExcel(dailyTable.value, dateDisplay.value, coreStore.settings)
-    success('Report exported successfully!')
+    const saved = await exportToExcel(dailyTable.value, dateDisplay.value, coreStore.settings)
+    if (saved) {
+      success('Report exported successfully!')
+    }
   } catch (_err) {
     console.error('Export failed:', _err)
   }

@@ -1,5 +1,5 @@
 import { getDb, schema } from '~/db'
-import { gte, lte, and } from 'drizzle-orm'
+import { gte, lte, and, or, isNull, notInArray } from 'drizzle-orm'
 import type { JiraEvent } from '~/types/jira'
 
 export async function getJiraActivitiesByPeriod(firstDay: Date, lastDay: Date) {
@@ -24,6 +24,7 @@ export async function upsertJiraActivity(event: JiraEvent) {
       type: event.type,
       status: event.status,
       projectName: event.project_name,
+      projectKey: event.project_key,
       updatedAt: new Date(event.updated_at),
       userEmail: event.user_email,
       webUrl: event.web_url,
@@ -36,11 +37,40 @@ export async function upsertJiraActivity(event: JiraEvent) {
         type: event.type,
         status: event.status,
         projectName: event.project_name,
+        projectKey: event.project_key,
         updatedAt: new Date(event.updated_at),
         userEmail: event.user_email,
         webUrl: event.web_url,
       },
     })
+}
+
+/**
+ * Drops synced rows in the period that no longer belong to any allowed project.
+ * Rows written before project keys were stored have a NULL projectKey and are
+ * removed too, otherwise a tightened filter would keep showing stale issues.
+ */
+export async function deleteJiraActivitiesOutsideProjects(
+  firstDay: Date,
+  lastDay: Date,
+  allowedKeys: string[],
+) {
+  if (allowedKeys.length === 0) return 0
+
+  const db = await getDb()
+  const result = await db
+    .delete(schema.jiraActivities)
+    .where(
+      and(
+        gte(schema.jiraActivities.updatedAt, firstDay),
+        lte(schema.jiraActivities.updatedAt, lastDay),
+        or(
+          isNull(schema.jiraActivities.projectKey),
+          notInArray(schema.jiraActivities.projectKey, allowedKeys),
+        ),
+      ),
+    )
+  return result.rowsAffected ?? 0
 }
 
 export async function getJiraActivitiesByDates(dates: string[]) {

@@ -13,6 +13,8 @@ export interface MonthlyReportRow {
   done: string
   status: string
   sources?: string[]
+  /** Jira issue keys manually linked to this row. */
+  jiraKeys?: string[]
 }
 
 export interface YearlyReportRow {

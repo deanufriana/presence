@@ -52,10 +52,10 @@ export async function getGitLabConfig(): Promise<GitLabConfig> {
   }
 }
 
-export async function fetchGitLab<T = unknown>(
+async function fetchGitLabResponse<T = unknown>(
   path: string,
   query: Record<string, string | number | boolean> = {},
-): Promise<T> {
+): Promise<{ data: T; nextPage: number | null }> {
   const config = await getGitLabConfig()
   if (!config.token) {
     throw new Error('GitLab Token is missing in configuration')
@@ -72,7 +72,22 @@ export async function fetchGitLab<T = unknown>(
     throw new Error(`GitLab API error: ${response.statusText}`)
   }
 
-  return (await response.json()) as T
+  // The Commits API omits x-total / x-total-pages, but x-next-page is still sent.
+  const rawNextPage = response.headers.get('x-next-page')?.trim()
+  const parsedNextPage = rawNextPage ? Number(rawNextPage) : NaN
+
+  return {
+    data: (await response.json()) as T,
+    nextPage: Number.isInteger(parsedNextPage) && parsedNextPage > 0 ? parsedNextPage : null,
+  }
+}
+
+export async function fetchGitLab<T = unknown>(
+  path: string,
+  query: Record<string, string | number | boolean> = {},
+): Promise<T> {
+  const { data } = await fetchGitLabResponse<T>(path, query)
+  return data
 }
 
 export async function getGitLabUser(): Promise<RawGitLabUser> {
@@ -92,14 +107,64 @@ export async function getProjectDetails(projectId: number): Promise<RawGitLabPro
   return await fetchGitLab<RawGitLabProject>(`projects/${projectId}`)
 }
 
+export interface ProjectCommitsQuery {
+  since?: string
+  until?: string
+  per_page?: number
+  ref_name?: string
+  all?: boolean
+  page?: number
+}
+
+const GITLAB_PAGE_SIZE = 100
+const GITLAB_MAX_PAGES = 20
+
 export async function getProjectCommits(
   projectId: number,
-  query: { since?: string; until?: string; per_page?: number },
+  query: ProjectCommitsQuery,
 ): Promise<RawGitLabCommit[]> {
   return await fetchGitLab<RawGitLabCommit[]>(
     `projects/${projectId}/repository/commits`,
     query as Record<string, string | number | boolean>,
   )
+}
+
+/**
+ * Collects every commit in the period across all branches.
+ *
+ * GitLab resolves a missing `ref_name` to the project default branch
+ * (`ref = params[:ref_name].presence || user_project.default_branch unless params[:all]`
+ * in lib/api/commits.rb), so `all: true` is required to also pick up commits that
+ * only live on feature branches. It does not suppress `since` / `until`.
+ */
+export async function getAllProjectCommits(
+  projectId: number,
+  query: Omit<ProjectCommitsQuery, 'all' | 'page'>,
+): Promise<RawGitLabCommit[]> {
+  const perPage = query.per_page ?? GITLAB_PAGE_SIZE
+  const collected = new Map<string, RawGitLabCommit>()
+
+  let page = 1
+  while (page <= GITLAB_MAX_PAGES) {
+    const { data, nextPage } = await fetchGitLabResponse<RawGitLabCommit[]>(
+      `projects/${projectId}/repository/commits`,
+      { ...query, per_page: perPage, page, all: true } as Record<string, string | number | boolean>,
+    )
+
+    const commits = data || []
+    for (const commit of commits) {
+      collected.set(commit.id, commit)
+    }
+
+    // Prefer the header; fall back to a short page meaning "no more results".
+    const resolvedNext = nextPage ?? (commits.length < perPage ? null : page + 1)
+    if (resolvedNext === null || resolvedNext <= page) {
+      break
+    }
+    page = resolvedNext
+  }
+
+  return [...collected.values()]
 }
 
 export async function getCommitRefs(projectId: number, sha: string): Promise<RawGitLabRef[]> {
@@ -132,10 +197,9 @@ export async function syncGitLabEvents(dateStr: string, force: boolean = false) 
   const commitPromises = selectedProjectIds.map(async (projectId: number) => {
     try {
       const project = await getProjectDetails(projectId)
-      const commits = await getProjectCommits(projectId, {
+      const commits = await getAllProjectCommits(projectId, {
         since: `${firstDay}T00:00:00+07:00`,
         until: `${lastDay}T23:59:59+07:00`,
-        per_page: 100,
       })
 
       const authoredCommits = (commits || []).filter((c) => c.author_email === userEmail)

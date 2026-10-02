@@ -2,7 +2,7 @@ import { getDb, schema } from '~/db'
 import type { OllamaModel } from '~/types/ollama'
 import { eq } from 'drizzle-orm'
 import { fetch } from '@tauri-apps/plugin-http'
-import { stripMarkdownCodeBlock } from './format'
+import { stripMarkdownCodeBlock, stripThinking } from './format'
 
 export interface AiOptions {
   signal?: AbortSignal
@@ -12,14 +12,6 @@ export interface AiOptions {
   model?: string
   apiKey?: string
   ollamaUrl?: string
-}
-
-export function stripThinking(text: string): string {
-  if (!text) return ''
-  if (text.includes('</think>')) {
-    return text.split('</think>').pop()?.trim() || text
-  }
-  return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim()
 }
 
 export async function generateSummary(prompt: string, options: AiOptions = {}) {
